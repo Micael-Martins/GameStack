@@ -31,7 +31,7 @@ npm --version
 Clone o repositório e acesse a pasta do projeto:
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
+git clone https://github.com/Micael-Martins/GameStack.git
 cd GameStack
 ```
 
