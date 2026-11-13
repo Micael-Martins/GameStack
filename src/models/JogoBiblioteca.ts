@@ -8,7 +8,7 @@ export interface JogoBiblioteca {
     minutosJogados: number;
     nota: number | null;
     anotacao: string;
-    dataAdicao: number;
-    dataConclusao: number | null;
+    dataAdicao: string;
+    dataConclusao: string | null;
     ultimaInteracao: string;
 }

@@ -1,12 +1,12 @@
 export interface Jogo {
     id: string;
     apiId: string;
-    origemId: string;
+    origemAPI: string;
     nome: string;
-    imagemURL: string;
+    imagemURL: string | null;
     genero: string;
     desenvolvedora: string;
-    anoLancamento: number;
+    anoLancamento: number | null;
     tempoMedio: number;
     plataformas: string[];
 }

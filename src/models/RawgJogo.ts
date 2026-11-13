@@ -1,9 +1,9 @@
 export interface RawgJogo {
-    id: string;
+    id: number;
     name: string;
-    background_image: string;
-    released: string;
+    background_image: string | null;
+    released: string | null;
     playtime: number;
-    genres: any[];
-    platforms: any[];
+    genres: { name: string }[];
+    platforms: { platform: { name: string } }[] | null;
 }
