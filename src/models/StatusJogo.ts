@@ -1,0 +1,1 @@
+export type StatusJogo = 'NA_FILA' | 'JOGANDO' | 'CONCLUIDO' | 'ABANDONADO';
