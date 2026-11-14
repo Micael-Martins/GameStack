@@ -4,7 +4,7 @@ import test from 'node:test';
 import {
   buscarJogosRawg,
   converterRawgParaJogo,
-} from '../src/services/rawgService.ts';
+} from '../src/data/services/rawgService.ts';
 
 test('Converte os dados da RAWG para o modelo Jogo', () => {
   const jogo = converterRawgParaJogo({
