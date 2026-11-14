@@ -1,13 +1,14 @@
+import { RootStackParamList } from '@/src/navigation/tipos';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RootStackParamList } from '../../../navigation/tipos';
-import { cores, tipografia } from '../../../theme';
-import Cabecalho from '../../../views/components/Cabecalho';
-import CampoTexto from '../../../views/components/CampoTexto';
-import Interruptor from '../../../views/components/Interruptor';
-import TituloSecao from '../../../views/components/TituloSecao';
+import Cabecalho from '../Cabecalho';
+import TituloSecao from '../TituloSecao';
+import CampoTexto from '../CampoTexto';
+import { cores, tipografia } from '@/src/theme';
+import Interruptor from '../Interruptor';
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'FormularioDemo'>;
 

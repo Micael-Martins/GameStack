@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { cores } from '../../theme';
+import { cores } from '../theme';
 
 export type EstrelasProps = {
   nota?: number | null;

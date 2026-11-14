@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
-import { cores, tipografia } from '../../theme';
+import { cores, tipografia } from '../theme';
 
 type CampoTextoProps = TextInputProps & { label?: string; sufixo?: string };
 
@@ -29,10 +29,26 @@ export default function CampoTexto({ label, sufixo, style, onFocus, onBlur, mult
 
 const styles = StyleSheet.create({
   grupo: { gap: 8 },
-  label: { color: cores.texto, fontFamily: tipografia.fonte, fontSize: 13 },
-  campo: { flexDirection: 'row', alignItems: 'center', backgroundColor: cores.card, borderWidth: 1, borderColor: cores.borda, borderRadius: 12, paddingHorizontal: 12 },
+  label: { color: '#D4D4D4', fontFamily: tipografia.fontes.semiBold, fontSize: 14 },
+  campo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: cores.card,
+    borderWidth: 1,
+    borderColor: '#2E2E2E',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+  },
   focado: { borderColor: cores.texto },
-  input: { flex: 1, minWidth: 0, minHeight: 48, paddingVertical: 12, color: cores.texto, fontFamily: tipografia.fonte, fontSize: 15 },
+  input: {
+    flex: 1,
+    minWidth: 0,
+    minHeight: 52,
+    paddingVertical: 14,
+    color: cores.texto,
+    fontFamily: tipografia.fontes.regular,
+    fontSize: 16,
+  },
   multiline: { minHeight: 96, textAlignVertical: 'top' },
-  sufixo: { color: cores.textoSecundario, fontFamily: tipografia.fonte, marginLeft: 8 },
+  sufixo: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, marginLeft: 8 },
 });

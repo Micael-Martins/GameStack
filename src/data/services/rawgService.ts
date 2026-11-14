@@ -206,3 +206,27 @@ export async function buscarJogosRawg(
     opcoes.signal?.removeEventListener('abort', cancelar);
   }
 }
+
+// Capas dos jogos mais adicionados na RAWG (usadas na ilustração do onboarding).
+export async function buscarCapasPopulares(limite = 3): Promise<string[]> {
+  const chave = (await obterChavePadrao()).trim();
+  if (!chave) {
+    throw new Error('RAWG: chave da API não configurada.');
+  }
+
+  const url =
+    `${RAWG_URL}/games` +
+    `?key=${encodeURIComponent(chave)}` +
+    `&ordering=-added` +
+    `&page_size=${limite}`;
+
+  const resposta = await fetch(url, { headers: { Accept: 'application/json' } });
+  if (!resposta.ok) {
+    throw new Error(`RAWG: falha ao buscar capas (HTTP ${resposta.status}).`);
+  }
+
+  const dados: Partial<RespostaRawg> = await resposta.json();
+  return (dados.results ?? [])
+    .map((jogo) => jogo.background_image)
+    .filter((url): url is string => typeof url === 'string' && url.length > 0);
+}

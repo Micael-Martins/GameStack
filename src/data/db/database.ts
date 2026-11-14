@@ -1,17 +1,23 @@
+/*
+    Responsável por criar, abrir e configurar o banco de dados do aplicativo.
+*/
+
 import * as SQLite from 'expo-sqlite';
 import * as Crypto from 'expo-crypto';
 
 import { CRIAR_TABELAS } from './esquema';
 
+// Abre o banco, cria as tabelas e o usuário padrão (só na primeira vez).
 export const initDatabase = async () => {
   const db = await SQLite.openDatabaseAsync('backlogzero.db');
 
+  // Ativa a verificação das chaves estrangeiras.
   await db.execAsync(`PRAGMA foreign_keys = ON;`);
 
   await db.execAsync(CRIAR_TABELAS);
 
   const usuarioExistente = await db.getFirstAsync<{ id: string }>('SELECT id FROM usuario LIMIT 1');
-  
+
   if (!usuarioExistente) {
     const defaultUserId = Crypto.randomUUID();
     const defaultLibId = Crypto.randomUUID();

@@ -7,7 +7,6 @@ export const initDatabase = async () => {
     }
 }
 
-// No navegador não existe SQLite nativo: os repositórios avisam com um erro claro.
 export const obterBanco = async (): Promise<never> => {
     throw new Error('O banco SQLite só funciona no Android e no iOS.');
 };

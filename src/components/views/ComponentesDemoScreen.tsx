@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Capa from '../Capa';
+import BarraProgresso from '../BarraProgresso';
+import Estrelas from '../Estrelas';
+import { cores, espacamentos, tipografia } from '@/src/theme';
 
-import { cores, espacamentos, tipografia } from '../../../theme';
-import BarraProgresso from '../../../views/components/BarraProgresso';
-import Capa from '../../../views/components/Capa';
-import Estrelas from '../../../views/components/Estrelas';
+
 
 // PNG local em memória: a demonstração de sucesso não depende de uma API ou rede.
 const capaValida = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAECAIAAADETxJQAAAAE0lEQVR4nGO0aYhgAAMmCIWDBQAppAEcKAfBkgAAAABJRU5ErkJggg==';
