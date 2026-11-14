@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import * as Crypto from 'expo-crypto';
 
 export const initDatabase = async () => {
   const db = await SQLite.openDatabaseAsync('backlogzero.db');
@@ -53,8 +54,8 @@ export const initDatabase = async () => {
   const usuarioExistente = await db.getFirstAsync<{ id: string }>('SELECT id FROM usuario LIMIT 1');
   
   if (!usuarioExistente) {
-    const defaultUserId = crypto.randomUUID ? crypto.randomUUID() : 'user-padrao-1';
-    const defaultLibId = crypto.randomUUID ? crypto.randomUUID() : 'lib-padrao-1';
+    const defaultUserId = Crypto.randomUUID();
+    const defaultLibId = Crypto.randomUUID();
 
     await db.runAsync(
       'INSERT INTO usuario (id, nome, notificacaoAtiva) VALUES (?, ?, ?)',
