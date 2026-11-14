@@ -1,5 +1,5 @@
-import type { Jogo } from '../models/Jogo';
-import type { RawgJogo } from '../models/RawgJogo';
+import type { Jogo } from '../../models/Jogo';
+import type { RawgJogo } from '../../models/RawgJogo';
 
 const RAWG_URL = 'https://api.rawg.io/api';
 const TEMPO_LIMITE_MS = 10000;
