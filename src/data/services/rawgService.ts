@@ -16,6 +16,15 @@ export interface OpcoesBuscaRawg {
   chave?: string;
   signal?: AbortSignal;
   fetcher?: typeof fetch;
+  // De onde vem a chave quando `chave` não é passada (nos testes dá para trocar).
+  obterChave?: () => Promise<string>;
+}
+
+// Padrão: lê a chave do SecureStore (src/data/secure/credenciais.ts).
+// O import é feito só aqui dentro para os testes no Node não carregarem o Expo.
+async function obterChavePadrao(): Promise<string> {
+  const { obterChaveApi } = await import('../secure/credenciais');
+  return obterChaveApi();
 }
 
 export interface ResultadoBuscaRawg {
@@ -84,7 +93,7 @@ export async function buscarJogosRawg(
   }
 
   const chave = (
-    opcoes.chave ?? process.env.EXPO_PUBLIC_RAWG_KEY ?? ''
+    opcoes.chave ?? (await (opcoes.obterChave ?? obterChavePadrao)())
   ).trim();
 
   if (!chave) {
