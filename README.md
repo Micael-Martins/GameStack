@@ -149,3 +149,8 @@ GameStack/
 ## Licença
 
 Consulte o arquivo [LICENSE](./LICENSE).
+
+## Por que SecureStore e não AsyncStorage para a chave da RAWG?
+
+O AsyncStorage guarda texto puro, que pode ser lido por quem acessar os arquivos do app. O SecureStore usa o Keychain (iOS) e o Keystore (Android), que criptografam o valor; por isso a chave da RAWG fica nele (`src/data/secure/credenciais.ts`).
+A chave do `.env` também vai dentro do app instalado, então isso não a esconde de quem descompilar: o que mostramos é a boa prática de nunca guardar segredo em texto puro. Num app real, a chave ficaria num servidor.
