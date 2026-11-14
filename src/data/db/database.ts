@@ -1,9 +1,31 @@
+/*
+    Responsável por criar, abrir e configurar o banco de dados do aplicativo.
+*/
+
 import * as SQLite from 'expo-sqlite';
 import * as Crypto from 'expo-crypto';
 
-export const initDatabase = async () => {
+
+// armazena uma promessa de retorno do banco SQLite que pode ser nulo ou nao.
+let openedDb: Promise<SQLite.SQLiteDatabase> | null = null;
+
+// Abre o banco uma única vez e devolve sempre a mesma conexão.
+// Todos os repositórios usam esta função.
+export function getDb(): Promise<SQLite.SQLiteDatabase> {
+  // Se ainda não existir uma conexão, chama a função que abre o banco e cria as tabelas.
+  if (!openedDb) {
+    openedDb = openAndCreateTables();
+  }
+  // Devolve a conexão armazenada.
+  return openedDb;
+}
+
+// responsável por abrir o banco e criar as tabelas.
+async function openAndCreateTables() {
+  // Abre o banco de dados chamado backlogzero.db.
   const db = await SQLite.openDatabaseAsync('backlogzero.db');
 
+  // Ativa a verificação das chaves estrangeiras.
   await db.execAsync(`PRAGMA foreign_keys = ON;`);
 
   await db.execAsync(`
@@ -52,7 +74,7 @@ export const initDatabase = async () => {
   `);
 
   const usuarioExistente = await db.getFirstAsync<{ id: string }>('SELECT id FROM usuario LIMIT 1');
-  
+
   if (!usuarioExistente) {
     const defaultUserId = Crypto.randomUUID();
     const defaultLibId = Crypto.randomUUID();
@@ -69,4 +91,4 @@ export const initDatabase = async () => {
   }
 
   return db;
-};
+}

@@ -1,0 +1,179 @@
+import { StyleSheet } from 'react-native';
+
+import { cores, tipografia } from '../../../theme';
+
+// Cinza claro enquanto a capa da RAWG não carrega
+const COVER_PLACEHOLDER = '#E5E5E5';
+
+export const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: cores.fundo },
+  content: { flexGrow: 1 },
+
+  illustration: { backgroundColor: cores.background, overflow: 'hidden' },
+  stage: { height: 300, alignItems: 'center', justifyContent: 'center' },
+
+  // Sombra + borda fraca para a capa não "sumir" no fundo branco
+  cover: {
+    position: 'absolute',
+    width: 112,
+    height: 150,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.08)',
+    backgroundColor: COVER_PLACEHOLDER,
+    boxShadow: '0px 10px 24px rgba(0, 0, 0, 0.22)',
+  },
+  coverLeft: { transform: [{ translateX: -76 }, { rotate: '-14deg' }] },
+  coverRight: { transform: [{ translateX: 76 }, { rotate: '13deg' }] },
+  coverCenter: {
+    width: 146,
+    height: 196,
+    borderRadius: 18,
+    padding: 12,
+    justifyContent: 'space-between',
+    boxShadow: '0px 16px 32px rgba(0, 0, 0, 0.35)',
+    transform: [{ rotate: '-3deg' }],
+  },
+  // 1 a menos que o card, por causa da borda de 1px
+  coverImage: { width: '100%', height: '100%', borderRadius: 15 },
+  coverImageCenter: { ...StyleSheet.absoluteFill, borderRadius: 17 },
+
+  playingChip: {
+    alignSelf: 'flex-start',
+    backgroundColor: cores.fundo,
+    color: cores.texto,
+    fontFamily: tipografia.fontes.extraBold,
+    fontSize: 10,
+    letterSpacing: 0.8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
+  progressTrack: { height: 6, borderRadius: 999, backgroundColor: 'rgba(0,0,0,0.35)', overflow: 'hidden' },
+  progressFill: { width: '84%', height: '100%', borderRadius: 999, backgroundColor: '#FFFFFF' },
+
+  // Anel de progresso (75%) feito só com borda: um lado transparente e rotação.
+  // Selo com o controle, inclinado como os outros chips
+iconBadge: {
+  position: 'absolute',
+  top: 28,
+  left: 28,
+  width: 52,
+  height: 52,
+  borderRadius: 16,
+  backgroundColor: cores.fundo,
+  alignItems: 'center',
+  justifyContent: 'center',
+  boxShadow: '0px 8px 18px rgba(0, 0, 0, 0.2)',
+  transform: [{ rotate: '-10deg' }],
+},
+  floating: { position: 'absolute', overflow: 'hidden', fontFamily: tipografia.fontes.extraBold },
+  doneChip: {
+    top: 48,
+    right: 20,
+    backgroundColor: cores.fundo,
+    color: cores.texto,
+    fontSize: 12,
+    letterSpacing: 0.6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    transform: [{ rotate: '7deg' }],
+  },
+  hoursChip: {
+    bottom: 34,
+    left: 26,
+    color: cores.fundo,
+    backgroundColor: cores.texto,
+    borderWidth: 2,
+    borderColor: cores.fundo,
+    fontSize: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    transform: [{ rotate: '-8deg' }],
+  },
+  stars: {
+    bottom: 38,
+    right: 28,
+    color: cores.texto,
+    backgroundColor: cores.fundo,
+    fontSize: 13,
+    letterSpacing: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 12,
+    transform: [{ rotate: '6deg' }],
+  },
+  curve: { height: 32, alignItems: 'center' },
+  curveCircle: {
+    position: 'absolute',
+    top: 0,
+    width: 1400,
+    height: 1400,
+    borderRadius: 700,
+    backgroundColor: cores.fundo,
+  },
+
+  body: { flex: 1, paddingHorizontal: 24, paddingTop: 8, gap: 16 },
+  texts: { alignItems: 'center', gap: 8, marginBottom: 8 },
+  title: {
+    color: cores.texto,
+    fontFamily: tipografia.fontes.extraBold,
+    fontSize: tipografia.tamanhos.titulo,
+    textAlign: 'center',
+    letterSpacing: -0.8,
+  },
+  subtitle: {
+    color: '#BDBDBD',
+    fontFamily: tipografia.fontes.regular,
+    fontSize: tipografia.tamanhos.corpo,
+    textAlign: 'center',
+    lineHeight: 22,
+    maxWidth: 290,
+  },
+
+  field: { gap: 8 },
+  label: { color: '#D4D4D4', fontFamily: tipografia.fontes.semiBold, fontSize: 14 },
+  input: {
+    height: 52,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#2E2E2E',
+    backgroundColor: cores.card,
+    color: cores.texto,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontFamily: tipografia.fontes.regular,
+  },
+
+  reminderCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    backgroundColor: cores.card,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  reminderTexts: { flex: 1, gap: 3 },
+  reminderTitle: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: 15 },
+  reminderDescription: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
+
+  error: { color: '#F09595', fontFamily: tipografia.fontes.regular, fontSize: 13, textAlign: 'center' },
+
+  button: {
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: cores.texto,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  buttonPressed: { opacity: 0.8 },
+  buttonText: { color: cores.fundo, fontFamily: tipografia.fontes.extraBold, fontSize: 16 },
+  footer: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular, fontSize: 12, textAlign: 'center' },
+});

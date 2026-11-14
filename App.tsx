@@ -9,18 +9,21 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { initDatabase } from './src/data/db/database';
-import BoasVindasScreen from './src/features/onboarding/Views/BoasVindasScreen';
+import { getDb } from './src/data/db/database';
+import { hasSeenOnboarding } from './src/data/storage/preferences';
+import WelcomeScreen from './src/features/onboarding/Views/OnBoardingScreen';
 import TabRouter from './src/navigation/TabRouter';
 import { RootStackParamList } from './src/navigation/tipos';
 import { cores } from './src/theme';
+import OnBoardingScreen from './src/features/onboarding/Views/OnBoardingScreen';
 
 SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const temaNavegacao = {
+const navigationTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
@@ -32,36 +35,48 @@ const temaNavegacao = {
 };
 
 export default function App() {
-  const [fontesCarregadas] = useFonts({
+  const [fontsLoaded] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_800ExtraBold,
   });
-  const [bancoPronto, setBancoPronto] = useState(false);
+
+  // Tela inicial: boas-vindas no primeiro acesso, abas nos seguintes.
+  const [initialRoute, setInitialRoute] = useState<keyof RootStackParamList | null>(null);
 
   useEffect(() => {
-    initDatabase()
-      .catch((erro) => console.error('Erro ao iniciar o banco:', erro))
-      .finally(() => setBancoPronto(true));
+    async function prepare() {
+      try {
+        await getDb(); // cria o banco e as tabelas
+      } catch (error) {
+        console.error('Erro ao iniciar o banco:', error);
+      }
+      const seen = await hasSeenOnboarding(); // AsyncStorage
+      setInitialRoute(seen ? 'Abas' : 'BoasVindas');
+    }
+    prepare();
   }, []);
 
   useEffect(() => {
-    if (fontesCarregadas && bancoPronto) {
+    if (fontsLoaded && initialRoute) {
       SplashScreen.hideAsync();
     }
-  }, [fontesCarregadas, bancoPronto]);
+  }, [fontsLoaded, initialRoute]);
 
-  if (!fontesCarregadas || !bancoPronto) {
+  // Enquanto não sabe qual tela abrir, a splash continua na frente.
+  if (!fontsLoaded || !initialRoute) {
     return null;
   }
 
   return (
-    <NavigationContainer theme={temaNavegacao}>
-      <StatusBar style="light" />
-      <Stack.Navigator initialRouteName="Abas" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Abas" component={TabRouter} />
-        <Stack.Screen name="BoasVindas" component={BoasVindasScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer theme={navigationTheme}>
+        <StatusBar style="light" />
+        <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="BoasVindas" component={OnBoardingScreen} />
+          <Stack.Screen name="Abas" component={TabRouter} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
