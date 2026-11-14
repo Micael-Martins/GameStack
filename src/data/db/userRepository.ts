@@ -38,3 +38,12 @@ export async function saveProfile(name: string, remindersEnabled: boolean): Prom
     [name, remindersEnabled ? 1 : 0, DEFAULT_REMINDER_TIME]
   );
 }
+
+// Salva se os lembretes estão ligados e o horário ("HH:MM").
+export async function saveReminders(remindersEnabled: boolean, reminderTime: string): Promise<void> {
+  const db = await obterBanco();
+  await db.runAsync('UPDATE usuario SET notificacaoAtiva = ?, horarioNotificacao = ?', [
+    remindersEnabled ? 1 : 0,
+    reminderTime,
+  ]);
+}
