@@ -114,3 +114,22 @@ test('Trata resultados sem jogos', async () => {
   assert.deepEqual(resultado.jogos, []);
   assert.equal(resultado.temProximaPagina, false);
 });
+
+test('Sem chave nas opções, usa a chave de obterChave (SecureStore no app)', async () => {
+  let urlRecebida = '';
+
+  const fetcher = async (url) => {
+    urlRecebida = String(url);
+    return new Response(
+      JSON.stringify({ count: 0, next: null, results: [] }),
+      { status: 200 },
+    );
+  };
+
+  await buscarJogosRawg('Zelda', {
+    obterChave: async () => 'chave-do-securestore',
+    fetcher,
+  });
+
+  assert.equal(new URL(urlRecebida).searchParams.get('key'), 'chave-do-securestore');
+});
