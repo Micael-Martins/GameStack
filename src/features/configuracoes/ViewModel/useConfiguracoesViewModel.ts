@@ -116,6 +116,7 @@ export function useConfiguracoesViewModel() {
   }
 
   return {
+    carregado: usuario !== null,
     nome,
     setNome,
     salvarNome,

@@ -1,7 +1,10 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useEffect, useRef, useState } from 'react';
 import {
+  AccessibilityInfo,
   ActivityIndicator,
   Alert,
+  Animated,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -27,6 +30,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Configuracoes'>;
 export default function ConfiguracoesScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const vm = useConfiguracoesViewModel();
+  const horario = useHorarioAnimado(vm.lembretesAtivos, vm.carregado);
 
   function confirmarApagar() {
     Alert.alert(
@@ -87,9 +91,20 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
               />
             </View>
 
-            {/* O horário só aparece com os lembretes ligados. */}
-            {vm.lembretesAtivos ? (
-              <View style={[styles.linha, styles.divisor]}>
+            {/* O horário só aparece com os lembretes ligados: abre e fecha deslizando. */}
+            {horario.visivel ? (
+              <Animated.View
+                style={[
+                  styles.linha,
+                  styles.divisor,
+                  styles.linhaAnimada,
+                  {
+                    height: horario.altura,
+                    opacity: horario.opacidade,
+                    transform: [{ translateY: horario.deslize }],
+                  },
+                ]}
+              >
                 <Text style={[styles.texto, styles.flex]}>Horário do lembrete</Text>
                 <TextInput
                   value={vm.horario}
@@ -104,7 +119,7 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
                   accessibilityLabel="Horário do lembrete"
                   style={[styles.horario, vm.erroHorario ? styles.horarioErro : null]}
                 />
-              </View>
+              </Animated.View>
             ) : null}
             {vm.lembretesAtivos && vm.erroHorario ? <Text style={styles.erro}>{vm.erroHorario}</Text> : null}
           </View>
@@ -142,6 +157,52 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
   );
 }
 
+const ALTURA_LINHA = 69; // minHeight 56 + borda 1 + folga do campo de 44 com padding 12
+
+// Abre e fecha a linha do horário. Fica montada até a animação de saída terminar.
+// Na primeira leitura do usuário não anima (a tela já abre no estado certo), e
+// respeita a opção "reduzir movimento" do celular.
+function useHorarioAnimado(ligado: boolean, carregado: boolean) {
+  const progresso = useRef(new Animated.Value(ligado ? 1 : 0)).current;
+  const [visivel, setVisivel] = useState(ligado);
+  const primeiraVez = useRef(true);
+
+  useEffect(() => {
+    if (!carregado) return;
+    if (primeiraVez.current) {
+      primeiraVez.current = false;
+      progresso.setValue(ligado ? 1 : 0);
+      setVisivel(ligado);
+      return;
+    }
+
+    let cancelado = false;
+    if (ligado) setVisivel(true);
+    AccessibilityInfo.isReduceMotionEnabled()
+      .catch(() => false)
+      .then((reduzir) => {
+        if (cancelado) return;
+        Animated.timing(progresso, {
+          toValue: ligado ? 1 : 0,
+          duration: reduzir ? 0 : ligado ? 260 : 200,
+          useNativeDriver: false, // altura não roda no driver nativo
+        }).start(({ finished }) => {
+          if (finished && !ligado && !cancelado) setVisivel(false);
+        });
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, [ligado, carregado, progresso]);
+
+  return {
+    visivel,
+    altura: progresso.interpolate({ inputRange: [0, 1], outputRange: [0, ALTURA_LINHA] }),
+    opacidade: progresso.interpolate({ inputRange: [0, 0.4, 1], outputRange: [0, 0, 1] }),
+    deslize: progresso.interpolate({ inputRange: [0, 1], outputRange: [-10, 0] }),
+  };
+}
+
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
   conteudo: { flexGrow: 1, paddingHorizontal: espacamentos.gg },
@@ -163,6 +224,7 @@ const styles = StyleSheet.create({
     paddingVertical: espacamentos.m,
   },
   divisor: { borderTopWidth: 1, borderTopColor: cores.borda },
+  linhaAnimada: { minHeight: 0, paddingVertical: 0, overflow: 'hidden' },
   texto: { color: cores.texto, fontFamily: tipografia.fontes.regular, fontSize: tipografia.tamanhos.corpo },
   textoForte: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: tipografia.tamanhos.corpo },
   descricao: {
