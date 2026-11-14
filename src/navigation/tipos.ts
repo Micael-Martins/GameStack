@@ -1,6 +1,7 @@
 export type RootStackParamList = {
   Abas: undefined;
   BoasVindas: undefined;
+  FormularioDemo: undefined;
 };
 
 export type TabParamList = {

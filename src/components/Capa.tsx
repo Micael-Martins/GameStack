@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
-import { cores, espacamentos } from '../../theme';
+import { cores, espacamentos } from '../theme';
 
 export type CapaProps = {
   imagemURL?: string | null;

@@ -7,7 +7,9 @@
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.GameStack",
+      "appleTeamId": "MB73MN45Q2"
     },
     "android": {
       "adaptiveIcon": {

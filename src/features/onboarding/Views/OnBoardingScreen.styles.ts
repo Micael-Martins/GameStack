@@ -177,4 +177,5 @@ iconBadge: {
   footer: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular, fontSize: 12, textAlign: 'center'},
 
 optional: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular },
+spacer: { flex: 1 },
 });

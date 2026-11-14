@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Image } from 'react-native';
 
 import { saveProfile } from '../../../data/db/userRepository';
-import { markOnboardingSeen } from '../../../data/storage/preferences';
 import { buscarCapasPopulares } from '../../../data/services/rawgService';
+import { CHAVES, salvar } from '../../../data/storage/preferencias';
 
 const DEFAULT_NAME = 'Jogador';
 
@@ -13,22 +14,39 @@ export function useOnBoardingViewModel(onFinish: () => void) {
   const [remindersEnabled, setRemindersEnabled] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [covers, setCovers] = useState<string[]>([]);
+  const [coversReady, setCoversReady] = useState(false);
 
-    const [covers, setCovers] = useState<string[]>([]);
-
-  // Busca 3 capas ao abrir a tela. Se falhar, a tela segue com os cards coloridos.
   useEffect(() => {
+    let finished = false;
+    const finish = () => {
+      if (!finished) {
+        finished = true;
+        setCoversReady(true);
+      }
+    };
+    const timeout = setTimeout(finish, 2500);
+
     buscarCapasPopulares(3)
-      .then(setCovers)
-      .catch((e) => console.warn('Sem capas da RAWG:', e));
+      .then(async (urls) => {
+        await Promise.all(urls.map((url) => Image.prefetch(url).catch(() => false)));
+        setCovers(urls);
+      })
+      .catch((e) => console.warn('Sem capas da RAWG:', e))
+      .finally(() => {
+        clearTimeout(timeout);
+        finish();
+      });
+
+    return () => clearTimeout(timeout);
   }, []);
 
   async function start() {
     setSaving(true);
     setError(null);
     try {
-      await saveProfile(name.trim() || DEFAULT_NAME, remindersEnabled); 
-      await markOnboardingSeen(); 
+      await saveProfile(name.trim() || DEFAULT_NAME, remindersEnabled);
+      await salvar(CHAVES.onboardingVisto, true);
       onFinish();
     } catch (e) {
       console.error('Erro no onboarding:', e);
@@ -38,5 +56,5 @@ export function useOnBoardingViewModel(onFinish: () => void) {
     }
   }
 
-  return { name, setName, remindersEnabled, setRemindersEnabled, saving, error, start, covers };
+  return { name, setName, remindersEnabled, setRemindersEnabled, saving, error, start, covers, coversReady };
 }

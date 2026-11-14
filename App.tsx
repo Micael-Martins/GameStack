@@ -12,12 +12,11 @@ import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { getDb } from './src/data/db/database';
-import { hasSeenOnboarding } from './src/data/storage/preferences';
-import WelcomeScreen from './src/features/onboarding/Views/OnBoardingScreen';
+import { CHAVES, ler } from './src/data/storage/preferencias';
+import OnBoardingScreen from './src/features/onboarding/Views/OnBoardingScreen';
 import TabRouter from './src/navigation/TabRouter';
 import { RootStackParamList } from './src/navigation/tipos';
 import { cores } from './src/theme';
-import OnBoardingScreen from './src/features/onboarding/Views/OnBoardingScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -51,7 +50,7 @@ export default function App() {
       } catch (error) {
         console.error('Erro ao iniciar o banco:', error);
       }
-      const seen = await hasSeenOnboarding(); // AsyncStorage
+      const seen = await ler(CHAVES.onboardingVisto); // AsyncStorage
       setInitialRoute(seen ? 'Abas' : 'BoasVindas');
     }
     prepare();
@@ -63,7 +62,6 @@ export default function App() {
     }
   }, [fontsLoaded, initialRoute]);
 
-  // Enquanto não sabe qual tela abrir, a splash continua na frente.
   if (!fontsLoaded || !initialRoute) {
     return null;
   }
