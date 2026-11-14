@@ -22,7 +22,7 @@ Update the applicable `AGENTS.md` files whenever verified, relevant project stat
 
 ### Git reference checked on 2026-11-14
 
-After fetching, local `main` is at `ef97768`, one commit behind `origin/main` (`5ba353c`); `origin/develop` is at `66edaa4`. GitHub has six `feature/*` branches and no open PRs at this check: five are incorporated into `develop`, while `feature/navegacao` has PR #5 closed without merging. Recheck this dated observation before development.
+After fetching, local `main` is at `ef97768`, one commit behind `origin/main` (`5ba353c`); `origin/develop` is at `d068163`, including PR #8. Open PRs at the 2026-11-14 check: #7 (StatusChip/ChipFiltro), #9 (RAWG service), #10 (form components). Recheck this dated observation before development.
 
 ## Expo has changed — do not trust your training data
 
@@ -49,7 +49,7 @@ Run lint and typecheck before declaring any task done.
 
 ## Navigation & Routing
 
-- In `origin/develop` at `66edaa4` (checked on 2026-11-14), navigation uses **React Navigation**, with `@react-navigation/native`, bottom tabs, and native stack. The entry point is `index.ts`; navigation definitions are in `src/navigation/TabRouter.tsx` and `src/navigation/tipos.ts`.
+- In `origin/develop` at `d068163` (checked on 2026-11-14), navigation uses **React Navigation**, with `@react-navigation/native`, bottom tabs, and native stack. The entry point is `index.ts`; navigation definitions are in `src/navigation/TabRouter.tsx` and `src/navigation/tipos.ts`.
 - The local `main` checkout is older and still has the former Expo Router structure. Before changing navigation or using its APIs, inspect the active branch's `package.json`, entry point, and navigation files, and follow the implementation on the verified development base.
 - Do not infer the current navigation architecture from an older checkout or reintroduce Expo Router based on stale instructions.
 
@@ -57,7 +57,7 @@ Run lint and typecheck before declaring any task done.
 
 Shared visual game components are in `src/views/components/`. Their development-only catalog is `src/features/componentes/Views/ComponentesDemoScreen.tsx`, exposed by a `__DEV__` tab. Contracts and manual checks are documented in `docs/features/componentes-jogo.md`.
 
-Keep the product's MVVM responsibilities: models define types, data modules own persistence and services, view models own screen logic, and views display data. In `origin/develop` at `66edaa4` (checked on 2026-11-14), shared models are in `src/models/`, SQLite code is in `src/data/db/`, and feature directories use `src/features/<feature>/Views`, `ViewModel`, and `Model`. Some directories contain only placeholders; this layout does not prove that all planned functionality is implemented. Recheck the active branch and follow its existing organization before adding files.
+Keep the product's MVVM responsibilities: models define types, data modules own persistence and services, view models own screen logic, and views display data. In `origin/develop` at `d068163` (checked on 2026-11-14), shared models are in `src/models/`, SQLite code is in `src/data/db/`, and feature directories use `src/features/<feature>/Views`, `ViewModel`, and `Model`. Some directories contain only placeholders; this layout does not prove that all planned functionality is implemented. Recheck the active branch and follow its existing organization before adding files.
 
 ## Building with EAS
 
