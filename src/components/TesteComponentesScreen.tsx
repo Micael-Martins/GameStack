@@ -12,8 +12,8 @@ import {
   View,
 } from 'react-native';
 
-import type { StatusJogo } from '../../models/StatusJogo';
-import { cores, espacamentos } from '../../theme';
+import type { StatusJogo } from '../models/StatusJogo';
+import { cores, espacamentos } from '../theme';
 import ChipFiltro from './ChipFiltro';
 import StatusChip from './StatusChip';
 

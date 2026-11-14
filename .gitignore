@@ -341,3 +341,6 @@ Temporary Items
 
 expo-env.d.ts
 # @end expo-cli
+# Pastas nativas geradas pelo expo run
+/ios
+/android

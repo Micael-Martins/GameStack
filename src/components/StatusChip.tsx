@@ -2,8 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import type { StatusJogo } from '../../models/StatusJogo';
-import { cores, espacamentos } from '../../theme';
+import type { StatusJogo } from '../models/StatusJogo';
+import { cores, espacamentos } from '../theme';
 
 type NomeIcone = ComponentProps<typeof Ionicons>['name'];
 
