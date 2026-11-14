@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { saveProfile } from '../../../data/db/userRepository';
 import { markOnboardingSeen } from '../../../data/storage/preferences';
-import { getPopularCovers } from '../../../data/services/rawgService';
+import { buscarCapasPopulares } from '../../../data/services/rawgService';
 
 const DEFAULT_NAME = 'Jogador';
 
@@ -18,7 +18,7 @@ export function useOnBoardingViewModel(onFinish: () => void) {
 
   // Busca 3 capas ao abrir a tela. Se falhar, a tela segue com os cards coloridos.
   useEffect(() => {
-    getPopularCovers(3)
+    buscarCapasPopulares(3)
       .then(setCovers)
       .catch((e) => console.warn('Sem capas da RAWG:', e));
   }, []);

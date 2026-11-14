@@ -42,9 +42,9 @@ export default function OnBoardingScreen({ navigation }: Props) {
           </View>
 
           <View style={styles.field}>
-            <Text style={styles.label} nativeID="nameLabel">
-              Como podemos te chamar?
-            </Text>
+            <Text style={styles.label}>
+  Como podemos te chamar? <Text style={styles.optional}>(opcional)</Text>
+</Text>
             <TextInput
               style={styles.input}
               value={vm.name}

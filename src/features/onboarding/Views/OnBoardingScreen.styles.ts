@@ -53,8 +53,7 @@ export const styles = StyleSheet.create({
   progressTrack: { height: 6, borderRadius: 999, backgroundColor: 'rgba(0,0,0,0.35)', overflow: 'hidden' },
   progressFill: { width: '84%', height: '100%', borderRadius: 999, backgroundColor: '#FFFFFF' },
 
-  // Anel de progresso (75%) feito só com borda: um lado transparente e rotação.
-  // Selo com o controle, inclinado como os outros chips
+
 iconBadge: {
   position: 'absolute',
   top: 28,
@@ -175,5 +174,7 @@ iconBadge: {
   },
   buttonPressed: { opacity: 0.8 },
   buttonText: { color: cores.fundo, fontFamily: tipografia.fontes.extraBold, fontSize: 16 },
-  footer: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular, fontSize: 12, textAlign: 'center' },
+  footer: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular, fontSize: 12, textAlign: 'center'},
+
+optional: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular },
 });
