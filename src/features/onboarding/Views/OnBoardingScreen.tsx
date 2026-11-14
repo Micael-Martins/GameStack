@@ -11,7 +11,6 @@ import CampoTexto from '../../../components/CampoTexto';
 import Interruptor from '../../../components/Interruptor';
 import { useOnBoardingViewModel } from '../ViewModel/useOnBoardingViewModel';
 import { styles } from './OnBoardingScreen.styles';
-import { PopIn } from './PopIn';
 import { OnBoardingIllustration } from './OnBoardingIllustration';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BoasVindas'>;
@@ -69,54 +68,3 @@ export default function OnBoardingScreen({ navigation }: Props) {
   );
 }
 
-function Illustration({ top, covers }: { top: number; covers: string[] }) {
-  return (
-    <View
-      style={[styles.illustration, { paddingTop: top }]}
-      accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants"
-    >
-
-<View style={styles.stage}>
-  <PopIn delay={0}>
-    <View style={[styles.cover, styles.coverLeft]}>
-      {covers[1] && <Image source={{ uri: covers[1] }} style={styles.coverImage} />}
-    </View>
-  </PopIn>
-  <PopIn delay={80}>
-    <View style={[styles.cover, styles.coverRight]}>
-      {covers[2] && <Image source={{ uri: covers[2] }} style={styles.coverImage} />}
-    </View>
-  </PopIn>
-  <PopIn delay={180}>
-    <View style={[styles.cover, styles.coverCenter]}>
-      {covers[0] && <Image source={{ uri: covers[0] }} style={styles.coverImageCenter} />}
-      <Text style={styles.playingChip}>• JOGANDO</Text>
-      <View style={styles.progressTrack}>
-        <View style={styles.progressFill} />
-      </View>
-    </View>
-  </PopIn>
-
-  <PopIn delay={450}>
-    <View style={styles.iconBadge}>
-      <Ionicons name="game-controller" size={26} color={cores.texto} />
-    </View>
-  </PopIn>
-  <PopIn delay={530}>
-    <Text style={[styles.floating, styles.doneChip]}>✓ CONCLUÍDO</Text>
-  </PopIn>
-  <PopIn delay={610}>
-    <Text style={[styles.floating, styles.hoursChip]}>+2h</Text>
-  </PopIn>
-  <PopIn delay={690}>
-    <Text style={[styles.floating, styles.stars]}>★★★★★</Text>
-  </PopIn>
-</View>
-
-      <View style={styles.curve}>
-        <View style={styles.curveCircle} />
-      </View>
-    </View>
-  );
-}

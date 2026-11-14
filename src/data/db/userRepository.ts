@@ -1,5 +1,5 @@
 import { Usuario } from '../../models/Usuario';
-import { getDb } from './database';
+import { obterBanco } from './database';
 
 // Formato da linha como ela vem do SQLite.
 // O SQLite não tem boolean: guarda 1 (sim) ou 0 (não).
@@ -22,20 +22,16 @@ function rowToUser(row: UserRow): Usuario {
   };
 }
 
-// Busca o usuário do app.
+// Busca o usuário do app (só existe um).
 export async function getUser(): Promise<Usuario | null> {
-  const db = await getDb();
-  if (!db) return null; 
-
+  const db = await obterBanco();
   const row = await db.getFirstAsync<UserRow>('SELECT * FROM usuario LIMIT 1');
   return row ? rowToUser(row) : null;
 }
 
 // Salva o nome e se os lembretes estão ligados.
 export async function saveProfile(name: string, remindersEnabled: boolean): Promise<void> {
-  const db = await getDb();
-  if (!db) return;
-
+  const db = await obterBanco();
   await db.runAsync(
     `UPDATE usuario
        SET nome = ?, notificacaoAtiva = ?, horarioNotificacao = COALESCE(horarioNotificacao, ?)`,

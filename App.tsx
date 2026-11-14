@@ -11,13 +11,12 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { getDb } from './src/data/db/database';
-import { CHAVES, ler } from './src/data/storage/preferencias';
+import { obterBanco } from './src/data/db/database';
 import OnBoardingScreen from './src/features/onboarding/Views/OnBoardingScreen';
 import TabRouter from './src/navigation/TabRouter';
 import { RootStackParamList } from './src/navigation/tipos';
 import { cores } from './src/theme';
-
+import { CHAVES, ler, limparTudo } from './src/data/storage/preferencias';
 SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -40,18 +39,18 @@ export default function App() {
     PlusJakartaSans_800ExtraBold,
   });
 
-  // Tela inicial: boas-vindas no primeiro acesso, abas nos seguintes.
   const [initialRoute, setInitialRoute] = useState<keyof RootStackParamList | null>(null);
 
   useEffect(() => {
     async function prepare() {
       try {
-        await getDb(); // cria o banco e as tabelas
+          await obterBanco();
       } catch (error) {
         console.error('Erro ao iniciar o banco:', error);
       }
-      const seen = await ler(CHAVES.onboardingVisto); // AsyncStorage
+const seen = await ler(CHAVES.onboardingVisto);
       setInitialRoute(seen ? 'Abas' : 'BoasVindas');
+
     }
     prepare();
   }, []);
