@@ -16,13 +16,13 @@ Compare the intended scope with branch changes, pull requests, and Trello cards,
 
 ## Keep project instructions current
 
+Compact project glossary: https://app.notion.com/p/418d0be8b172800ea560e9df5d6210c0. It is auxiliary context; verify current code, Git and Trello before acting.
+
 Update the applicable `AGENTS.md` files whenever verified, relevant project state, architecture, rules, or workflow changes. Correct guidance that no longer matches the code. Date and identify the source of temporary observations, and recheck them before acting; an old snapshot must not be treated as permanent truth.
 
-### Branch state checked on 2026-11-14
+### Git reference checked on 2026-11-14
 
-This worktree starts at develop `66edaa4`. The coordinator checked PR #7 (colleague chips) and #8 (game components) before implementation. A fresh fetch in this worktree failed due to DNS; recheck GitHub before publishing. Form demo uses App.tsx and RootStackParamList to avoid the TabRouter changes in PR #8.
-
-Glossary: https://app.notion.com/p/418d0be8b172800ea560e9df5d6210c0. Code, Git and Trello remain the current sources of truth.
+After fetching, local `main` is at `ef97768`, one commit behind `origin/main` (`5ba353c`); `origin/develop` is at `66edaa4`. GitHub has six `feature/*` branches and no open PRs at this check: five are incorporated into `develop`, while `feature/navegacao` has PR #5 closed without merging. Recheck this dated observation before development.
 
 ## Expo has changed — do not trust your training data
 
@@ -54,6 +54,8 @@ Run lint and typecheck before declaring any task done.
 - Do not infer the current navigation architecture from an older checkout or reintroduce Expo Router based on stale instructions.
 
 ## MVVM structure
+
+Shared visual game components are in `src/views/components/`. Their development-only catalog is `src/features/componentes/Views/ComponentesDemoScreen.tsx`, exposed by a `__DEV__` tab. Contracts and manual checks are documented in `docs/features/componentes-jogo.md`.
 
 Keep the product's MVVM responsibilities: models define types, data modules own persistence and services, view models own screen logic, and views display data. In `origin/develop` at `66edaa4` (checked on 2026-11-14), shared models are in `src/models/`, SQLite code is in `src/data/db/`, and feature directories use `src/features/<feature>/Views`, `ViewModel`, and `Model`. Some directories contain only placeholders; this layout does not prove that all planned functionality is implemented. Recheck the active branch and follow its existing organization before adding files.
 
