@@ -11,6 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 
 import { initDatabase } from './src/data/db/database';
+import FormularioDemoScreen from './src/features/componentes/Views/FormularioDemoScreen';
 import BoasVindasScreen from './src/features/onboarding/Views/BoasVindasScreen';
 import TabRouter from './src/navigation/TabRouter';
 import { RootStackParamList } from './src/navigation/tipos';
@@ -58,7 +59,8 @@ export default function App() {
   return (
     <NavigationContainer theme={temaNavegacao}>
       <StatusBar style="light" />
-      <Stack.Navigator initialRouteName="Abas" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={__DEV__ && process.env.EXPO_PUBLIC_FORMULARIO_DEMO === '1' ? 'FormularioDemo' : 'Abas'} screenOptions={{ headerShown: false }}>
+        {__DEV__ && <Stack.Screen name="FormularioDemo" component={FormularioDemoScreen} />}
         <Stack.Screen name="Abas" component={TabRouter} />
         <Stack.Screen name="BoasVindas" component={BoasVindasScreen} />
       </Stack.Navigator>
