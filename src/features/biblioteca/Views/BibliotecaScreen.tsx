@@ -9,7 +9,7 @@ import EstadoVazio from '../../../components/EstadoVazio';
 import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
 import type { StatusJogo } from '../../../models/StatusJogo';
 import { cores } from '../../../theme';
-import type { FiltroBiblioteca } from '../Model/filtrosBiblioteca';
+import { resolverEstadoListaBiblioteca, type FiltroBiblioteca } from '../Model/filtrosBiblioteca';
 import { useBibliotecaViewModel } from '../ViewModel/useBibliotecaViewModel';
 import { styles } from './BibliotecaScreen.styles';
 
@@ -68,10 +68,19 @@ export default function BibliotecaScreen({ navigation }: Props) {
     </View>
   );
 
+  const estadoLista = resolverEstadoListaBiblioteca({
+    carregando: vm.carregando,
+    erro: vm.erro,
+    quantidadeTotal: vm.jogos.length,
+    quantidadeVisivel: vm.jogosVisiveis.length,
+  });
+
   let vazio = null;
-  if (vm.carregando && vm.jogos.length === 0) {
+  if (estadoLista === 'CARREGANDO') {
     vazio = <ActivityIndicator color={cores.texto} size="large" style={styles.indicador} />;
-  } else if (vm.jogos.length === 0 && !vm.erro) {
+  } else if (estadoLista === 'ERRO') {
+    vazio = <EstadoVazio titulo="Não foi possível carregar os jogos" descricao={vm.erro ?? 'Tente novamente em instantes.'} acao={{ titulo: 'Tentar novamente', onPress: () => void vm.tentarNovamente() }} />;
+  } else if (estadoLista === 'VAZIO') {
     vazio = (
       <EstadoVazio
         titulo="Sua biblioteca está vazia"
@@ -80,7 +89,7 @@ export default function BibliotecaScreen({ navigation }: Props) {
         acao={{ titulo: 'Pesquisar jogos', onPress: () => navigation.navigate('Pesquisar') }}
       />
     );
-  } else if (vm.jogosVisiveis.length === 0) {
+  } else if (estadoLista === 'SEM_RESULTADOS') {
     vazio = (
       <EstadoVazio
         titulo="Nenhum jogo encontrado"
@@ -88,8 +97,6 @@ export default function BibliotecaScreen({ navigation }: Props) {
         icone="search-outline"
       />
     );
-  } else if (vm.jogos.length === 0 && vm.erro) {
-    vazio = <EstadoVazio titulo="Não foi possível carregar os jogos" descricao={vm.erro} acao={{ titulo: 'Tentar novamente', onPress: () => void vm.tentarNovamente() }} />;
   }
 
   return (

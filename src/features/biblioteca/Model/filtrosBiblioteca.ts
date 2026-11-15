@@ -2,6 +2,25 @@ import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
 import type { StatusJogo } from '../../../models/StatusJogo';
 
 export type FiltroBiblioteca = 'TODOS' | StatusJogo;
+export type EstadoListaBiblioteca = 'CARREGANDO' | 'ERRO' | 'VAZIO' | 'SEM_RESULTADOS' | null;
+
+export function resolverEstadoListaBiblioteca({
+  carregando,
+  erro,
+  quantidadeTotal,
+  quantidadeVisivel,
+}: {
+  carregando: boolean;
+  erro: string | null;
+  quantidadeTotal: number;
+  quantidadeVisivel: number;
+}): EstadoListaBiblioteca {
+  if (carregando && quantidadeTotal === 0) return 'CARREGANDO';
+  if (quantidadeTotal === 0 && erro) return 'ERRO';
+  if (quantidadeTotal === 0) return 'VAZIO';
+  if (quantidadeVisivel === 0) return 'SEM_RESULTADOS';
+  return null;
+}
 
 export function filtrarBiblioteca(
   jogos: JogoBiblioteca[],
