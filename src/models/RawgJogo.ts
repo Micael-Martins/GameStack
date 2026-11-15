@@ -6,4 +6,5 @@ export interface RawgJogo {
     playtime: number;
     genres: { name: string }[];
     platforms: { platform: { name: string } }[] | null;
+    developers?: { name: string }[]; // só vem no detalhe (/games/{id})
 }
