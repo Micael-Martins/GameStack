@@ -18,6 +18,7 @@ import { NowPlayingCard, nowPlayingCardStyle } from './CardDestaque';
 type Props = {
   games: JogoBiblioteca[];
   onLogHours: (game: JogoBiblioteca) => void;
+  onOpenGame: (game: JogoBiblioteca) => void;
   onOpenLibrary: () => void;
 };
 
@@ -25,8 +26,7 @@ const SCREEN_PADDING = 20; // padding lateral da Home
 const PEEK = 34; // pedaço do próximo card que fica aparecendo
 const GAP = 10;
 
-export function NowPlayingCarousel({ games, onLogHours, onOpenLibrary }: Props) {
-  const { width } = useWindowDimensions();
+export function NowPlayingCarousel({ games, onLogHours, onOpenGame, onOpenLibrary }: Props) {  const { width } = useWindowDimensions();
   const [page, setPage] = useState(0);
 
   if (games.length === 0) {
@@ -67,8 +67,10 @@ export function NowPlayingCarousel({ games, onLogHours, onOpenLibrary }: Props) 
         onMomentumScrollEnd={onScrollEnd}
         style={single ? undefined : styles.list}
         contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => <NowPlayingCard game={item} width={cardWidth} onLogHours={() => onLogHours(item)} />}
-      />
+        renderItem={({ item }) => (
+          <NowPlayingCard game={item} width={cardWidth} onLogHours={() => onLogHours(item)} onOpen={() => onOpenGame(item)} />
+        )}
+                      />
 
       {!single && (
         <View style={styles.dots} accessibilityLabel={`Jogo ${page + 1} de ${games.length}`}>

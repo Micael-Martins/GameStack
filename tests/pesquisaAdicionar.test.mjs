@@ -5,9 +5,10 @@ import {
   linhaDesenvolvedora,
   linhaPlataformasGenero,
   linhaResultado,
+  textoLancamento,
   textoTempoMedio,
 } from '../src/components/cardResultadoUtils.ts';
-import { buscarDetalhes, converterRawgParaJogo } from '../src/data/services/rawgService.ts';
+import { buscarDetalhes, converterRawgParaJogo, extrairSobre } from '../src/data/services/rawgService.ts';
 import {
   horasParaMinutos,
   minutosIniciais,
@@ -117,4 +118,44 @@ test('buscarDetalhes lança erro quando a RAWG falha (a tela segue sem a desenvo
 test('A pesquisa continua sem desenvolvedora (ela só vem no detalhe)', () => {
   const jogo = converterRawgParaJogo({ id: 1, name: 'X', background_image: null, released: null, playtime: 0, genres: [], platforms: null });
   assert.equal(jogo.desenvolvedora, '');
+});
+
+// ---------- Sobre o jogo (tela Adicionar) ----------
+
+test('buscarDetalhes traz o "Sobre o jogo": descrição, Metacritic e lançamento', async () => {
+  const fetcher = async () =>
+    new Response(
+      JSON.stringify({
+        id: 22511,
+        name: 'Zelda',
+        background_image: null,
+        released: '2017-03-03',
+        playtime: 50,
+        genres: [],
+        platforms: null,
+        description_raw: 'Explore um reino enorme.\n\nEspañol\nExplora un reino enorme.',
+        metacritic: 97,
+      }),
+      { status: 200 },
+    );
+
+  const detalhes = await buscarDetalhes('22511', { chave: 'abc', fetcher });
+
+  assert.deepEqual(detalhes.sobre, {
+    descricao: 'Explore um reino enorme.', // sem a parte repetida em espanhol
+    metacritic: 97,
+    dataLancamento: '2017-03-03',
+  });
+});
+
+test('extrairSobre: sem descrição ou Metacritic, volta vazio/nulo', () => {
+  assert.deepEqual(extrairSobre({ released: null }), { descricao: '', metacritic: null, dataLancamento: null });
+  assert.equal(extrairSobre({ metacritic: 0 }).metacritic, null);
+});
+
+test('textoLancamento: "Lançado em 03 mar 2017" sem mudar o dia por causa do fuso', () => {
+  assert.equal(textoLancamento('2017-03-03'), 'Lançado em 03 mar 2017');
+  assert.equal(textoLancamento('2023-12-31'), 'Lançado em 31 dez 2023');
+  assert.equal(textoLancamento(null), '');
+  assert.equal(textoLancamento('2017'), '');
 });

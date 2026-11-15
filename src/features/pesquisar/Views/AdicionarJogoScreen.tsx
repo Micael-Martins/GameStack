@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -21,6 +21,7 @@ import Capa from '../../../components/Capa';
 import {
   linhaDesenvolvedora,
   linhaPlataformasGenero,
+  textoLancamento,
   textoTempoMedio,
 } from '../../../components/cardResultadoUtils';
 import { PrimaryButton } from '../../../components/PrimaryButton';
@@ -44,12 +45,15 @@ function MioloRadio({ marcado }: { marcado: boolean }) {
   return <Animated.View style={[styles.radioMiolo, { transform: [{ scale: escala }] }]} />;
 }
 
-// Tela 05 do protótipo. Abre ao tocar no "+" de um resultado da pesquisa.
+// Tela 05 do protótipo. Abre ao tocar num resultado da pesquisa (ou num popular da Home).
 export default function AdicionarJogoScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
   const vm = useAdicionarViewModel(route.params.jogo);
   const { jogo } = vm;
   const tempoMedio = textoTempoMedio(jogo.tempoMedio);
+  const [textoAberto, setTextoAberto] = useState(false); // "Ler mais" da descrição
+  const lancamento = textoLancamento(vm.sobre?.dataLancamento ?? null);
+  const temSobre = !!vm.sobre && (!!vm.sobre.descricao || vm.sobre.metacritic !== null || !!lancamento);
 
   // Trocar o status anima o campo de horas abrindo ou fechando (ele some em Na fila).
   function escolherStatus(status: StatusJogo) {
@@ -99,6 +103,44 @@ export default function AdicionarJogoScreen({ navigation, route }: Props) {
             ) : null}
           </View>
         </EntradaAnimada>
+
+        {/* Sobre o jogo: só aparece quando a RAWG mandou alguma dessas informações */}
+        {temSobre && vm.sobre ? (
+          <EntradaAnimada style={styles.secao}>
+            <TituloSecao titulo="Sobre o jogo" />
+            {vm.sobre.metacritic !== null || lancamento ? (
+              <View style={styles.selos}>
+                {vm.sobre.metacritic !== null ? (
+                  <View style={styles.selo} accessible accessibilityLabel={`Nota ${vm.sobre.metacritic} no Metacritic`}>
+                    <Text style={styles.notaMetacritic}>{vm.sobre.metacritic}</Text>
+                    <Text style={styles.textoSelo}>Metacritic</Text>
+                  </View>
+                ) : null}
+                {lancamento ? (
+                  <View style={[styles.selo, styles.seloSimples]}>
+                    <Ionicons name="calendar-outline" size={16} color={cores.textoSecundario} />
+                    <Text style={styles.textoSelo}>{lancamento}</Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
+            {vm.sobre.descricao ? (
+              <>
+                <Text style={styles.descricao} numberOfLines={textoAberto ? undefined : 4}>
+                  {vm.sobre.descricao}
+                </Text>
+                <Text
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: textoAberto }}
+                  onPress={() => setTextoAberto(!textoAberto)}
+                  style={styles.lerMais}
+                >
+                  {textoAberto ? 'Ler menos' : 'Ler mais'}
+                </Text>
+              </>
+            ) : null}
+          </EntradaAnimada>
+        ) : null}
 
         <EntradaAnimada atraso={70} style={styles.secao}>
           <TituloSecao titulo="Status inicial" />
@@ -169,6 +211,42 @@ const styles = StyleSheet.create({
   carregando: { alignSelf: 'flex-start', marginVertical: 2 },
   linhaTempo: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
   secao: { marginTop: espacamentos.gg, gap: espacamentos.p },
+  selos: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  selo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 6,
+    paddingLeft: 6,
+    paddingRight: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    backgroundColor: cores.card,
+  },
+  seloSimples: { paddingLeft: 12, minHeight: 44 },
+  notaMetacritic: {
+    minWidth: 30,
+    paddingHorizontal: 6,
+    paddingVertical: 5,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: cores.texto,
+    color: cores.fundo,
+    fontFamily: tipografia.fontes.extraBold,
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  textoSelo: { color: '#D4D4D4', fontFamily: tipografia.fontes.regular, fontSize: 13 },
+  descricao: { color: '#D4D4D4', fontFamily: tipografia.fontes.regular, fontSize: 14, lineHeight: 22 },
+  lerMais: {
+    alignSelf: 'flex-start',
+    paddingVertical: 10,
+    color: cores.texto,
+    fontFamily: tipografia.fontes.semiBold,
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
   opcoes: { gap: 10 },
   opcao: {
     flexDirection: 'row',

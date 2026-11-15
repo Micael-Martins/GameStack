@@ -4,17 +4,17 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
+import type { Jogo } from '../../../models/Jogo';
 import CardJogo from '../../../components/CardJogo';
 import TituloSecao from '../../../components/TituloSecao';
 import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
-import { useHomeViewModel } from '../ViewModel/useHomeViewModel';
 import { EmptyQueueCard } from './components/CardFilaVazia';
 import { NowPlayingCarousel } from './components/CarrosselJogando';
 import { PopularGamesRow } from './components/LinhaPopulares';
 import { SummaryStrip } from './components/FaixaResumo';
 import { styles } from './InicioScreen.styles';
-import { useInicioViewModel } from '../ViewModel/useInicioViewModel.';
+import { useInicioViewModel } from '../ViewModel/useInicioViewModel';
+import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
 
 export default function InicioScreen() {
   const insets = useSafeAreaInsets();
@@ -23,7 +23,8 @@ export default function InicioScreen() {
   const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const goToSearch = () => navigation.navigate('Pesquisar');
   const goToLibrary = () => navigation.navigate('Biblioteca');
-
+  const openDetails = (game: JogoBiblioteca) => rootNavigation.navigate('DetalhesJogo', { id: game.id });
+    const openAdd = (game: Jogo) => rootNavigation.navigate('AdicionarJogo', { jogo: game });
   const vm = useInicioViewModel();
   const hasGames = !vm.isEmpty;
 
@@ -58,6 +59,7 @@ export default function InicioScreen() {
           <NowPlayingCarousel
             games={vm.playingGames}
             onLogHours={() => console.log('TODO: abrir Registrar horas')}
+            onOpenGame={openDetails}
             onOpenLibrary={goToLibrary}
           />
           {vm.recentGames.length > 0 && (
@@ -65,8 +67,7 @@ export default function InicioScreen() {
               <TituloSecao titulo="Jogados recentemente" link={{ texto: 'Ver todos', onPress: goToLibrary }} />
               <View style={styles.recentList}>
                 {vm.recentGames.map((game) => (
-                  <CardJogo key={game.id} item={game} variante="compacto" />
-                ))}
+                  <CardJogo key={game.id} item={game} variante="compacto" onPress={openDetails} />                ))}
               </View>
             </View>
           )}
@@ -76,8 +77,7 @@ export default function InicioScreen() {
           <EmptyQueueCard onSearch={goToSearch} />
           {/* Populares só com a biblioteca vazia; sem internet, a seção some */}
           {vm.popularGames.length > 0 && (
-            <PopularGamesRow games={vm.popularGames} onSeeMore={goToSearch} onSelect={goToSearch} />
-          )}
+            <PopularGamesRow games={vm.popularGames} onSeeMore={goToSearch} onSelect={openAdd} />          )}
         </>
       )}
     </ScrollView>

@@ -15,8 +15,7 @@ export function horasInteiras(minutos: number): number {
   return Number.isFinite(minutos) ? Math.max(0, Math.floor(minutos / 60)) : 0;
 }
 
-const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-
+export const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 // Quando foi a última interação: "hoje", "ontem", "há 3 dias" ou "02 nov".
 export function formatarQuando(dataISO: string, agora: Date = new Date()): string {
   const data = new Date(dataISO);
@@ -30,4 +29,13 @@ export function formatarQuando(dataISO: string, agora: Date = new Date()): strin
   if (dias === 1) return 'ontem';
   if (dias < 7) return `há ${dias} dias`;
   return `${String(data.getDate()).padStart(2, '0')} ${MESES[data.getMonth()]}`;
+}
+
+
+// Data completa: "12 ago 2026" (Detalhes: adicionado em, concluído em).
+export function formatarData(dataISO: string | null): string {
+  if (!dataISO) return '';
+  const data = new Date(dataISO);
+  if (Number.isNaN(data.getTime())) return '';
+  return `${String(data.getDate()).padStart(2, '0')} ${MESES[data.getMonth()]} ${data.getFullYear()}`;
 }

@@ -35,8 +35,14 @@ export default function PesquisarScreen() {
       ? `${vm.total} ${vm.total === 1 ? 'resultado' : 'resultados'} para "${vm.termoPesquisado}"`
       : 'Encontre sua próxima aventura';
 
-  const abrirAdicionar = useCallback((jogo: Jogo) => navigation.navigate('AdicionarJogo', { jogo }), [navigation]);
-
+  // Já na biblioteca: abre os Detalhes. Senão: abre Adicionar (com o "Sobre o jogo").
+  const abrirResultado = useCallback(
+    (jogo: Jogo, idBiblioteca: string | null) =>
+      idBiblioteca
+        ? navigation.navigate('DetalhesJogo', { id: idBiblioteca })
+        : navigation.navigate('AdicionarJogo', { jogo }),
+    [navigation],
+  );
   // Apagar o texto todo volta para a tela inicial.
   function alterarTermo(texto: string) {
     vm.setTermoDigitado(texto);
@@ -131,8 +137,12 @@ export default function PesquisarScreen() {
         keyExtractor={(item) => item.jogo.apiId}
         renderItem={({ item, index }) => (
           <EntradaAnimada atraso={atrasoDaLista(index)}>
-            <CardResultado jogo={item.jogo} naBiblioteca={item.naBiblioteca} onAdicionar={abrirAdicionar} />
-          </EntradaAnimada>
+<CardResultado
+              jogo={item.jogo}
+              naBiblioteca={item.naBiblioteca}
+              onTocar={(jogo) => abrirResultado(jogo, item.idBiblioteca)}
+            />
+                      </EntradaAnimada>
         )}
         ItemSeparatorComponent={() => <View style={styles.separador} />}
         contentContainerStyle={styles.lista}

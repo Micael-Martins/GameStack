@@ -7,4 +7,6 @@ export interface RawgJogo {
     genres: { name: string }[];
     platforms: { platform: { name: string } }[] | null;
     developers?: { name: string }[]; // só vem no detalhe (/games/{id})
+    description_raw?: string; // só vem no detalhe
+    metacritic?: number | null; // só vem no detalhe
 }

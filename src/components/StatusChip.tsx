@@ -9,6 +9,7 @@ type NomeIcone = ComponentProps<typeof Ionicons>['name'];
 
 interface StatusChipProps {
   status: StatusJogo;
+  grande?: boolean; // versão maior, para o card de status da tela Detalhes
 }
 
 const configuracoes: Record<
@@ -37,7 +38,7 @@ const configuracoes: Record<
   },
 };
 
-export default function StatusChip({ status }: StatusChipProps) {
+export default function StatusChip({ status, grande = false }: StatusChipProps) {
   const { rotulo, icone, tamanho } = configuracoes[status];
   const concluido = status === 'CONCLUIDO';
 
@@ -54,15 +55,16 @@ export default function StatusChip({ status }: StatusChipProps) {
       style={[
         styles.base,
         styles[status],
+        grande && styles.baseGrande,
       ]}
     >
       <Ionicons
         name={icone}
-        size={tamanho}
+        size={grande ? tamanho + 2 : tamanho}
         color={corConteudo}
       />
 
-      <Text style={[styles.rotulo, { color: corConteudo }]}>
+      <Text style={[styles.rotulo, grande && styles.rotuloGrande, { color: corConteudo }]}>
         {rotulo}
       </Text>
     </View>
@@ -107,5 +109,16 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 12,
     letterSpacing: 0.4,
+  },
+
+  baseGrande: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+
+  rotuloGrande: {
+    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontSize: 13,
+    letterSpacing: 0.8,
   },
 });
