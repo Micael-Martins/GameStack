@@ -22,8 +22,13 @@ export default function RegistrarHorasScreen({ navigation, route }: Props) {
 
   if (!vm.item) {
     return (
-      <View style={[styles.tela, styles.estadoSemJogo, { paddingTop: insets.top + 8 }]}>
-        <EstadoVazio titulo="Jogo não encontrado" descricao="Ele pode ter sido removido da sua biblioteca." />
+      <View style={[styles.tela, { paddingTop: insets.top + 8 }]}>
+        <View style={styles.cabecalhoErro}>
+          <Cabecalho titulo="Registrar horas" onVoltar={navigation.goBack} />
+        </View>
+        <View style={styles.estadoSemJogo}>
+          <EstadoVazio titulo="Jogo não encontrado" descricao="Ele pode ter sido removido da sua biblioteca." />
+        </View>
       </View>
     );
   }
@@ -87,7 +92,8 @@ export default function RegistrarHorasScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
-  estadoSemJogo: { paddingHorizontal: espacamentos.m, justifyContent: 'center' },
+  cabecalhoErro: { paddingHorizontal: espacamentos.m },
+  estadoSemJogo: { flex: 1, paddingHorizontal: espacamentos.m, justifyContent: 'center' },
   conteudo: { paddingHorizontal: espacamentos.m, gap: 24 },
   jogo: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, backgroundColor: cores.card, borderRadius: 18 },
   dadosJogo: { flex: 1, gap: 6 },
