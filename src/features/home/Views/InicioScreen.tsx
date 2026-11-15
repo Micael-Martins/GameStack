@@ -6,6 +6,8 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Jogo } from '../../../models/Jogo';
 import CardJogo from '../../../components/CardJogo';
+import EstadoCarregando from '../../../components/EstadoCarregando';
+import EstadoVazio from '../../../components/EstadoVazio';
 import TituloSecao from '../../../components/TituloSecao';
 import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
 import { EmptyQueueCard } from './components/CardFilaVazia';
@@ -26,7 +28,7 @@ export default function InicioScreen() {
   const openDetails = (game: JogoBiblioteca) => rootNavigation.navigate('DetalhesJogo', { id: game.id });
     const openAdd = (game: Jogo) => rootNavigation.navigate('AdicionarJogo', { jogo: game });
   const vm = useInicioViewModel();
-  const hasGames = !vm.isEmpty;
+  const hasGames = vm.estadoBiblioteca === 'LISTA';
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={[styles.content, { paddingTop: insets.top + 16 }]}>
@@ -50,11 +52,29 @@ export default function InicioScreen() {
       </View>
 
       {/* Mesma faixa nos dois estados: sem jogos, os números aparecem apagados */}
-      <View style={styles.summary}>
-        <SummaryStrip {...vm.summary} dimmed={!hasGames} />
-      </View>
+      {(hasGames || vm.isEmpty) && (
+        <View style={styles.summary}>
+          {vm.carregandoDados ? (
+            <EstadoCarregando mensagem="Carregando informações..." />
+          ) : (
+            <SummaryStrip {...vm.summary} dimmed={!hasGames} />
+          )}
+        </View>
+      )}
 
-      {hasGames ? (
+      {vm.estadoBiblioteca === 'CARREGANDO' ? (
+        <EstadoCarregando mensagem="Abrindo sua biblioteca..." />
+      ) : vm.estadoBiblioteca === 'ERRO' ? (
+        <EstadoVazio
+          titulo="Não foi possível abrir a biblioteca"
+          descricao={vm.erroBiblioteca ?? 'Tente novamente em instantes.'}
+          icone="alert-circle-outline"
+          acao={{
+            titulo: 'Tentar de novo',
+            onPress: vm.tentarNovamente,
+          }}
+        />
+      ) : hasGames ? (
         <>
           <NowPlayingCarousel
             games={vm.playingGames}
@@ -75,6 +95,10 @@ export default function InicioScreen() {
         <>
           <EmptyQueueCard onSearch={goToSearch} />
           {/* Populares só com a biblioteca vazia; sem internet, a seção some */}
+          {vm.carregandoPopulares && (
+            <EstadoCarregando mensagem="Buscando jogos populares..." />
+          )}
+
           {vm.popularGames.length > 0 && (
             <PopularGamesRow games={vm.popularGames} onSeeMore={goToSearch} onSelect={openAdd} />          )}
         </>

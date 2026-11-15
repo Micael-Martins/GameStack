@@ -9,6 +9,7 @@ import CampoTexto from '../../../components/CampoTexto';
 import CardResultado from '../../../components/CardResultado';
 import ChipFiltro from '../../../components/ChipFiltro';
 import EstadoVazio from '../../../components/EstadoVazio';
+import EstadoCarregando from '../../../components/EstadoCarregando';
 import TituloSecao from '../../../components/TituloSecao';
 import type { Jogo } from '../../../models/Jogo';
 import type { RootStackParamList } from '../../../navigation/tipos';
@@ -99,8 +100,7 @@ export default function PesquisarScreen() {
     if (vm.carregando) {
       return (
         <View style={styles.centro}>
-          <ActivityIndicator size="large" color={cores.texto} />
-          <Text style={styles.textoCarregando}>Buscando jogos...</Text>
+          <EstadoCarregando mensagem="Buscando jogos..." />
         </View>
       );
     }
@@ -148,12 +148,22 @@ export default function PesquisarScreen() {
         contentContainerStyle={styles.lista}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        onEndReached={() => void vm.carregarMais()}
+        onEndReached={() => { if (!vm.erro) void vm.carregarMais(); }}
         onEndReachedThreshold={0.4}
         ListFooterComponent={
           <View>
             {vm.carregandoMais ? <ActivityIndicator color={cores.texto} style={styles.mais} /> : null}
-            {vm.erro ? <Text style={styles.aviso}>{vm.erro}</Text> : null}
+            {vm.erro ? (
+              <EstadoVazio
+                titulo="Não foi possível carregar mais jogos"
+                descricao={vm.erro}
+                icone="cloud-offline-outline"
+                acao={{
+                  titulo: 'Tentar de novo',
+                  onPress: vm.tentarNovamente,
+                }}
+              />
+            ) : null}
             <CreditoRawg />
           </View>
         }

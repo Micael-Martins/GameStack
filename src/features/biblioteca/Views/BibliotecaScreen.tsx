@@ -3,12 +3,13 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect } from 'react';
-import { ActivityIndicator, FlatList, Pressable, ScrollView, Text, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import CardJogo from '../../../components/CardJogo';
 import ChipFiltro from '../../../components/ChipFiltro';
 import EstadoVazio from '../../../components/EstadoVazio';
+import EstadoCarregando from '../../../components/EstadoCarregando';
 import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
 import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
 import { cores } from '../../../theme';
@@ -60,8 +61,7 @@ export default function BibliotecaScreen({ navigation, route }: Props) {
 
             {vm.estado === 'CARREGANDO' ? (
         <View style={styles.centro}>
-          <ActivityIndicator size="large" color={cores.texto} />
-          <Text style={styles.textoCarregando}>Abrindo sua biblioteca...</Text>
+          <EstadoCarregando mensagem="Abrindo sua biblioteca..." />
         </View>
       ) : vm.estado === 'ERRO' ? (
         <View style={styles.centro}>
