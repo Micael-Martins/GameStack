@@ -11,6 +11,7 @@ Arquivos (MVVM):
 ## O que aparece
 
 - **Topo:** X para fechar, o anel do logo fechado com o check (entra com uma mola), "Jogo concluído", "Zerou!" e o nome do jogo.
+- **Fogos de artifício em preto e branco** (`components/Fogos.tsx`): três explosões saem do anel logo depois do check, e dar 5 estrelas ("Obra-prima") solta um estouro extra. Só `Animated` do React Native, com driver nativo; não bloqueia os toques e respeita o "reduzir movimento".
 - **"Xh jogadas · Nº jogo zerado":** o número é o total de concluídos (sem contar este) + 1.
 - **Estrelas clicáveis**, com a descrição da nota: Não curti, Mais ou menos, Bom, Muito bom e Obra-prima.
 - **"O que você achou? (opcional)":** começa com a anotação que o jogo já tinha, para não perder nada.

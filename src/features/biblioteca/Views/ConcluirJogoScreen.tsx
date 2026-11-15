@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -18,6 +18,7 @@ import { EntradaAnimada, movimentoReduzido, ToqueAnimado } from '../../../compon
 import CampoTexto from '../../../components/CampoTexto';
 import Capa from '../../../components/Capa';
 import Estrelas from '../../../components/Estrelas';
+import Fogos from '../../../components/Fogos';
 import { PrimaryButton } from '../../../components/PrimaryButton';
 import type { RootStackParamList } from '../../../navigation/tipos';
 import { cores, espacamentos, tipografia } from '../../../theme';
@@ -55,6 +56,8 @@ function AnelConcluido() {
 export default function ConcluirJogoScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
   const vm = useConcluirViewModel(route.params.id);
+  // Cada vez que a nota vira 5 ("Obra-prima"), solta um estouro extra (a key nova recria os fogos).
+  const [estourosObraPrima, setEstourosObraPrima] = useState(0);
 
   // O jogo foi removido enquanto a tela estava aberta: só fecha.
   if (!vm.item) {
@@ -94,6 +97,7 @@ export default function ConcluirJogoScreen({ navigation, route }: Props) {
         {/* Comemoração */}
         <View style={styles.cabecalho}>
           <AnelConcluido />
+          <Fogos explosoes={3} atraso={450} />
           <EntradaAnimada atraso={250}>
             <Text style={styles.selo}>JOGO CONCLUÍDO</Text>
             <Text accessibilityRole="header" style={styles.titulo}>
@@ -110,8 +114,15 @@ export default function ConcluirJogoScreen({ navigation, route }: Props) {
 
         {/* Nota */}
         <EntradaAnimada atraso={420} style={styles.cardNota}>
+          {estourosObraPrima > 0 ? <Fogos key={estourosObraPrima} explosoes={1} atraso={0} topo={70} /> : null}
           <Text style={styles.tituloNota}>Que nota você dá?</Text>
-          <Estrelas nota={vm.nota} onChange={vm.escolherNota} />
+          <Estrelas
+            nota={vm.nota}
+            onChange={(nota) => {
+              if (nota === 5 && vm.nota !== 5) setEstourosObraPrima((n) => n + 1);
+              vm.escolherNota(nota);
+            }}
+          />
           <Text style={[styles.textoNota, vm.nota !== null && styles.textoNotaEscolhida]}>{vm.textoNota}</Text>
         </EntradaAnimada>
 
