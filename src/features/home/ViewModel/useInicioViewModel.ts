@@ -114,7 +114,7 @@ export function useInicioViewModel() {
     () =>
       recentes(
         games.filter((j) => j.status !== "JOGANDO"),
-        2,
+        5,
       ),
     [games],
   );

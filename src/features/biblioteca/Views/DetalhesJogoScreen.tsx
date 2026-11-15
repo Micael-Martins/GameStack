@@ -18,6 +18,7 @@ import { useDetalhesViewModel } from '../ViewModel/useDetalhesViewModel';
 import BotaoRemoverJogo from './BotaoRemoverJogo';
 import { styles } from './DetalhesJogoScreen.styles';
 import PainelMudarStatus from './PainelMudarStatus';
+import { progressoDoTempo } from '../Model/detalhesJogo';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DetalhesJogo'>;
 
@@ -84,7 +85,7 @@ export default function DetalhesJogoScreen({ navigation, route }: Props) {
           {item.jogo.tempoMedio > 0 ? (
             <>
               <BarraProgresso
-                valor={dados.progresso}
+                valor={progressoDoTempo(item)}
                 temTempoMedio
                 descricao={`Progresso de ${item.jogo.nome}: ${dados.textoHoras}`}
               />

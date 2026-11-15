@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-
+import { useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 import { reagendarLembrete } from '../../../data/services/notificationService';
 import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
 import type { StatusJogo } from '../../../models/StatusJogo';
@@ -29,6 +29,19 @@ export function usePainelMudarStatusViewModel(
 
   const salvando = salvandoStatus !== null;
 
+
+  // No iPhone, a tela Concluir (fullScreenModal) não abre enquanto o painel ainda
+  // está fechando: o iOS ignora uma tela nova por cima de outra que está saindo.
+  // Por isso o jogo fica guardado aqui e a navegação só acontece quando o painel
+  // terminar de fechar (onDismiss do Modal, ver aoTerminarDeFechar).
+  const concluirPendente = useRef<JogoBiblioteca | null>(null);
+
+  function aoTerminarDeFechar() {
+    const jogo = concluirPendente.current;
+    concluirPendente.current = null;
+    if (jogo) onConcluir(jogo);
+  }
+
   async function escolher(status: StatusJogo): Promise<void> {
     if (!jogoAtual || salvando) return;
 
@@ -36,10 +49,14 @@ export function usePainelMudarStatusViewModel(
 
     if (acao === 'nada') return;
 
-    // Concluir sempre passa pela tela de conclusão, que pede a nota.
-    if (acao === 'concluir') {
-      onFechar();
-      onConcluir(jogoAtual);
+        if (acao === 'concluir') {
+      if (Platform.OS === 'ios') {
+        concluirPendente.current = jogoAtual; // abre quando o painel terminar de fechar
+        onFechar();
+      } else {
+        onFechar(); // no Android não tem esse problema
+        onConcluir(jogoAtual);
+      }
       return;
     }
 
@@ -62,11 +79,12 @@ export function usePainelMudarStatusViewModel(
     onFechar();
   }
 
-  return {
+    return {
     jogoAtual,
     escolher,
     salvando,
     salvandoStatus,
     erro,
+    aoTerminarDeFechar,
   };
 }
