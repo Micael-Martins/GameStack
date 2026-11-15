@@ -83,7 +83,6 @@ export function usePesquisaViewModel() {
   }, [controller]);
 
   // Cada resultado sabe se já está na biblioteca (botão "Adicionar" × "Na biblioteca").
-    // Cada resultado sabe se já está na biblioteca ("+" × "Na biblioteca") e, se estiver, o id dele lá.
   const resultados = useMemo(
     () =>
       estado.jogos.map((jogo: Jogo) => {

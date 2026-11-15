@@ -67,7 +67,7 @@ export default function InicioScreen() {
               <TituloSecao titulo="Jogados recentemente" link={{ texto: 'Ver todos', onPress: goToLibrary }} />
               <View style={styles.recentList}>
                 {vm.recentGames.map((game) => (
-<CardJogo key={game.id} item={game} variante="compacto" onPress={openDetails} />                ))}
+                  <CardJogo key={game.id} item={game} variante="compacto" onPress={openDetails} />                ))}
               </View>
             </View>
           )}
