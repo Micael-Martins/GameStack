@@ -8,13 +8,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CardJogo from '../../../components/CardJogo';
 import TituloSecao from '../../../components/TituloSecao';
 import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
-import { useHomeViewModel } from '../ViewModel/useHomeViewModel';
 import { EmptyQueueCard } from './components/CardFilaVazia';
 import { NowPlayingCarousel } from './components/CarrosselJogando';
 import { PopularGamesRow } from './components/LinhaPopulares';
 import { SummaryStrip } from './components/FaixaResumo';
 import { styles } from './InicioScreen.styles';
-import { useInicioViewModel } from '../ViewModel/useInicioViewModel.';
+import { useInicioViewModel } from '../ViewModel/useInicioViewModel';
 
 export default function InicioScreen() {
   const insets = useSafeAreaInsets();
