@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { memo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import type { Jogo } from '../models/Jogo';
 import { cores, espacamentos, tipografia } from '../theme';
+import { EntradaAnimada, ToqueAnimado } from './animacoes';
 import Capa from './Capa';
 import { linhaResultado, textoTempoMedio } from './cardResultadoUtils';
 
@@ -41,19 +42,21 @@ function CardResultado({ jogo, naBiblioteca, onAdicionar }: CardResultadoProps) 
       </View>
 
       {naBiblioteca ? (
+        <EntradaAnimada key="na-biblioteca" deslocamento={0}>
         <View style={styles.naBiblioteca} accessible accessibilityLabel="Já está na biblioteca">
           <Ionicons name="checkmark" size={15} color={cores.textoSecundario} />
           <Text style={styles.textoNaBiblioteca}>Na biblioteca</Text>
         </View>
+        </EntradaAnimada>
       ) : (
-        <Pressable
+        <ToqueAnimado
           onPress={() => onAdicionar(jogo)}
           accessibilityRole="button"
           accessibilityLabel={`Adicionar ${jogo.nome} à biblioteca`}
-          style={({ pressed }) => [styles.botaoMais, pressed && styles.pressionado]}
+          style={styles.botaoMais}
         >
           <Ionicons name="add" size={24} color={cores.texto} />
-        </Pressable>
+        </ToqueAnimado>
       )}
     </View>
   );
@@ -87,5 +90,4 @@ const styles = StyleSheet.create({
   },
   naBiblioteca: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   textoNaBiblioteca: { color: cores.textoSecundario, fontFamily: tipografia.fontes.semiBold, fontSize: 13 },
-  pressionado: { opacity: 0.7 },
 });

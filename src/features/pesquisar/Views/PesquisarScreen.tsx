@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { ActivityIndicator, FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { atrasoDaLista, EntradaAnimada } from '../../../components/animacoes';
 import CampoTexto from '../../../components/CampoTexto';
 import CardResultado from '../../../components/CardResultado';
 import ChipFiltro from '../../../components/ChipFiltro';
@@ -42,6 +43,17 @@ export default function PesquisarScreen() {
     if (!texto.trim()) vm.limparPesquisa();
   }
 
+  // Qual "estado" a área de baixo está mostrando: ao trocar, o conteúdo entra suave.
+  const estadoTela = !emResultados
+    ? 'inicial'
+    : vm.carregando
+      ? 'carregando'
+      : vm.erro && vm.resultados.length === 0
+        ? 'erro'
+        : vm.resultados.length === 0
+          ? 'vazio'
+          : `lista-${vm.termoPesquisado}`;
+
   function renderizarConteudo() {
     // Antes de pesquisar: pesquisas recentes e convite.
     if (!emResultados) {
@@ -54,14 +66,15 @@ export default function PesquisarScreen() {
             <View style={styles.recentes}>
               <TituloSecao titulo="Pesquisas recentes" link={{ texto: 'Limpar', onPress: vm.limparHistorico }} />
               <View style={styles.chips}>
-                {vm.pesquisasRecentes.map((recente) => (
-                  <ChipFiltro
-                    key={recente}
-                    texto={recente}
-                    icone="time-outline"
-                    selecionado={false}
-                    onPress={() => vm.selecionarPesquisaRecente(recente)}
-                  />
+                {vm.pesquisasRecentes.map((recente, indice) => (
+                  <EntradaAnimada key={recente} atraso={atrasoDaLista(indice, 40)} deslocamento={8}>
+                    <ChipFiltro
+                      texto={recente}
+                      icone="time-outline"
+                      selecionado={false}
+                      onPress={() => vm.selecionarPesquisaRecente(recente)}
+                    />
+                  </EntradaAnimada>
                 ))}
               </View>
             </View>
@@ -116,8 +129,10 @@ export default function PesquisarScreen() {
       <FlatList
         data={vm.resultados}
         keyExtractor={(item) => item.jogo.apiId}
-        renderItem={({ item }) => (
-          <CardResultado jogo={item.jogo} naBiblioteca={item.naBiblioteca} onAdicionar={abrirAdicionar} />
+        renderItem={({ item, index }) => (
+          <EntradaAnimada atraso={atrasoDaLista(index)}>
+            <CardResultado jogo={item.jogo} naBiblioteca={item.naBiblioteca} onAdicionar={abrirAdicionar} />
+          </EntradaAnimada>
         )}
         ItemSeparatorComponent={() => <View style={styles.separador} />}
         contentContainerStyle={styles.lista}
@@ -159,7 +174,9 @@ export default function PesquisarScreen() {
           returnKeyType="search"
         />
       </View>
-      <View style={styles.conteudo}>{renderizarConteudo()}</View>
+      <EntradaAnimada key={estadoTela} deslocamento={8} style={styles.conteudo}>
+        {renderizarConteudo()}
+      </EntradaAnimada>
     </View>
   );
 }

@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { EntradaAnimada } from '../../../components/animacoes';
 import Cabecalho from '../../../components/Cabecalho';
 import CampoTexto from '../../../components/CampoTexto';
 import Interruptor from '../../../components/Interruptor';
@@ -61,7 +62,7 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
       >
         <Cabecalho titulo="Configurações" onVoltar={navigation.goBack} />
 
-        <View style={styles.secao}>
+        <EntradaAnimada atraso={0} style={styles.secao}>
           <TituloSecao titulo="Perfil" />
           <CampoTexto
             label="Nome"
@@ -75,9 +76,9 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
             maxLength={30}
             returnKeyType="done"
           />
-        </View>
+        </EntradaAnimada>
 
-        <View style={styles.secao}>
+        <EntradaAnimada atraso={60} style={styles.secao}>
           <TituloSecao titulo="Lembretes" />
           <View style={styles.card}>
             <View style={styles.linha}>
@@ -125,9 +126,9 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
             {vm.lembretesAtivos && vm.erroHorario ? <Text style={styles.erro}>{vm.erroHorario}</Text> : null}
           </View>
           {vm.aviso ? <Text style={styles.aviso}>{vm.aviso}</Text> : null}
-        </View>
+        </EntradaAnimada>
 
-        <View style={styles.secao}>
+        <EntradaAnimada atraso={120} style={styles.secao}>
           <TituloSecao titulo="Dados" />
           <View style={styles.card}>
             <View style={styles.linha}>
@@ -149,7 +150,7 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
               {vm.apagando ? <ActivityIndicator color={cores.textoSecundario} /> : null}
             </Pressable>
           </View>
-        </View>
+        </EntradaAnimada>
 
         <View style={styles.flex} />
         <Text style={styles.versao}>{NOME_APP} · versão 1.0</Text>

@@ -82,8 +82,8 @@ export default function App() {
         <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
           <Stack.Screen name="BoasVindas" component={OnBoardingScreen} />
           <Stack.Screen name="Abas" component={TabRouter} />
-          <Stack.Screen name="Configuracoes" component={ConfiguracoesScreen} />
-          <Stack.Screen name="AdicionarJogo" component={AdicionarJogoScreen} />
+          <Stack.Screen name="Configuracoes" component={ConfiguracoesScreen} options={{ animation: 'ios_from_right' }} />
+          <Stack.Screen name="AdicionarJogo" component={AdicionarJogoScreen} options={{ animation: 'ios_from_right' }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

@@ -29,6 +29,16 @@ Uma tela só, na aba Pesquisar, usando o `usePesquisaViewModel`:
 - "Adicionar à biblioteca": converte horas em minutos, salva pela store, reagenda o lembrete e volta para a aba Biblioteca. Jogo repetido mostra "Esse jogo já está na sua biblioteca.".
 - Regras puras em `features/pesquisar/Model/adicionarJogo.ts`.
 
+## Animações e navegação
+
+`src/components/animacoes.tsx` (respeita a opção "reduzir movimento" do celular):
+
+- `EntradaAnimada`: aparece subindo um pouco. Usada nos cards dos resultados (em sequência, só os primeiros 8), nos chips de pesquisas recentes, na troca de estado da Pesquisa (inicial, carregando, erro, lista), no card e nas opções da tela Adicionar e nas seções das Configurações.
+- `ToqueAnimado`: botão que afunda um pouco ao tocar (botão "+" e opções de status).
+- Configurações e Adicionar entram deslizando da direita (`ios_from_right`), com o gesto de voltar.
+- A troca de abas usa `fade` (TabRouter).
+- Na tela Adicionar, o rádio marca com uma mola e o campo de horas abre e fecha suave (LayoutAnimation).
+
 ## Testes
 
 `tests/pesquisaAdicionar.test.mjs`: textos do CardResultado, status inicial, conversão de horas, Na fila com 0h e `buscarDetalhes`.

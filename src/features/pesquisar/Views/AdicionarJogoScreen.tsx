@@ -1,10 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   KeyboardAvoidingView,
+  LayoutAnimation,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,6 +14,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { EntradaAnimada, ToqueAnimado } from '../../../components/animacoes';
 import Cabecalho from '../../../components/Cabecalho';
 import CampoTexto from '../../../components/CampoTexto';
 import Capa from '../../../components/Capa';
@@ -22,6 +25,7 @@ import {
 } from '../../../components/cardResultadoUtils';
 import { PrimaryButton } from '../../../components/PrimaryButton';
 import TituloSecao from '../../../components/TituloSecao';
+import type { StatusJogo } from '../../../models/StatusJogo';
 import type { RootStackParamList } from '../../../navigation/tipos';
 import { cores, espacamentos, tipografia } from '../../../theme';
 import { OPCOES_STATUS_INICIAL } from '../Model/adicionarJogo';
@@ -29,12 +33,30 @@ import { useAdicionarViewModel } from '../ViewModel/useAdicionarViewModel';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AdicionarJogo'>;
 
+// Bolinha do rádio: cresce com uma mola ao ser marcada.
+function MioloRadio({ marcado }: { marcado: boolean }) {
+  const escala = useRef(new Animated.Value(marcado ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.spring(escala, { toValue: marcado ? 1 : 0, friction: 6, tension: 180, useNativeDriver: true }).start();
+  }, [marcado, escala]);
+
+  return <Animated.View style={[styles.radioMiolo, { transform: [{ scale: escala }] }]} />;
+}
+
 // Tela 05 do protótipo. Abre ao tocar no "+" de um resultado da pesquisa.
 export default function AdicionarJogoScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
   const vm = useAdicionarViewModel(route.params.jogo);
   const { jogo } = vm;
   const tempoMedio = textoTempoMedio(jogo.tempoMedio);
+
+  // Trocar o status anima o campo de horas abrindo ou fechando (ele some em Na fila).
+  function escolherStatus(status: StatusJogo) {
+    if (status === vm.status) return;
+    LayoutAnimation.configureNext(LayoutAnimation.create(220, 'easeInEaseOut', 'opacity'));
+    vm.setStatus(status);
+  }
 
   async function aoAdicionar() {
     if (await vm.adicionar()) {
@@ -51,7 +73,7 @@ export default function AdicionarJogoScreen({ navigation, route }: Props) {
       >
         <Cabecalho titulo="Adicionar jogo" onVoltar={navigation.goBack} />
 
-        <View style={styles.cardJogo}>
+        <EntradaAnimada style={styles.cardJogo}>
           <Capa imagemURL={jogo.imagemURL} tamanho="G" descricao={`Capa de ${jogo.nome}`} />
           <View style={styles.textosJogo}>
             <Text style={styles.nomeJogo} numberOfLines={3}>
@@ -76,31 +98,31 @@ export default function AdicionarJogoScreen({ navigation, route }: Props) {
               </View>
             ) : null}
           </View>
-        </View>
+        </EntradaAnimada>
 
-        <View style={styles.secao}>
+        <EntradaAnimada atraso={70} style={styles.secao}>
           <TituloSecao titulo="Status inicial" />
           <View style={styles.opcoes} accessibilityRole="radiogroup">
             {OPCOES_STATUS_INICIAL.map((opcao) => {
               const selecionada = vm.status === opcao.status;
               return (
-                <Pressable
+                <ToqueAnimado
                   key={opcao.status}
-                  onPress={() => vm.setStatus(opcao.status)}
+                  onPress={() => escolherStatus(opcao.status)}
                   accessibilityRole="radio"
                   accessibilityState={{ checked: selecionada }}
                   accessibilityLabel={opcao.rotulo}
-                  style={({ pressed }) => [styles.opcao, selecionada && styles.opcaoSelecionada, pressed && styles.pressionado]}
+                  style={[styles.opcao, selecionada && styles.opcaoSelecionada]}
                 >
                   <View style={[styles.radio, selecionada && styles.radioSelecionado]}>
-                    {selecionada ? <View style={styles.radioMiolo} /> : null}
+                    <MioloRadio marcado={selecionada} />
                   </View>
                   <Text style={styles.textoOpcao}>{opcao.rotulo}</Text>
-                </Pressable>
+                </ToqueAnimado>
               );
             })}
           </View>
-        </View>
+        </EntradaAnimada>
 
         {/* Na fila começa com 0h, então o campo some. */}
         {vm.mostrarCampoHoras ? (
@@ -175,5 +197,4 @@ const styles = StyleSheet.create({
   erro: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
   erroRodape: { textAlign: 'center', marginBottom: espacamentos.m },
   rodape: { paddingHorizontal: espacamentos.gg, paddingTop: espacamentos.m, backgroundColor: cores.fundo },
-  pressionado: { opacity: 0.8 },
 });
