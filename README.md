@@ -1,156 +1,343 @@
 # GameStack
 
-Aplicativo mobile para organizar jogos, acompanhar uma biblioteca pessoal e pesquisar novos títulos. O projeto foi desenvolvido com React Native, Expo, TypeScript e Expo Router.
+Aplicativo mobile para organizar seu backlog de jogos, acompanhar
+o progresso e descobrir novos títulos.
+
+## Sobre o projeto
+
+O GameStack ajuda jogadores a organizarem os jogos que possuem,
+mas ainda não terminaram.
+
+O aplicativo permite acompanhar as horas jogadas, registrar
+avaliações e anotações, organizar a fila de jogos e visualizar
+estatísticas da biblioteca pessoal.
+
+## Funcionalidades
+
+- Pesquisa de jogos pela API RAWG.
+- Biblioteca pessoal com filtros por status.
+- Registro de horas jogadas.
+- Avaliações de uma a cinco estrelas.
+- Anotações pessoais.
+- Acompanhamento do progresso.
+- Estatísticas da biblioteca.
+- Lembretes após cinco dias sem interação.
+- Persistência local dos dados.
 
 ## Tecnologias
 
-- Expo SDK 57
-- React Native 0.86
-- React 19
-- TypeScript
-- Expo Router
+| Tecnologia | Finalidade |
+| --- | --- |
+| React Native | Desenvolvimento mobile |
+| Expo SDK 57 | Ambiente de desenvolvimento |
+| TypeScript | Tipagem e segurança do código |
+| React Navigation | Navegação entre telas |
+| Zustand | Gerenciamento de estado |
+| SQLite | Banco de dados local |
+| AsyncStorage | Preferências do usuário |
+| SecureStore | Armazenamento seguro |
+| RAWG API | Consulta de informações sobre jogos |
+| Expo Notifications | Lembretes locais |
 
-## Pré-requisitos
+## Como executar
 
-Antes de executar o projeto, instale:
+### Pré-requisitos
 
-- [Node.js](https://nodejs.org/) em uma versão LTS recente, que já inclui o npm;
-- [Expo Go](https://expo.dev/go) no celular, caso queira testar em um dispositivo físico;
-- Android Studio para executar em um emulador Android; ou
-- Xcode, disponível somente no macOS, para executar no simulador do iOS.
+- Node.js 24.
+- npm.
+- Expo Go compatível com o SDK do projeto.
+- Uma chave de acesso à API RAWG.
 
-Confira se o Node.js e o npm estão disponíveis:
-
-```bash
-node --version
-npm --version
-```
-
-## Instalação
-
-Clone o repositório e acesse a pasta do projeto:
+### 1. Clonar o repositório
 
 ```bash
-git clone https://github.com/Micael-Martins/GameStack.git
+git clone -b develop https://github.com/Micael-Martins/GameStack.git
 cd GameStack
 ```
 
-Instale exatamente as dependências registradas no `package-lock.json`:
-
-```bash
-npm ci
-```
-
-Caso esteja trabalhando em uma cópia sem `package-lock.json`, use:
+### 2. Instalar as dependências
 
 ```bash
 npm install
 ```
 
-## Executando o projeto
+Também é possível utilizar `npm ci` para instalar exatamente
+as versões registradas no package-lock.json.
 
-Inicie o servidor de desenvolvimento do Expo:
+### 3. Configurar a API RAWG
 
-```bash
-npm start
-```
+Obtenha uma chave em:
 
-O terminal exibirá um QR Code. Abra o Expo Go no Android ou a câmera no iOS para executar o aplicativo em um dispositivo físico.
+https://rawg.io/apidocs
 
-### Android
-
-Com um emulador Android aberto:
+Crie o arquivo `.env` a partir do exemplo:
 
 ```bash
-npm run android
+cp .env.example .env
 ```
 
-### iOS
+No Windows PowerShell:
 
-No macOS, com o Xcode instalado:
+```powershell
+Copy-Item .env.example .env
+```
+
+Preencha o arquivo `.env`:
+
+```env
+EXPO_PUBLIC_RAWG_KEY=SUA_CHAVE_AQUI
+```
+
+Nunca envie a chave real para o GitHub.
+
+### 4. Iniciar o aplicativo
 
 ```bash
-npm run ios
+npx expo start
 ```
 
-### Navegador
+Escaneie o QR Code utilizando o Expo Go em um dispositivo
+compatível.
+
+Também estão disponíveis os comandos:
+
+| Comando | Plataforma |
+| --- | --- |
+| npm run android | Android |
+| npm run ios | iOS |
+| npm run web | Navegador |
+
+O aplicativo foi desenvolvido prioritariamente para Android
+e iOS. A versão web possui limitações de persistência e
+notificações, pois a implementação atual do SQLite é nativa.
+
+## Telas do aplicativo
+
+Capturas reais do GameStack em execução.
+
+| Início | Pesquisa | Resultados |
+| :---: | :---: | :---: |
+| <img src="docs/screenshots/home.png" width="230"> | <img src="docs/screenshots/pesquisa.png" width="230"> | <img src="docs/screenshots/resultados.png" width="230"> |
+
+| Biblioteca | Adicionar jogo |
+| :---: | :---: |
+| <img src="docs/screenshots/biblioteca.png" width="230"> | <img src="docs/screenshots/adicionar-jogo.png" width="230"> |
+
+> Capturas realizadas na versão web. A persistência SQLite está disponível no Android e iOS.
+
+
+## Arquitetura MVVM
+
+O projeto utiliza a arquitetura Model-View-ViewModel para
+separar a interface, as regras de negócio e o acesso aos dados.
+
+### Estrutura de pastas
+
+```text
+GameStack/
+├── assets/
+├── docs/
+├── src/
+│   ├── components/
+│   ├── data/
+│   │   ├── db/
+│   │   ├── secure/
+│   │   ├── services/
+│   │   └── storage/
+│   ├── features/
+│   │   ├── biblioteca/
+│   │   ├── configuracoes/
+│   │   ├── home/
+│   │   ├── onboarding/
+│   │   └── pesquisar/
+│   ├── models/
+│   ├── navigation/
+│   ├── store/
+│   ├── theme/
+│   └── utils/
+├── tests/
+├── App.tsx
+└── package.json
+```
+
+| Camada | Responsabilidade |
+| --- | --- |
+| Models | Entidades, tipos e estruturas de dados |
+| Data | Banco de dados, repositórios e serviços externos |
+| ViewModel | Estado das telas e regras de interação |
+| Views | Interface visual e interação com o usuário |
+| Store | Estado compartilhado da biblioteca |
+| Components | Componentes visuais reutilizáveis |
+
+### Exemplo: pesquisa de jogos
+
+```mermaid
+flowchart TD
+    A[PesquisarScreen] --> B[usePesquisaViewModel]
+    B --> C[PesquisaController]
+    C --> D[rawgService]
+    D --> E[API RAWG]
+    E --> F[Resultados convertidos em Jogo]
+    F --> C
+    C --> B
+    B --> A
+```
+
+A tela recebe a interação do usuário. O ViewModel coordena
+a pesquisa, o serviço consulta a RAWG e os resultados são
+apresentados na interface.
+
+## Banco de dados
+
+O SQLite armazena os dados do usuário, sua biblioteca,
+os jogos consultados e as informações de progresso.
+
+```mermaid
+erDiagram
+    USUARIO ||--o| BIBLIOTECA : possui
+    BIBLIOTECA ||--o{ JOGO_BIBLIOTECA : contem
+    JOGO ||--o{ JOGO_BIBLIOTECA : referencia
+
+    USUARIO {
+        TEXT id PK
+        TEXT nome
+        INTEGER notificacaoAtiva
+        TEXT horarioNotificacao
+    }
+
+    BIBLIOTECA {
+        TEXT id PK
+        TEXT usuarioId FK
+    }
+
+    JOGO {
+        TEXT id PK
+        TEXT apiId
+        TEXT origemAPI
+        TEXT nome
+        TEXT imagemURL
+        TEXT genero
+        TEXT desenvolvedora
+        INTEGER anoLancamento
+        INTEGER tempoMedio
+        TEXT plataformas
+    }
+
+    JOGO_BIBLIOTECA {
+        TEXT id PK
+        TEXT bibliotecaId FK
+        TEXT jogoId FK
+        TEXT status
+        INTEGER minutosJogados
+        INTEGER nota
+        TEXT anotacao
+        TEXT dataAdicao
+        TEXT dataConclusao
+        TEXT ultimaInteracao
+    }
+```
+
+Cada usuário possui no máximo uma biblioteca.
+
+A tabela jogo_biblioteca relaciona os jogos à biblioteca
+e registra as informações individuais de progresso.
+
+A combinação de bibliotecaId e jogoId é única, evitando
+duplicidades na biblioteca.
+
+O tempo médio fornecido pela RAWG é registrado em horas,
+enquanto o tempo jogado é armazenado em minutos.
+
+## Regras de status
+
+| Status | Comportamento |
+| --- | --- |
+| Na fila | Jogo aguardando início, sem nota ou data de conclusão |
+| Jogando | Jogo em andamento, sem nota ou data de conclusão |
+| Concluído | Registra a data de conclusão e a avaliação disponível |
+| Abandonado | Limpa a data de conclusão e pode manter uma nota anterior |
+
+Ao concluir pela tela de conclusão, o usuário precisa
+selecionar uma avaliação de uma a cinco estrelas.
+
+Toda mudança de status atualiza a última interação.
+
+Ao registrar horas de um jogo Na fila, ele passa para Jogando.
+
+O status Abandonado não é contabilizado como jogo concluído.
+
+## Persistência de dados
+
+| Tecnologia | Dados armazenados | Motivo |
+| --- | --- | --- |
+| SQLite | Usuário, biblioteca, jogos, horas, notas, anotações, status e lembretes | Dados relacionais e persistência local |
+| AsyncStorage | Onboarding, pesquisas recentes e último filtro | Preferências simples |
+| SecureStore | Chave da API RAWG | Armazenamento protegido pelo sistema operacional |
+
+A chave RAWG é copiada do arquivo `.env` para o SecureStore
+na execução do aplicativo nativo.
+
+Variáveis EXPO_PUBLIC são incluídas no bundle do aplicativo.
+O SecureStore protege os dados armazenados localmente,
+mas não impede a extração de uma chave incluída no bundle.
+Em produção, credenciais privadas devem permanecer em um servidor.
+
+## Testes
+
+Execute a suíte de testes automatizados:
 
 ```bash
-npm run web
+npm test
 ```
 
-## Comandos úteis
-
-Reiniciar o Expo limpando o cache:
-
-```bash
-npx expo start --clear
-```
-
-Verificar os tipos do TypeScript:
+Verifique a tipagem:
 
 ```bash
 npx tsc --noEmit
 ```
 
-Verificar a configuração e a compatibilidade das dependências:
+Verifique a compatibilidade das dependências:
 
 ```bash
 npx expo-doctor
 ```
 
-Corrigir versões de dependências incompatíveis com o SDK do Expo:
+Gere o bundle Android:
 
 ```bash
-npx expo install --fix
+npx expo export --platform android
 ```
 
-Instalar uma biblioteca compatível com a versão atual do Expo:
+Os testes abrangem persistência, regras de status, pesquisa,
+progresso, configurações e integração com os serviços.
 
-```bash
-npx expo install <NOME_DA_BIBLIOTECA>
-```
+## Git Flow
 
-Parar o servidor de desenvolvimento:
+O desenvolvimento é organizado por branches:
 
-```text
-Ctrl + C
-```
+- main: versão estável.
+- develop: integração das funcionalidades.
+- feature/*: implementação de funcionalidades.
+- fix/*: correções.
+- docs/*: documentação.
 
-## Reinstalação das dependências
+As alterações são enviadas por Pull Requests para develop,
+permitindo revisão e validação pelos integrantes.
 
-Se as dependências apresentarem problemas, faça uma instalação limpa:
+## Equipe
 
-```bash
-rm -rf node_modules
-npm ci
-```
+- [Agatha Karenne](https://github.com/AgathaKarenne)
+- [BrunnoCC](https://github.com/BrunnoCC)
+- [Débora Cristina](https://github.com/debCristina)
+- [Micael Martins](https://github.com/Micael-Martins)
 
-O diretório `node_modules` não é enviado ao Git. Ele pode ser recriado a qualquer momento com `npm ci`.
+## Créditos
 
-## Estrutura principal
+Os dados e as imagens dos jogos são fornecidos pela
+[RAWG Video Games Database](https://rawg.io/).
 
-```text
-GameStack/
-├── assets/                  # Imagens e fontes
-├── src/
-│   ├── app/                 # Rotas do Expo Router
-│   ├── components/          # Componentes compartilhados
-│   ├── constants/           # Constantes globais
-│   └── features/            # Funcionalidades organizadas em MVVM
-│       ├── biblioteca/
-│       ├── home/
-│       └── pesquisar/
-├── app.json                 # Configuração do Expo
-├── package.json             # Scripts e dependências
-└── tsconfig.json            # Configuração do TypeScript
-```
+Projeto acadêmico desenvolvido pela equipe GameStack.
 
 ## Licença
 
-Consulte o arquivo [LICENSE](./LICENSE).
-
-## Por que SecureStore e não AsyncStorage para a chave da RAWG?
-
-O AsyncStorage guarda texto puro, que pode ser lido por quem acessar os arquivos do app. O SecureStore usa o Keychain (iOS) e o Keystore (Android), que criptografam o valor; por isso a chave da RAWG fica nele (`src/data/secure/credenciais.ts`).
-A chave do `.env` também vai dentro do app instalado, então isso não a esconde de quem descompilar: o que mostramos é a boa prática de nunca guardar segredo em texto puro. Num app real, a chave ficaria num servidor.
+[MIT](./LICENSE)
