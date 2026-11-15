@@ -38,3 +38,16 @@ export function textoResumo(jogos: JogoBiblioteca[]): string {
   const quantidade = jogos.length === 1 ? '1 jogo' : `${jogos.length} jogos`;
   return `${quantidade} · ${horasInteiras(minutos)}h registradas`;
 }
+
+
+// O que a tela mostra no lugar da lista. A ordem importa: se a leitura do banco
+// falhou, a lista também vem vazia, mas a mensagem certa é a de erro (e não
+// "Adicione seu primeiro jogo", que faria parecer que os jogos sumiram).
+export type EstadoBiblioteca = 'CARREGANDO' | 'ERRO' | 'VAZIA' | 'LISTA';
+
+export function estadoDaBiblioteca(carregando: boolean, erro: string | null, total: number): EstadoBiblioteca {
+  if (total > 0) return 'LISTA'; // já tem jogos na tela: mostra mesmo se uma recarga falhar
+  if (carregando) return 'CARREGANDO';
+  if (erro) return 'ERRO';
+  return 'VAZIA';
+}

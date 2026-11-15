@@ -3,7 +3,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect } from 'react';
-import { FlatList, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import CardJogo from '../../../components/CardJogo';
@@ -15,7 +15,6 @@ import { cores } from '../../../theme';
 import { FILTROS } from '../Model/filtrosBiblioteca';
 import { useBibliotecaViewModel } from '../ViewModel/useBibliotecaViewModel';
 import { styles } from './BibliotecaScreen.styles';
-
 // Aba das abas (Biblioteca) que também abre telas da pilha principal (Detalhes).
 type Props = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, 'Biblioteca'>,
@@ -59,7 +58,21 @@ export default function BibliotecaScreen({ navigation, route }: Props) {
         </Pressable>
       </View>
 
-      {vm.bibliotecaVazia ? (
+            {vm.estado === 'CARREGANDO' ? (
+        <View style={styles.centro}>
+          <ActivityIndicator size="large" color={cores.texto} />
+          <Text style={styles.textoCarregando}>Abrindo sua biblioteca...</Text>
+        </View>
+      ) : vm.estado === 'ERRO' ? (
+        <View style={styles.centro}>
+          <EstadoVazio
+            titulo="Não foi possível abrir a biblioteca"
+            descricao={vm.erro ?? 'Tente novamente em instantes.'}
+            icone="alert-circle-outline"
+            acao={{ titulo: 'Tentar novamente', onPress: vm.tentarNovamente }}
+          />
+        </View>
+      ) : vm.estado === 'VAZIA' ? (
         <View style={styles.centro}>
           <EstadoVazio
             titulo="Adicione seu primeiro jogo"

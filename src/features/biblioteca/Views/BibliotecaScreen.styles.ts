@@ -42,4 +42,11 @@ export const styles = StyleSheet.create({
 
   // Biblioteca vazia
   centro: { flex: 1, justifyContent: 'center', paddingHorizontal: 20, paddingBottom: 60 },
+  textoCarregando: {
+    marginTop: 12,
+    textAlign: 'center',
+    color: cores.textoSecundario,
+    fontFamily: tipografia.fontes.regular,
+    fontSize: 14,
+  },
 });

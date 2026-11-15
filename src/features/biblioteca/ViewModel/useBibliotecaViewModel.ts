@@ -4,6 +4,7 @@ import { CHAVES, ler, salvar } from '../../../data/storage/preferencias';
 import { useBibliotecaStore } from '../../../store/bibliotecaStore';
 import {
   contagemPorFiltro,
+  estadoDaBiblioteca,
   type FiltroBiblioteca,
   filtrarJogos,
   filtroValido,
@@ -15,6 +16,9 @@ import {
 export function useBibliotecaViewModel(filtroInicial?: FiltroBiblioteca) {
   // Jogos da store, já ordenados pela última sessão.
   const jogos = useBibliotecaStore((s) => s.jogos);
+const carregando = useBibliotecaStore((s) => s.carregando);
+  const erro = useBibliotecaStore((s) => s.erro);
+  const carregar = useBibliotecaStore((s) => s.carregar);
   const [filtro, setFiltro] = useState<FiltroBiblioteca>('TODOS');
 
   // Ao abrir (só uma vez): usa o último filtro salvo no AsyncStorage.
@@ -46,6 +50,8 @@ export function useBibliotecaViewModel(filtroInicial?: FiltroBiblioteca) {
     contagem,
     resumo: textoResumo(jogos),
     total: jogos.length,
-    bibliotecaVazia: jogos.length === 0,
+    estado: estadoDaBiblioteca(carregando, erro, jogos.length),
+    erro,
+    tentarNovamente: () => void carregar(), // lê os jogos do SQLite de novo
   };
-}
+};
