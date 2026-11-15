@@ -277,3 +277,30 @@ test('tentarNovamente sem pesquisa anterior não faz nada', async () => {
   assert.equal(await controller.tentarNovamente(), false);
   assert.equal(chamadas, 0);
 });
+test('Tentar novamente recupera a paginação sem perder resultados', async () => {
+  let falhar = true;
+
+  const controller = criarPesquisaController(async (_termo, opcoes) => {
+    if (opcoes.pagina === 1) {
+      return resposta([1], 1, true);
+    }
+
+    if (falhar) {
+      throw new Error('RAWG: falha de conexão.');
+    }
+
+    return resposta([2], 2, false);
+  });
+
+  await controller.pesquisar('Zelda');
+
+  assert.equal(await controller.carregarMais(), false);
+  assert.equal(controller.obterEstado().jogos.length, 1);
+
+  falhar = false;
+
+  assert.equal(await controller.tentarNovamente(), true);
+  assert.equal(controller.obterEstado().jogos.length, 2);
+  assert.equal(controller.obterEstado().erro, null);
+  assert.equal(controller.obterEstado().pagina, 2);
+});

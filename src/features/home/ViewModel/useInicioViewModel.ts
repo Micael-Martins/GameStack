@@ -1,6 +1,7 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { obterEstatisticas } from "../../../data/db/bibliotecaRepository";
+import { estadoDaBiblioteca } from "../../biblioteca/Model/filtrosBiblioteca";
 import { obterUsuario } from "../../../data/db/userRepository";
 import { buscarJogosPopulares } from "../../../data/services/rawgService";
 import type { Estatisticas } from "../../../models/Estatisticas";
@@ -24,36 +25,86 @@ export function useInicioViewModel() {
   // Jogos vêm da store compartilhada: mudou em qualquer tela, a Home atualiza sozinha.
   const games = useBibliotecaStore((s) => s.jogos);
   const loading = useBibliotecaStore((s) => s.carregando);
+  const erroBiblioteca = useBibliotecaStore((s) => s.erro);
+  const recarregarBiblioteca = useBibliotecaStore((s) => s.carregar);
   const addGame = useBibliotecaStore((s) => s.adicionar);
 
   const [name, setName] = useState(DEFAULT_NAME);
   const [stats, setStats] = useState<Estatisticas>(EMPTY_STATS);
   const [popularGames, setPopularGames] = useState<Jogo[]>([]);
+  const [carregandoPerfil, setCarregandoPerfil] = useState(true);
+  const [carregandoEstatisticas, setCarregandoEstatisticas] = useState(true);
+  const [carregandoPopulares, setCarregandoPopulares] = useState(false);
 
-  const isEmpty = !loading && games.length === 0;
+  const estadoBiblioteca = estadoDaBiblioteca(loading, erroBiblioteca, games.length);
+  const isEmpty = estadoBiblioteca === "VAZIA";
 
-  // Nome: relê quando a aba ganha foco (pode ter mudado em Configurações).
+  // Atualiza o perfil quando a Home recebe foco.
   useFocusEffect(
     useCallback(() => {
+      let ativo = true;
+      setCarregandoPerfil(true);
+
       obterUsuario()
-        .then((user) => setName(user?.nome || DEFAULT_NAME))
-        .catch((e) => console.warn("Erro ao ler o usuário:", e));
+        .then((user) => {
+          if (ativo) setName(user?.nome || DEFAULT_NAME);
+        })
+        .catch((e) => console.warn("Erro ao ler o usuário:", e))
+        .finally(() => {
+          if (ativo) setCarregandoPerfil(false);
+        });
+
+      return () => {
+        ativo = false;
+      };
     }, []),
   );
 
-  // Estatísticas (SQL): recalcula toda vez que a lista de jogos muda.
+  // Atualiza as estatísticas quando a biblioteca muda.
   useEffect(() => {
+    let ativo = true;
+    setCarregandoEstatisticas(true);
+
     obterEstatisticas()
-      .then(setStats)
-      .catch((e) => console.warn("Erro ao calcular estatísticas:", e));
+      .then((dados) => {
+        if (ativo) setStats(dados);
+      })
+      .catch((e) => console.warn("Erro ao calcular estatísticas:", e))
+      .finally(() => {
+        if (ativo) setCarregandoEstatisticas(false);
+      });
+
+    return () => {
+      ativo = false;
+    };
   }, [games]);
 
-  // Populares da RAWG: só busca quando a biblioteca está vazia, e uma vez só.
+  // Os populares são opcionais: a Home continua funcionando sem internet.
   useEffect(() => {
-    if (!isEmpty || popularGames.length > 0) return;
-    buscarJogosPopulares(10)
-      .then(setPopularGames)
-      .catch((e) => console.warn("Sem populares da RAWG:", e)); // sem internet: a seção some
+    if (!isEmpty || popularGames.length > 0) {
+      setCarregandoPopulares(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    let ativo = true;
+    setCarregandoPopulares(true);
+
+    buscarJogosPopulares(10, { signal: controller.signal })
+      .then((jogos) => {
+        if (ativo) setPopularGames(jogos);
+      })
+      .catch((e) => {
+        if (ativo) console.warn("Sem populares da RAWG:", e);
+      })
+      .finally(() => {
+        if (ativo) setCarregandoPopulares(false);
+      });
+
+    return () => {
+      ativo = false;
+      controller.abort();
+    };
   }, [isEmpty, popularGames.length]);
 
   // Carrossel: todos os "Jogando", do mais recente para o mais antigo.
@@ -79,6 +130,11 @@ export function useInicioViewModel() {
   return {
     name,
     isEmpty,
+    estadoBiblioteca,
+    carregandoDados: carregandoPerfil || carregandoEstatisticas,
+    carregandoPopulares,
+    erroBiblioteca,
+    tentarNovamente: () => void recarregarBiblioteca(),
     summary: {
       completed: stats.totalConcluidos,
       playing: stats.quantidadePorStatus.JOGANDO ?? 0,

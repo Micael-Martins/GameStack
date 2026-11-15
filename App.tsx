@@ -11,7 +11,6 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { obterBanco } from './src/data/db/database';
 import { configurarNotificacoes, reagendarLembrete } from './src/data/services/notificationService';
 import { CHAVES, ler } from './src/data/storage/preferencias';
 import ConfiguracoesScreen from './src/features/configuracoes/Views/ConfiguracoesScreen';
@@ -53,8 +52,8 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        await obterBanco(); // cria o banco e as tabelas
-        await carregarBiblioteca(); // lista de jogos na store antes da splash sair
+        // O repositório abre o banco e a store informa falhas de carregamento.
+        await carregarBiblioteca();
         await configurarNotificacoes();
         await reagendarLembrete(); // lembrete dos 5 dias (conta da última interação)
       } catch (error) {
