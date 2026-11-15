@@ -1,6 +1,7 @@
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator, FlatList, ScrollView, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import CampoTexto from '../../../components/CampoTexto';
 import CardJogo from '../../../components/CardJogo';
@@ -24,13 +25,14 @@ const filtros: { id: FiltroBiblioteca; rotulo: string; status?: StatusJogo }[] =
 ];
 
 export default function BibliotecaScreen({ navigation }: Props) {
+  const insets = useSafeAreaInsets();
   const vm = useBibliotecaViewModel();
   const navigationRaiz = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
 
   const abrirDetalhes = (id: string) => navigationRaiz?.navigate('DetalhesJogo', { id });
 
   const cabecalho = (
-    <View style={styles.cabecalho}>
+    <View style={[styles.cabecalho, { paddingTop: insets.top + 16 }]}>
       <Text accessibilityRole="header" style={styles.titulo}>Biblioteca</Text>
       <Text style={styles.subtitulo}>
         {vm.jogos.length === 1 ? '1 jogo salvo' : `${vm.jogos.length} jogos salvos`}
@@ -106,7 +108,7 @@ export default function BibliotecaScreen({ navigation }: Props) {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <CardJogo item={item} onPress={() => abrirDetalhes(item.id)} />}
         ListHeaderComponent={cabecalho}
-        ListEmptyComponent={vazio}
+        ListEmptyComponent={vazio ? <View style={styles.listaVazia}>{vazio}</View> : null}
         ItemSeparatorComponent={() => <View style={styles.separador} />}
         contentContainerStyle={[styles.lista, vm.jogosVisiveis.length === 0 && styles.estado]}
         keyboardShouldPersistTaps="handled"
