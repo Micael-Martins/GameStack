@@ -60,8 +60,7 @@ export default function InicioScreen() {
             games={vm.playingGames}
             onLogHours={() => console.log('TODO: abrir Registrar horas')}
             onOpenGame={openDetails}
-            onOpenLibrary={goToLibrary}
-          />
+            onOpenLibrary={() => navigation.navigate('Biblioteca', { filtro: 'NA_FILA' })}          />
           {vm.recentGames.length > 0 && (
             <View>
               <TituloSecao titulo="Jogados recentemente" link={{ texto: 'Ver todos', onPress: goToLibrary }} />

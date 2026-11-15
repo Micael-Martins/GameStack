@@ -49,16 +49,7 @@ export default function TabRouter() {
           tabBarIcon: ({ color, size }) => <Ionicons name="library-outline" size={size} color={color} />,
         }}
       />
-      {__DEV__ && (
-        <Tab.Screen
-          name="Componentes"
-          component={ComponentesDemoScreen}
-          options={{
-            title: 'Componentes',
-            tabBarIcon: ({ color, size }) => <Ionicons name="construct-outline" size={size} color={color} />,
-          }}
-        />
-      )}
+      
     </Tab.Navigator>
   );
 }
