@@ -28,7 +28,7 @@ export default function OnBoardingScreen({ navigation }: Props) {
 <OnBoardingIllustration top={insets.top} covers={vm.covers} />
         <View style={[styles.body, { paddingBottom: insets.bottom + 24 }]}>
           <View style={styles.texts}>
-            <Text style={styles.title}>Backlog Zero</Text>
+            <Text style={styles.title}>GameStack</Text>
             <Text style={styles.subtitle}>Termine o que começou antes de comprar o próximo jogo.</Text>
           </View>
 
