@@ -12,11 +12,13 @@ import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { obterBanco } from './src/data/db/database';
+import { CHAVES, ler } from './src/data/storage/preferencias';
 import OnBoardingScreen from './src/features/onboarding/Views/OnBoardingScreen';
 import TabRouter from './src/navigation/TabRouter';
 import { RootStackParamList } from './src/navigation/tipos';
+import { carregarBiblioteca } from './src/store/bibliotecaStore';
 import { cores } from './src/theme';
-import { CHAVES, ler, limparTudo } from './src/data/storage/preferencias';
+
 SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -39,18 +41,20 @@ export default function App() {
     PlusJakartaSans_800ExtraBold,
   });
 
+  // Tela inicial: boas-vindas no primeiro acesso, abas nos seguintes.
   const [initialRoute, setInitialRoute] = useState<keyof RootStackParamList | null>(null);
 
   useEffect(() => {
     async function prepare() {
       try {
-          await obterBanco();
+        await obterBanco(); // cria o banco e as tabelas
+        await carregarBiblioteca(); // lista de jogos pronta antes da splash sair
       } catch (error) {
         console.error('Erro ao iniciar o banco:', error);
       }
-const seen = await ler(CHAVES.onboardingVisto);
-      setInitialRoute(seen ? 'Abas' : 'BoasVindas');
 
+      const seen = await ler(CHAVES.onboardingVisto); // AsyncStorage
+      setInitialRoute(seen ? 'Abas' : 'BoasVindas');
     }
     prepare();
   }, []);
@@ -61,6 +65,7 @@ const seen = await ler(CHAVES.onboardingVisto);
     }
   }, [fontsLoaded, initialRoute]);
 
+  // Enquanto não sabe qual tela abrir, a splash continua na frente.
   if (!fontsLoaded || !initialRoute) {
     return null;
   }
