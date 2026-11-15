@@ -56,7 +56,9 @@ export function converterRawgParaJogo(rawg: RawgJogo): Jogo {
     nome: rawg.name,
     imagemURL: rawg.background_image ?? null,
     genero: generos.join(', '),
-    desenvolvedora: '',
+    desenvolvedora: Array.isArray(rawg.developers)
+      ? rawg.developers.map((item) => item.name).filter(Boolean).join(', ')
+      : '',
     anoLancamento: Number.isFinite(ano) ? ano : null,
     tempoMedio:
       typeof rawg.playtime === 'number' &&
@@ -238,4 +240,34 @@ export async function buscarCapasPopulares(limite = 3): Promise<string[]> {
   return jogos
     .map((jogo) => jogo.imagemURL)
     .filter((url): url is string => typeof url === 'string' && url.length > 0);
+}
+
+// Detalhes de um jogo (/games/{id}). Usado na tela Adicionar para mostrar a
+// desenvolvedora, que não vem na pesquisa.
+export async function buscarDetalhes(
+  apiId: string,
+  opcoes: Pick<OpcoesBuscaRawg, 'chave' | 'obterChave' | 'fetcher' | 'signal'> = {},
+): Promise<Jogo> {
+  const chave = (opcoes.chave ?? (await (opcoes.obterChave ?? obterChavePadrao)())).trim();
+  if (!chave) {
+    throw new Error('RAWG: chave da API não configurada.');
+  }
+
+  const url = `${RAWG_URL}/games/${encodeURIComponent(apiId)}?key=${encodeURIComponent(chave)}`;
+  const requisicao = opcoes.fetcher ?? fetch;
+
+  const resposta = await requisicao(url, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+    signal: opcoes.signal,
+  });
+  if (!resposta.ok) {
+    throw new Error(`RAWG: falha ao buscar detalhes (HTTP ${resposta.status}).`);
+  }
+
+  const dados: Partial<RawgJogo> = await resposta.json();
+  if (!dados || typeof dados.id !== 'number' || typeof dados.name !== 'string') {
+    throw new Error('RAWG: formato de resposta inesperado.');
+  }
+  return converterRawgParaJogo(dados as RawgJogo);
 }

@@ -1,16 +1,36 @@
-import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { ComponentProps, useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 import { cores, tipografia } from '../theme';
 
-type CampoTextoProps = TextInputProps & { label?: string; sufixo?: string };
+type CampoTextoProps = TextInputProps & {
+  label?: string;
+  sufixo?: string;
+  icone?: ComponentProps<typeof Ionicons>['name']; // ex.: lupa da Pesquisa
+  onLimpar?: () => void; // mostra um X para limpar quando há texto
+  destacado?: boolean; // borda branca mesmo sem foco (campo preenchido)
+};
 
-export default function CampoTexto({ label, sufixo, style, onFocus, onBlur, multiline, accessibilityLabel, ...props }: CampoTextoProps) {
+export default function CampoTexto({
+  label,
+  sufixo,
+  icone,
+  onLimpar,
+  destacado = false,
+  style,
+  onFocus,
+  onBlur,
+  multiline,
+  accessibilityLabel,
+  ...props
+}: CampoTextoProps) {
   const [focado, setFocado] = useState(false);
 
   return (
     <View style={styles.grupo}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
-      <View style={[styles.campo, focado && styles.focado]}>
+      <View style={[styles.campo, (focado || destacado) && styles.focado]}>
+        {icone ? <Ionicons name={icone} size={20} color={cores.textoSecundario} style={styles.icone} /> : null}
         <TextInput
           {...props}
           accessibilityLabel={accessibilityLabel ?? label}
@@ -22,6 +42,11 @@ export default function CampoTexto({ label, sufixo, style, onFocus, onBlur, mult
           onBlur={(evento) => { setFocado(false); onBlur?.(evento); }}
         />
         {sufixo ? <Text style={styles.sufixo}>{sufixo}</Text> : null}
+        {onLimpar && props.value ? (
+          <Pressable accessibilityRole="button" accessibilityLabel="Limpar" onPress={onLimpar} hitSlop={8} style={styles.limpar}>
+            <Ionicons name="close" size={20} color={cores.textoSecundario} />
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );
@@ -51,4 +76,6 @@ const styles = StyleSheet.create({
   },
   multiline: { minHeight: 96, textAlignVertical: 'top' },
   sufixo: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, marginLeft: 8 },
+  icone: { marginRight: 10 },
+  limpar: { minWidth: 32, minHeight: 44, alignItems: 'center', justifyContent: 'center', marginLeft: 4 },
 });

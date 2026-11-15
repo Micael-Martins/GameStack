@@ -16,6 +16,7 @@ export default function TabRouter() {
       initialRouteName="Inicio"
       screenOptions={{
         headerShown: false,
+        animation: 'fade',
         tabBarStyle: {
           backgroundColor: cores.fundo,
           borderTopColor: cores.borda,

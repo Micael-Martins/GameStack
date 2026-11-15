@@ -15,6 +15,7 @@ import { obterBanco } from './src/data/db/database';
 import { configurarNotificacoes, reagendarLembrete } from './src/data/services/notificationService';
 import { CHAVES, ler } from './src/data/storage/preferencias';
 import ConfiguracoesScreen from './src/features/configuracoes/Views/ConfiguracoesScreen';
+import AdicionarJogoScreen from './src/features/pesquisar/Views/AdicionarJogoScreen';
 import OnBoardingScreen from './src/features/onboarding/Views/OnBoardingScreen';
 import TabRouter from './src/navigation/TabRouter';
 import { RootStackParamList } from './src/navigation/tipos';
@@ -81,7 +82,8 @@ export default function App() {
         <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
           <Stack.Screen name="BoasVindas" component={OnBoardingScreen} />
           <Stack.Screen name="Abas" component={TabRouter} />
-          <Stack.Screen name="Configuracoes" component={ConfiguracoesScreen} />
+          <Stack.Screen name="Configuracoes" component={ConfiguracoesScreen} options={{ animation: 'ios_from_right' }} />
+          <Stack.Screen name="AdicionarJogo" component={AdicionarJogoScreen} options={{ animation: 'ios_from_right' }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
