@@ -15,5 +15,5 @@ export type RootStackParamList = {
 export type TabParamList = {
   Inicio: undefined;
   Pesquisar: undefined;
-  Biblioteca: { filtro?: FiltroBiblioteca } | undefined; // filtro: abrir já filtrada  Componentes: undefined;
-};
+  Biblioteca: { filtro?: FiltroBiblioteca } | undefined; 
+}

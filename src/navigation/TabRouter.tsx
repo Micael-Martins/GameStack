@@ -6,7 +6,6 @@ import InicioScreen from '../features/home/Views/InicioScreen';
 import PesquisarScreen from '../features/pesquisar/Views/PesquisarScreen';
 import { cores } from '../theme';
 import { TabParamList } from './tipos';
-import ComponentesDemoScreen from '../components/views/ComponentesDemoScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
