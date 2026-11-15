@@ -212,3 +212,68 @@ test('Limpar pesquisa restaura o estado inicial', async () => {
   assert.equal(estado.pesquisou, false);
   assert.equal(estado.carregando, false);
 });
+
+// ---------- Ajustes: mínimo de letras, tentar novamente e mensagens ----------
+
+test('Com menos de 2 letras não chama a API e mostra aviso', async () => {
+  let chamadas = 0;
+  const controller = criarPesquisaController(async () => {
+    chamadas++;
+    return resposta([1]);
+  });
+
+  const sucesso = await controller.pesquisar(' z ');
+  const estado = controller.obterEstado();
+
+  assert.equal(sucesso, false);
+  assert.equal(chamadas, 0);
+  assert.equal(estado.aviso, 'Digite pelo menos 2 letras.');
+  assert.equal(estado.pesquisou, false);
+});
+
+test('Com 2 letras a pesquisa acontece e o aviso some', async () => {
+  const controller = criarPesquisaController(async () => resposta([1]));
+
+  await controller.pesquisar('z');
+  assert.ok(controller.obterEstado().aviso);
+
+  assert.equal(await controller.pesquisar('ze'), true);
+  assert.equal(controller.obterEstado().aviso, null);
+});
+
+test('Mensagem de erro chega sem o prefixo "RAWG:"', async () => {
+  const controller = criarPesquisaController(async () => {
+    throw new Error('RAWG: falha de conexão. Verifique a internet.');
+  });
+
+  await controller.pesquisar('Zelda');
+
+  assert.equal(controller.obterEstado().erro, 'falha de conexão. Verifique a internet.');
+});
+
+test('tentarNovamente repete a pesquisa que falhou', async () => {
+  let falhar = true;
+  const controller = criarPesquisaController(async () => {
+    if (falhar) throw new Error('RAWG: falha de conexão.');
+    return resposta([1, 2]);
+  });
+
+  await controller.pesquisar('Zelda');
+  assert.ok(controller.obterEstado().erro);
+
+  falhar = false;
+  assert.equal(await controller.tentarNovamente(), true);
+  assert.equal(controller.obterEstado().jogos.length, 2);
+  assert.equal(controller.obterEstado().erro, null);
+});
+
+test('tentarNovamente sem pesquisa anterior não faz nada', async () => {
+  let chamadas = 0;
+  const controller = criarPesquisaController(async () => {
+    chamadas++;
+    return resposta([1]);
+  });
+
+  assert.equal(await controller.tentarNovamente(), false);
+  assert.equal(chamadas, 0);
+});

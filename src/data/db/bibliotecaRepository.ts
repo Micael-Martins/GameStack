@@ -24,4 +24,6 @@ export const {
   atualizarMinutos,
   mudarStatus,
   removerJogo,
+  obterEstatisticas,
+
 } = repositorio;

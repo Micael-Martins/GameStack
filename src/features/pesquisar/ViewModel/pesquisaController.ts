@@ -14,6 +14,7 @@ export interface EstadoPesquisa {
   carregandoMais: boolean;
   pesquisou: boolean;
   erro: string | null;
+  aviso: string | null; // ex.: "Digite pelo menos 2 letras."
 }
 
 export const ESTADO_INICIAL_PESQUISA: EstadoPesquisa = {
@@ -26,7 +27,11 @@ export const ESTADO_INICIAL_PESQUISA: EstadoPesquisa = {
   carregandoMais: false,
   pesquisou: false,
   erro: null,
+  aviso: null,
 };
+
+// A pesquisa só vai para a API com pelo menos 2 letras.
+export const MINIMO_LETRAS = 2;
 
 type BuscarJogos = (
   termo: string,
@@ -35,7 +40,8 @@ type BuscarJogos = (
 
 function mensagemDeErro(erro: unknown): string {
   if (erro instanceof Error && erro.message) {
-    return erro.message;
+    // As mensagens do rawgService começam com "RAWG:"; para o usuário, sem o prefixo.
+    return erro.message.replace(/^RAWG:\s*/, '');
   }
 
   return 'Não foi possível buscar os jogos. Tente novamente.';
@@ -84,6 +90,16 @@ export function criarPesquisaController(
       return false;
     }
 
+    // Menos de 2 letras: não chama a API, só avisa.
+    if (termo.length < MINIMO_LETRAS) {
+      publicar({
+        ...ESTADO_INICIAL_PESQUISA,
+        termoPesquisado: termo,
+        aviso: `Digite pelo menos ${MINIMO_LETRAS} letras.`,
+      });
+      return false;
+    }
+
     const versaoAtual = versao;
     const controlador = new AbortController();
     requisicao = controlador;
@@ -98,6 +114,7 @@ export function criarPesquisaController(
       carregandoMais: false,
       pesquisou: false,
       erro: null,
+      aviso: null,
     });
 
     try {
@@ -210,8 +227,19 @@ export function criarPesquisaController(
     }
   }
 
+  // Botão "Tentar novamente" da tela de erro: repete o que falhou.
+  // Se já havia resultados, o erro foi ao carregar mais; senão, foi na pesquisa.
+  async function tentarNovamente(): Promise<boolean> {
+    if (!estado.termoPesquisado) return false;
+    if (estado.jogos.length > 0 && estado.temProximaPagina) {
+      return carregarMais();
+    }
+    return pesquisar(estado.termoPesquisado);
+  }
+
   return {
     obterEstado: () => estado,
+    tentarNovamente,
     pesquisar,
     carregarMais,
     cancelar,

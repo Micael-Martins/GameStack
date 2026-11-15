@@ -1,9 +1,9 @@
-import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
 
-import { listarBiblioteca } from '../db/bibliotecaRepository';
-import { getUser } from '../db/userRepository';
-import { jogandoAgora } from '../../store/bibliotecaStoreBase';
+import { jogandoAgora } from "../../store/bibliotecaStoreBase";
+import { listarBiblioteca } from "../db/bibliotecaRepository";
+import { obterUsuario } from "../db/userRepository";
 import {
   calcularDataLembrete,
   HORARIO_LEMBRETE_PADRAO,
@@ -11,7 +11,7 @@ import {
   MODO_TESTE,
   NOME_APP,
   SEGUNDOS_MODO_TESTE,
-} from './regrasLembrete';
+} from "./regrasLembrete";
 
 // Notificação local (agendada no próprio aparelho, sem servidor).
 // Regra: se um jogo está "Jogando" e o usuário não registra nada há 5 dias,
@@ -19,8 +19,8 @@ import {
 // ultimaInteracao do jogo (não da abertura do app). Sempre que o app abre ou
 // algo muda, o lembrete é cancelado e agendado de novo com a data certa.
 
-const CANAL_ANDROID = 'lembretes';
-const disponivel = Platform.OS !== 'web';
+const CANAL_ANDROID = "lembretes";
+const disponivel = Platform.OS !== "web";
 
 export interface DadosLembrete {
   jogoId: string;
@@ -39,20 +39,20 @@ export async function configurarNotificacoes(): Promise<void> {
         shouldSetBadge: false,
       }),
     });
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       await Notifications.setNotificationChannelAsync(CANAL_ANDROID, {
-        name: 'Lembretes para jogar',
+        name: "Lembretes para jogar",
         importance: Notifications.AndroidImportance.HIGH,
       });
     }
   } catch (erro) {
-    console.warn('Não foi possível configurar as notificações.', erro);
+    console.warn("Não foi possível configurar as notificações.", erro);
   }
 }
 
 async function temPermissao(): Promise<boolean> {
   const { status } = await Notifications.getPermissionsAsync();
-  return status === 'granted';
+  return status === "granted";
 }
 
 // Chamado na Boas-vindas e quando o usuário liga os lembretes.
@@ -61,9 +61,9 @@ export async function pedirPermissao(): Promise<boolean> {
   try {
     if (await temPermissao()) return true;
     const { status } = await Notifications.requestPermissionsAsync();
-    return status === 'granted';
+    return status === "granted";
   } catch (erro) {
-    console.warn('Não foi possível pedir permissão de notificação.', erro);
+    console.warn("Não foi possível pedir permissão de notificação.", erro);
     return false;
   }
 }
@@ -73,7 +73,7 @@ export async function cancelarLembretes(): Promise<void> {
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
   } catch (erro) {
-    console.warn('Não foi possível cancelar os lembretes.', erro);
+    console.warn("Não foi possível cancelar os lembretes.", erro);
   }
 }
 
@@ -84,7 +84,7 @@ export async function reagendarLembrete(): Promise<void> {
   try {
     await cancelarLembretes();
 
-    const usuario = await getUser();
+    const usuario = await obterUsuario();
     if (!usuario?.notificacaoAtiva) return;
     if (!(await temPermissao())) return;
 
@@ -108,10 +108,14 @@ export async function reagendarLembrete(): Promise<void> {
         };
 
     await Notifications.scheduleNotificationAsync({
-      content: { title: NOME_APP, body: mensagemLembrete(jogo.jogo.nome), data: { ...dados } },
+      content: {
+        title: NOME_APP,
+        body: mensagemLembrete(jogo.jogo.nome),
+        data: { ...dados },
+      },
       trigger,
     });
   } catch (erro) {
-    console.warn('Não foi possível agendar o lembrete.', erro);
+    console.warn("Não foi possível agendar o lembrete.", erro);
   }
 }

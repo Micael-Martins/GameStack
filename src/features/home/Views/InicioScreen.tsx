@@ -1,40 +1,85 @@
 import { Ionicons } from '@expo/vector-icons';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { RootStackParamList } from '../../../navigation/tipos';
-import { cores, tipografia } from '../../../theme';
+import CardJogo from '../../../components/CardJogo';
+import TituloSecao from '../../../components/TituloSecao';
+import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
+import { useHomeViewModel } from '../ViewModel/useHomeViewModel';
+import { EmptyQueueCard } from './components/CardFilaVazia';
+import { NowPlayingCarousel } from './components/CarrosselJogando';
+import { PopularGamesRow } from './components/LinhaPopulares';
+import { SummaryStrip } from './components/FaixaResumo';
+import { styles } from './InicioScreen.styles';
+import { useInicioViewModel } from '../ViewModel/useInicioViewModel.';
 
 export default function InicioScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const insets = useSafeAreaInsets();
+  // Duas navegações: a das abas (Pesquisar, Biblioteca) e a da pilha principal (Configurações)
+  const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
+  const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const goToSearch = () => navigation.navigate('Pesquisar');
+  const goToLibrary = () => navigation.navigate('Biblioteca');
+
+  const vm = useInicioViewModel();
+  const hasGames = !vm.isEmpty;
 
   return (
-    <View style={styles.container}>
-      {/* Engrenagem que abre as Configurações (manter na Home definitiva). */}
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Configurações"
-        onPress={() => navigation.navigate('Configuracoes')}
-        style={styles.engrenagem}
-      >
-        <Ionicons name="settings-outline" size={22} color={cores.texto} />
-      </Pressable>
-      <Text style={styles.titulo}>Início</Text>
-    </View>
+    <ScrollView style={styles.screen} contentContainerStyle={[styles.content, { paddingTop: insets.top + 16 }]}>
+      <View style={styles.header}>
+        <View style={styles.headerTexts}>
+          <Text style={styles.greeting} numberOfLines={1}>
+            Olá, {vm.name}!
+          </Text>
+          <Text style={styles.subtitle}>{hasGames ? 'Bom te ver de novo.' : 'Sua pilha de jogos começa aqui.'}</Text>
+        </View>
+
+        {/* Engrenagem: abre as Configurações */}
+        <Pressable
+          onPress={() => rootNavigation.navigate('Configuracoes')}
+          accessibilityRole="button"
+          accessibilityLabel="Configurações"
+          style={({ pressed }) => [styles.settingsButton, pressed && styles.pressed]}
+        >
+          <Ionicons name="settings-outline" size={20} color="#D4D4D4" />
+        </Pressable>
+      </View>
+
+      {/* Mesma faixa nos dois estados: sem jogos, os números aparecem apagados */}
+      <View style={styles.summary}>
+        <SummaryStrip {...vm.summary} dimmed={!hasGames} />
+      </View>
+
+      {hasGames ? (
+        <>
+          <NowPlayingCarousel
+            games={vm.playingGames}
+            onLogHours={() => console.log('TODO: abrir Registrar horas')}
+            onOpenLibrary={goToLibrary}
+          />
+          {vm.recentGames.length > 0 && (
+            <View>
+              <TituloSecao titulo="Jogados recentemente" link={{ texto: 'Ver todos', onPress: goToLibrary }} />
+              <View style={styles.recentList}>
+                {vm.recentGames.map((game) => (
+                  <CardJogo key={game.id} item={game} variante="compacto" />
+                ))}
+              </View>
+            </View>
+          )}
+        </>
+      ) : (
+        <>
+          <EmptyQueueCard onSearch={goToSearch} />
+          {/* Populares só com a biblioteca vazia; sem internet, a seção some */}
+          {vm.popularGames.length > 0 && (
+            <PopularGamesRow games={vm.popularGames} onSeeMore={goToSearch} onSelect={goToSearch} />
+          )}
+        </>
+      )}
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: cores.fundo, justifyContent: 'center', alignItems: 'center' },
-  titulo: { color: cores.texto, fontFamily: tipografia.fonte, fontSize: tipografia.tamanhos.titulo },
-  engrenagem: {
-    position: 'absolute',
-    top: 56,
-    right: 20,
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

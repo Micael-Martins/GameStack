@@ -1,102 +1,72 @@
 import { useEffect, useState } from 'react';
 
+import { reagendarLembrete } from '../../../data/services/notificationService';
 import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
 import type { StatusJogo } from '../../../models/StatusJogo';
 import { useBibliotecaStore } from '../../../store/bibliotecaStore';
-import {
-  notaParaMudanca,
-  podeSalvarStatus,
-} from '../Model/opcoesPainelStatus';
+import { acaoDaOpcao } from '../Model/opcoesPainelStatus';
 
 export function usePainelMudarStatusViewModel(
   item: JogoBiblioteca | null,
   visivel: boolean,
   onFechar: () => void,
-  onSalvo?: () => void,
+  onConcluir: (item: JogoBiblioteca) => void,
 ) {
   const mudarStatus = useBibliotecaStore((s) => s.mudarStatus);
 
   // Prioriza a versão atualizada que estiver na store.
-  const jogoNaStore = useBibliotecaStore((s) =>
-    s.jogos.find((jogo) => jogo.id === item?.id),
-  );
+  const jogoNaStore = useBibliotecaStore((s) => s.jogos.find((jogo) => jogo.id === item?.id));
   const jogoAtual = jogoNaStore ?? item;
 
-  const [statusSelecionado, setStatusSelecionado] =
-    useState<StatusJogo>(item?.status ?? 'NA_FILA');
-
-  const [notaSelecionada, setNotaSelecionada] =
-    useState<number | null>(item?.nota ?? null);
-
-  const [salvando, setSalvando] = useState(false);
+  // Qual opção está salvando agora (mostra o carregando só nela).
+  const [salvandoStatus, setSalvandoStatus] = useState<StatusJogo | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
-  // Cada abertura começa com os dados atuais do jogo.
+  // Cada abertura começa sem erro.
   useEffect(() => {
-    if (!visivel || !jogoAtual) return;
+    if (visivel) setErro(null);
+  }, [visivel]);
 
-    setStatusSelecionado(jogoAtual.status);
-    setNotaSelecionada(jogoAtual.nota);
-    setErro(null);
-  }, [
-    visivel,
-    jogoAtual?.id,
-    jogoAtual?.status,
-    jogoAtual?.nota,
-  ]);
+  const salvando = salvandoStatus !== null;
 
-  const podeConfirmar =
-    !!jogoAtual &&
-    !salvando &&
-    podeSalvarStatus(jogoAtual.status, statusSelecionado);
+  async function escolher(status: StatusJogo): Promise<void> {
+    if (!jogoAtual || salvando) return;
 
-  function selecionarStatus(status: StatusJogo) {
-    if (salvando) return;
+    const acao = acaoDaOpcao(jogoAtual.status, status);
 
-    setStatusSelecionado(status);
-    setErro(null);
-  }
+    if (acao === 'nada') return;
 
-  function selecionarNota(nota: number) {
-    if (salvando) return;
+    // Concluir sempre passa pela tela de conclusão, que pede a nota.
+    if (acao === 'concluir') {
+      onFechar();
+      onConcluir(jogoAtual);
+      return;
+    }
 
-    setNotaSelecionada(nota);
-    setErro(null);
-  }
-
-  async function confirmar(): Promise<void> {
-    if (!jogoAtual || !podeConfirmar) return;
-
-    setSalvando(true);
+    setSalvandoStatus(status);
     setErro(null);
 
     try {
-      await mudarStatus(
-        jogoAtual.id,
-        statusSelecionado,
-        notaParaMudanca(statusSelecionado, notaSelecionada),
-      );
+      await mudarStatus(jogoAtual.id, status);
     } catch (e) {
       console.warn('Erro ao mudar o status do jogo.', e);
-      setErro('Não foi possível salvar o status. Tente novamente.');
+      setErro('Não foi possível mudar o status. Tente novamente.');
       return;
     } finally {
-      setSalvando(false);
+      setSalvandoStatus(null);
     }
 
-    onSalvo?.();
+    // Mexeu no jogo: o lembrete dos 5 dias volta a contar a partir de agora.
+    reagendarLembrete().catch((e) => console.warn('Erro ao reagendar o lembrete.', e));
+
     onFechar();
   }
 
   return {
     jogoAtual,
-    statusSelecionado,
-    notaSelecionada,
-    selecionarStatus,
-    selecionarNota,
-    podeConfirmar,
-    confirmar,
+    escolher,
     salvando,
+    salvandoStatus,
     erro,
   };
 }

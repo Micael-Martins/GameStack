@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { buscarJogosRawg } from '../../../data/services/rawgService';
 import {
@@ -7,6 +7,8 @@ import {
   ler,
   limparPesquisasRecentes,
 } from '../../../data/storage/preferencias';
+import type { Jogo } from '../../../models/Jogo';
+import { useBibliotecaStore } from '../../../store/bibliotecaStore';
 
 import {
   criarPesquisaController,
@@ -22,6 +24,13 @@ export function usePesquisaViewModel() {
   const [pesquisasRecentes, setPesquisasRecentes] = useState<string[]>([]);
 
   const montado = useRef(true);
+
+  // Jogos que já estão na biblioteca (pela store, então atualiza na hora ao adicionar).
+  const jogosNaBiblioteca = useBibliotecaStore((s) => s.jogos);
+  const idsNaBiblioteca = useMemo(
+    () => new Set(jogosNaBiblioteca.map((item) => item.jogo.apiId)),
+    [jogosNaBiblioteca],
+  );
 
   // A mesma instância controla todas as buscas durante a vida da tela.
   const [controller] = useState(() =>
@@ -66,6 +75,16 @@ export function usePesquisaViewModel() {
     [controller, termoDigitado],
   );
 
+  const tentarNovamente = useCallback(async (): Promise<void> => {
+    await controller.tentarNovamente();
+  }, [controller]);
+
+  // Cada resultado sabe se já está na biblioteca (botão "Adicionar" × "Na biblioteca").
+  const resultados = useMemo(
+    () => estado.jogos.map((jogo: Jogo) => ({ jogo, naBiblioteca: idsNaBiblioteca.has(jogo.apiId) })),
+    [estado.jogos, idsNaBiblioteca],
+  );
+
   const carregarMais = useCallback(async (): Promise<void> => {
     await controller.carregarMais();
   }, [controller]);
@@ -89,13 +108,14 @@ export function usePesquisaViewModel() {
 
     // Resultados e estados para a interface.
     ...estado,
+    resultados,
 
     pesquisasRecentes,
 
-    // Ações disponíveis para a interface.
     pesquisar,
     selecionarPesquisaRecente: pesquisar,
     carregarMais,
+    tentarNovamente,
     cancelarPesquisa: controller.cancelar,
     limparPesquisa,
     limparHistorico,
