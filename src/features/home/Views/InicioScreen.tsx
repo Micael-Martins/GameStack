@@ -58,7 +58,7 @@ export default function InicioScreen() {
         <>
           <NowPlayingCarousel
             games={vm.playingGames}
-            onLogHours={() => console.log('TODO: abrir Registrar horas')}
+            onLogHours={(game) => rootNavigation.navigate('RegistrarHoras', { id: game.id })}
             onOpenGame={openDetails}
             onOpenLibrary={goToLibrary}
           />

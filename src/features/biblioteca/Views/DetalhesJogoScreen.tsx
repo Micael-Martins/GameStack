@@ -95,7 +95,7 @@ export default function DetalhesJogoScreen({ navigation, route }: Props) {
           )}
           <Pressable
             accessibilityRole="button"
-            onPress={() => console.log('TODO: abrir Registrar horas', item.id)}
+            onPress={() => navigation.navigate('RegistrarHoras', { id: item.id })}
             style={({ pressed }) => [styles.botaoContorno, pressed && styles.pressionado]}
           >
             <Ionicons name="time-outline" size={18} color={cores.texto} />

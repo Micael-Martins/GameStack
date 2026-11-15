@@ -8,6 +8,7 @@ export type RootStackParamList = {
   Configuracoes: undefined;
   AdicionarJogo: { jogo: Jogo };
    DetalhesJogo: { id: string };
+  RegistrarHoras: { id: string };
   FormularioDemo: undefined;
 };
 
