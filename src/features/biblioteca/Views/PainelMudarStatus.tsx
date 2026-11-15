@@ -28,8 +28,14 @@ export default function PainelMudarStatus({ item, visivel, onFechar, onConcluir 
 
   return (
     // onRequestClose = botão voltar do Android
-    <Modal visible={visivel} transparent animationType="slide" onRequestClose={fechar}>
-      <View style={styles.area}>
+    <Modal
+      visible={visivel}
+      transparent
+      animationType="slide"
+      onRequestClose={fechar}
+      onDismiss={vm.aoTerminarDeFechar}
+    >     
+     <View style={styles.area}>
         {/* Tocar fora do painel fecha */}
         <Pressable
           accessibilityRole="button"
