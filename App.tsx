@@ -12,7 +12,9 @@ import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { obterBanco } from './src/data/db/database';
+import { configurarNotificacoes, reagendarLembrete } from './src/data/services/notificationService';
 import { CHAVES, ler } from './src/data/storage/preferencias';
+import ConfiguracoesScreen from './src/features/configuracoes/Views/ConfiguracoesScreen';
 import OnBoardingScreen from './src/features/onboarding/Views/OnBoardingScreen';
 import TabRouter from './src/navigation/TabRouter';
 import { RootStackParamList } from './src/navigation/tipos';
@@ -48,9 +50,11 @@ export default function App() {
     async function prepare() {
       try {
         await obterBanco(); // cria o banco e as tabelas
-        await carregarBiblioteca(); // lista de jogos pronta antes da splash sair
+        await carregarBiblioteca(); // lista de jogos na store antes da splash sair
+        await configurarNotificacoes();
+        await reagendarLembrete(); // lembrete dos 5 dias (conta da última interação)
       } catch (error) {
-        console.error('Erro ao iniciar o banco:', error);
+        console.error('Erro ao iniciar o app:', error);
       }
 
       const seen = await ler(CHAVES.onboardingVisto); // AsyncStorage
@@ -77,6 +81,7 @@ export default function App() {
         <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
           <Stack.Screen name="BoasVindas" component={OnBoardingScreen} />
           <Stack.Screen name="Abas" component={TabRouter} />
+          <Stack.Screen name="Configuracoes" component={ConfiguracoesScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

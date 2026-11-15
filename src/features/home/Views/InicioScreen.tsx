@@ -1,20 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FlatList, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '../../../components/PrimaryButton';
 import TituloSecao from '../../../components/TituloSecao';
 import type { Jogo } from '../../../models/Jogo';
-import type { TabParamList } from '../../../navigation/tipos';
+import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
 import { cores } from '../../../theme';
 import { useHomeViewModel } from '../ViewModel/useHomeViewModel';
 import { styles } from './InicioScreen.styles';
 
 export default function InicioScreen() {
   const insets = useSafeAreaInsets();
+  // Duas navegações: a das abas (Pesquisar) e a da pilha principal (Configurações)
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
+  const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const goToSearch = () => navigation.navigate('Pesquisar');
 
   const vm = useHomeViewModel();
@@ -37,9 +40,9 @@ export default function InicioScreen() {
           <Text style={styles.subtitle}>{subtitle}</Text>
         </View>
 
-        {/* Engrenagem: vai abrir Configurações (tela ainda não existe) */}
+        {/* Engrenagem: abre as Configurações */}
         <Pressable
-          onPress={() => console.log('TODO: abrir Configurações')}
+          onPress={() => rootNavigation.navigate('Configuracoes')}
           accessibilityRole="button"
           accessibilityLabel="Configurações"
           style={({ pressed }) => [styles.settingsButton, pressed && styles.pressed]}
