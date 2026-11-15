@@ -25,10 +25,13 @@ export function usePesquisaViewModel() {
 
   const montado = useRef(true);
 
-  // Jogos que já estão na biblioteca (pela store, então atualiza na hora ao adicionar).
+   // Jogos que já estão na biblioteca (pela store, então atualiza na hora ao adicionar).
+   // Cada resultado sabe se já está na biblioteca (botão "Adicionar" × "Na biblioteca").
+    // Jogos que já estão na biblioteca (pela store, então atualiza na hora ao adicionar).
+  // Guarda o id da biblioteca de cada um, para o card abrir os Detalhes.
   const jogosNaBiblioteca = useBibliotecaStore((s) => s.jogos);
   const idsNaBiblioteca = useMemo(
-    () => new Set(jogosNaBiblioteca.map((item) => item.jogo.apiId)),
+    () => new Map(jogosNaBiblioteca.map((item) => [item.jogo.apiId, item.id])),
     [jogosNaBiblioteca],
   );
 
@@ -80,8 +83,13 @@ export function usePesquisaViewModel() {
   }, [controller]);
 
   // Cada resultado sabe se já está na biblioteca (botão "Adicionar" × "Na biblioteca").
+    // Cada resultado sabe se já está na biblioteca ("+" × "Na biblioteca") e, se estiver, o id dele lá.
   const resultados = useMemo(
-    () => estado.jogos.map((jogo: Jogo) => ({ jogo, naBiblioteca: idsNaBiblioteca.has(jogo.apiId) })),
+    () =>
+      estado.jogos.map((jogo: Jogo) => {
+        const idBiblioteca = idsNaBiblioteca.get(jogo.apiId) ?? null;
+        return { jogo, naBiblioteca: idBiblioteca !== null, idBiblioteca };
+      }),
     [estado.jogos, idsNaBiblioteca],
   );
 

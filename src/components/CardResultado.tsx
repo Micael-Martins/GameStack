@@ -11,17 +11,23 @@ import { linhaResultado, textoTempoMedio } from './cardResultadoUtils';
 type CardResultadoProps = {
   jogo: Jogo;
   naBiblioteca: boolean;
-  onAdicionar: (jogo: Jogo) => void;
+  // Tocar em qualquer parte do card: abre Adicionar (ou Detalhes, se já estiver na biblioteca).
+  onTocar: (jogo: Jogo) => void;
 };
 
 // Card de um jogo vindo da RAWG (ainda não salvo): mostra ano e tempo médio em
 // vez de status e horas. Diferente do CardJogo, que é de um jogo da biblioteca.
-function CardResultado({ jogo, naBiblioteca, onAdicionar }: CardResultadoProps) {
+function CardResultado({ jogo, naBiblioteca, onTocar }: CardResultadoProps) {
   const tempoMedio = textoTempoMedio(jogo.tempoMedio);
   const detalhes = linhaResultado(jogo);
 
   return (
-    <View style={styles.card}>
+    <ToqueAnimado
+      onPress={() => onTocar(jogo)}
+      accessibilityRole="button"
+      accessibilityLabel={naBiblioteca ? `${jogo.nome}, já na biblioteca. Ver detalhes` : `${jogo.nome}. Ver e adicionar`}
+      style={styles.card}
+    >
       <Capa imagemURL={jogo.imagemURL} tamanho="M" descricao={`Capa de ${jogo.nome}`} />
 
       <View style={styles.textos}>
@@ -43,22 +49,18 @@ function CardResultado({ jogo, naBiblioteca, onAdicionar }: CardResultadoProps) 
 
       {naBiblioteca ? (
         <EntradaAnimada key="na-biblioteca" deslocamento={0}>
-        <View style={styles.naBiblioteca} accessible accessibilityLabel="Já está na biblioteca">
-          <Ionicons name="checkmark" size={15} color={cores.textoSecundario} />
-          <Text style={styles.textoNaBiblioteca}>Na biblioteca</Text>
-        </View>
+          <View style={styles.naBiblioteca}>
+            <Ionicons name="checkmark" size={15} color={cores.textoSecundario} />
+            <Text style={styles.textoNaBiblioteca}>Na biblioteca</Text>
+          </View>
         </EntradaAnimada>
       ) : (
-        <ToqueAnimado
-          onPress={() => onAdicionar(jogo)}
-          accessibilityRole="button"
-          accessibilityLabel={`Adicionar ${jogo.nome} à biblioteca`}
-          style={styles.botaoMais}
-        >
+        // O "+" virou só uma pista visual: o card inteiro é o botão.
+        <View style={styles.botaoMais}>
           <Ionicons name="add" size={24} color={cores.texto} />
-        </ToqueAnimado>
+        </View>
       )}
-    </View>
+    </ToqueAnimado>
   );
 }
 

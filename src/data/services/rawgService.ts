@@ -242,12 +242,34 @@ export async function buscarCapasPopulares(limite = 3): Promise<string[]> {
     .filter((url): url is string => typeof url === 'string' && url.length > 0);
 }
 
+// Informações da seção "Sobre o jogo" (tela Adicionar). Só servem para mostrar:
+// não vão para o banco.
+export interface SobreJogo {
+  descricao: string;
+  metacritic: number | null;
+  dataLancamento: string | null; // "2017-03-03", como a RAWG manda
+}
+
+export interface DetalhesJogoRawg extends Jogo {
+  sobre: SobreJogo;
+}
+
+// A descrição da RAWG às vezes vem com o texto repetido em espanhol no final.
+export function extrairSobre(rawg: Partial<RawgJogo>): SobreJogo {
+  const descricao = (rawg.description_raw ?? '').split(/\n+Español\b/)[0].trim();
+  const metacritic =
+    typeof rawg.metacritic === 'number' && Number.isFinite(rawg.metacritic) && rawg.metacritic > 0
+      ? rawg.metacritic
+      : null;
+  return { descricao, metacritic, dataLancamento: rawg.released ?? null };
+}
+
 // Detalhes de um jogo (/games/{id}). Usado na tela Adicionar para mostrar a
-// desenvolvedora, que não vem na pesquisa.
+// desenvolvedora e o "Sobre o jogo", que não vêm na pesquisa.
 export async function buscarDetalhes(
   apiId: string,
   opcoes: Pick<OpcoesBuscaRawg, 'chave' | 'obterChave' | 'fetcher' | 'signal'> = {},
-): Promise<Jogo> {
+): Promise<DetalhesJogoRawg> {
   const chave = (opcoes.chave ?? (await (opcoes.obterChave ?? obterChavePadrao)())).trim();
   if (!chave) {
     throw new Error('RAWG: chave da API não configurada.');
@@ -269,5 +291,5 @@ export async function buscarDetalhes(
   if (!dados || typeof dados.id !== 'number' || typeof dados.name !== 'string') {
     throw new Error('RAWG: formato de resposta inesperado.');
   }
-  return converterRawgParaJogo(dados as RawgJogo);
+  return { ...converterRawgParaJogo(dados as RawgJogo), sobre: extrairSobre(dados) };
 }

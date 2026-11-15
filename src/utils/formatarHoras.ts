@@ -15,8 +15,7 @@ export function horasInteiras(minutos: number): number {
   return Number.isFinite(minutos) ? Math.max(0, Math.floor(minutos / 60)) : 0;
 }
 
-const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-
+export const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 // Quando foi a última interação: "hoje", "ontem", "há 3 dias" ou "02 nov".
 export function formatarQuando(dataISO: string, agora: Date = new Date()): string {
   const data = new Date(dataISO);

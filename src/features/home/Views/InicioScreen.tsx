@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
+import type { Jogo } from '../../../models/Jogo';
 import CardJogo from '../../../components/CardJogo';
 import TituloSecao from '../../../components/TituloSecao';
 import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
@@ -24,6 +24,7 @@ export default function InicioScreen() {
   const goToSearch = () => navigation.navigate('Pesquisar');
   const goToLibrary = () => navigation.navigate('Biblioteca');
   const openDetails = (game: JogoBiblioteca) => rootNavigation.navigate('DetalhesJogo', { id: game.id });
+    const openAdd = (game: Jogo) => rootNavigation.navigate('AdicionarJogo', { jogo: game });
   const vm = useInicioViewModel();
   const hasGames = !vm.isEmpty;
 
@@ -76,8 +77,7 @@ export default function InicioScreen() {
           <EmptyQueueCard onSearch={goToSearch} />
           {/* Populares só com a biblioteca vazia; sem internet, a seção some */}
           {vm.popularGames.length > 0 && (
-            <PopularGamesRow games={vm.popularGames} onSeeMore={goToSearch} onSelect={goToSearch} />
-          )}
+            <PopularGamesRow games={vm.popularGames} onSeeMore={goToSearch} onSelect={openAdd} />          )}
         </>
       )}
     </ScrollView>
