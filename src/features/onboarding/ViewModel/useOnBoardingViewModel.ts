@@ -3,6 +3,7 @@ import { Image } from 'react-native';
 
 import { saveProfile } from '../../../data/db/userRepository';
 import { buscarCapasPopulares } from '../../../data/services/rawgService';
+import { pedirPermissao, reagendarLembrete } from '../../../data/services/notificationService';
 import { CHAVES, salvar } from '../../../data/storage/preferencias';
 
 const DEFAULT_NAME = 'Jogador';
@@ -17,6 +18,7 @@ export function useOnBoardingViewModel(onFinish: () => void) {
   const [covers, setCovers] = useState<string[]>([]);
   const [coversReady, setCoversReady] = useState(false);
 
+  // Busca as capas e baixa as imagens antes de liberar a animação.
   useEffect(() => {
     let finished = false;
     const finish = () => {
@@ -41,15 +43,23 @@ export function useOnBoardingViewModel(onFinish: () => void) {
     return () => clearTimeout(timeout);
   }, []);
 
+  // Botão "Começar"
   async function start() {
     setSaving(true);
     setError(null);
     try {
-      await saveProfile(name.trim() || DEFAULT_NAME, remindersEnabled);
+      // Lembretes ligados: o celular mostra o alerta "Permitir notificações?".
+      // Se a pessoa negar, salvamos como desligado (dá para ligar depois em Configurações).
+      let reminders = remindersEnabled;
+      if (reminders) {
+        reminders = await pedirPermissao();
+      }
+
+      await saveProfile(name.trim() || DEFAULT_NAME, reminders);
       await salvar(CHAVES.onboardingVisto, true);
+      await reagendarLembrete(); // agenda o lembrete se tiver permissão e jogo "Jogando"
       onFinish();
     } catch (e) {
-      console.error('Erro no onboarding:', e);
       setError('Não foi possível salvar. Tente de novo.');
     } finally {
       setSaving(false);
