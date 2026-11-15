@@ -22,6 +22,7 @@ import Interruptor from '../../../components/Interruptor';
 import TituloSecao from '../../../components/TituloSecao';
 import { RootStackParamList } from '../../../navigation/tipos';
 import { cores, espacamentos, tipografia } from '../../../theme';
+import { NOME_APP } from '../../../data/services/regrasLembrete';
 import { useConfiguracoesViewModel } from '../ViewModel/useConfiguracoesViewModel';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Configuracoes'>;
@@ -151,7 +152,7 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
         </View>
 
         <View style={styles.flex} />
-        <Text style={styles.versao}>Backlog Zero · versão 1.0</Text>
+        <Text style={styles.versao}>{NOME_APP} · versão 1.0</Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );

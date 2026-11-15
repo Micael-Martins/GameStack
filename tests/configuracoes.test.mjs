@@ -20,18 +20,31 @@ test('horarioValido aceita de 00:00 a 23:59', () => {
   for (const ruim of ['24:00', '19:60', '9:00', '1900', '', '19:0']) assert.equal(horarioValido(ruim), false, ruim);
 });
 
-test('lembrete é agendado para daqui a 5 dias no horário escolhido', () => {
-  const agora = new Date(2026, 10, 14, 21, 10); // 14/11, 21:10 (horário local)
-  const data = calcularDataLembrete('19:30', agora);
+test('lembrete conta 5 dias a partir da última interação, no horário escolhido', () => {
+  const ultimaInteracao = new Date(2026, 10, 10, 15, 0); // 10/11, 15:00
+  const agora = new Date(2026, 10, 12, 9, 0); // 12/11: abrir o app não muda nada
+  const data = calcularDataLembrete('19:30', ultimaInteracao, agora);
 
-  assert.equal(data.getDate(), 19);
+  assert.equal(data.getDate(), 15);
   assert.equal(data.getMonth(), 10);
   assert.equal(data.getHours(), 19);
   assert.equal(data.getMinutes(), 30);
 });
 
-test('mensagem do lembrete leva o nome do jogo', () => {
-  assert.equal(mensagemLembrete('Zelda'), 'Há quanto tempo não salvas o mundo em Zelda? Vai jogar um pouco!');
+test('jogo parado há mais de 5 dias: lembrete no próximo horário (hoje ou amanhã)', () => {
+  const ultimaInteracao = new Date(2026, 10, 1, 15, 0);
+
+  const antesDoHorario = calcularDataLembrete('19:00', ultimaInteracao, new Date(2026, 10, 14, 10, 0));
+  assert.equal(antesDoHorario.getDate(), 14);
+  assert.equal(antesDoHorario.getHours(), 19);
+
+  const depoisDoHorario = calcularDataLembrete('19:00', ultimaInteracao, new Date(2026, 10, 14, 21, 0));
+  assert.equal(depoisDoHorario.getDate(), 15);
+  assert.equal(depoisDoHorario.getHours(), 19);
+});
+
+test('mensagem do lembrete em português do Brasil, com o nome do jogo', () => {
+  assert.equal(mensagemLembrete('Zelda'), 'Há quanto tempo você não salva o mundo em Zelda? Vai jogar um pouco!');
 });
 
 test('APAGAR_DADOS apaga os jogos e volta o usuário ao padrão, sem apagar usuário e biblioteca', () => {

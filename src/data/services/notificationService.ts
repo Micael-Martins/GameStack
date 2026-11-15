@@ -9,13 +9,15 @@ import {
   HORARIO_LEMBRETE_PADRAO,
   mensagemLembrete,
   MODO_TESTE,
+  NOME_APP,
   SEGUNDOS_MODO_TESTE,
 } from './regrasLembrete';
 
 // Notificação local (agendada no próprio aparelho, sem servidor).
 // Regra: se um jogo está "Jogando" e o usuário não registra nada há 5 dias,
-// recebe um lembrete no horário escolhido. Sempre que o app abre ou algo muda,
-// o lembrete é cancelado e agendado de novo, então quem usa o app nunca o recebe.
+// recebe um lembrete no horário escolhido. Os 5 dias contam a partir da
+// ultimaInteracao do jogo (não da abertura do app). Sempre que o app abre ou
+// algo muda, o lembrete é cancelado e agendado de novo com a data certa.
 
 const CANAL_ANDROID = 'lembretes';
 const disponivel = Platform.OS !== 'web';
@@ -98,12 +100,15 @@ export async function reagendarLembrete(): Promise<void> {
         }
       : {
           type: Notifications.SchedulableTriggerInputTypes.DATE,
-          date: calcularDataLembrete(usuario.horarioNotificacao || HORARIO_LEMBRETE_PADRAO),
+          date: calcularDataLembrete(
+            usuario.horarioNotificacao || HORARIO_LEMBRETE_PADRAO,
+            new Date(jogo.ultimaInteracao),
+          ),
           channelId: CANAL_ANDROID,
         };
 
     await Notifications.scheduleNotificationAsync({
-      content: { title: 'Backlog Zero', body: mensagemLembrete(jogo.jogo.nome), data: { ...dados } },
+      content: { title: NOME_APP, body: mensagemLembrete(jogo.jogo.nome), data: { ...dados } },
       trigger,
     });
   } catch (erro) {

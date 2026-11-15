@@ -27,7 +27,7 @@ Pede confirmação e então:
 
 ## Notificações
 
-O `src/data/services/notificationService.ts` (pedirPermissao, cancelarLembretes, reagendarLembrete, configurarNotificacoes) entrou aqui porque a tela precisa dele. As regras puras ficam em `regrasLembrete.ts` (com a constante `MODO_TESTE`). O App já reagenda o lembrete ao abrir.
+O `src/data/services/notificationService.ts` (pedirPermissao, cancelarLembretes, reagendarLembrete, configurarNotificacoes) entrou aqui porque a tela precisa dele. As regras puras ficam em `regrasLembrete.ts` (com a constante `MODO_TESTE`). O App já reagenda o lembrete ao abrir. Os 5 dias contam a partir da `ultimaInteracao` do jogo "Jogando" mais recente (abrir o app sem jogar não empurra o lembrete); se já passaram, o lembrete vai para o próximo horário escolhido. Título: "GameStack"; texto: "Há quanto tempo você não salva o mundo em [jogo]? Vai jogar um pouco!".
 
 Fica para o cartão de Notificações: reagendar ao registrar horas, ao mudar status e ao remover; pedir permissão na Boas-vindas; tocar na notificação abrir "Registrar horas".
 
