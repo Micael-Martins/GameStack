@@ -4,47 +4,54 @@ export interface OpcaoPainelStatus {
   status: StatusJogo;
   titulo: string;
   descricao: string;
+  destaque?: boolean; // "Concluir jogo" aparece em branco
 }
 
+// Textos do cartão "Painel Mudar status", na ordem do protótipo.
 export const OPCOES_PAINEL_STATUS: OpcaoPainelStatus[] = [
   {
     status: 'NA_FILA',
-    titulo: 'Na fila',
-    descricao: 'Quero jogar futuramente.',
+    titulo: 'Voltar para a fila',
+    descricao: 'Guardar para jogar depois.',
   },
   {
     status: 'JOGANDO',
     titulo: 'Jogando',
-    descricao: 'Estou jogando atualmente.',
+    descricao: 'Estou jogando agora.',
   },
   {
     status: 'CONCLUIDO',
-    titulo: 'Concluído',
-    descricao: 'Terminei este jogo.',
+    titulo: 'Concluir jogo',
+    descricao: 'Terminei! Dar nota e registrar.',
+    destaque: true,
   },
   {
     status: 'ABANDONADO',
-    titulo: 'Abandonado',
-    descricao: 'Parei de jogar.',
+    titulo: 'Abandonar',
+    descricao: 'Parei e não vou continuar.',
   },
 ];
 
-export function aceitaAvaliacao(status: StatusJogo): boolean {
-  return status === 'CONCLUIDO' || status === 'ABANDONADO';
+// O que acontece ao tocar numa opção:
+// - 'nada': é o status atual (já marcado com check)
+// - 'concluir': fecha o painel e abre a tela Concluir jogo (para nunca pular a nota)
+// - 'mudar': muda o status na hora
+export type AcaoOpcaoStatus = 'nada' | 'concluir' | 'mudar';
+
+export function acaoDaOpcao(statusAtual: StatusJogo, escolhido: StatusJogo): AcaoOpcaoStatus {
+  if (statusAtual === escolhido) return 'nada';
+  if (escolhido === 'CONCLUIDO') return 'concluir';
+  return 'mudar';
 }
 
-export function podeSalvarStatus(
-  statusAtual: StatusJogo,
-  statusSelecionado: StatusJogo,
-): boolean {
-  return statusAtual !== statusSelecionado;
-}
+// Texto da linha "Agora: ..." no topo do painel.
+const NOMES_STATUS: Record<StatusJogo, string> = {
+  NA_FILA: 'Na fila',
+  JOGANDO: 'Jogando',
+  CONCLUIDO: 'Concluído',
+  ABANDONADO: 'Abandonado',
+};
 
-export function notaParaMudanca(
-  status: StatusJogo,
-  nota: number | null,
-): number | undefined {
-  return aceitaAvaliacao(status) && nota !== null
-    ? nota
-    : undefined;
+export function nomeDoStatus(status: StatusJogo): string {
+  return NOMES_STATUS[status];
 }
