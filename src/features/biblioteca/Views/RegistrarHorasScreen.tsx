@@ -78,16 +78,19 @@ export default function RegistrarHorasScreen({ navigation, route }: Props) {
         <EntradaAnimada atraso={70} style={styles.secao}>
           <TituloSecao titulo="Quanto você jogou hoje?" />
           <View style={styles.botoes}>
-            {SOMAS_RAPIDAS.map((soma) => (
-              <ToqueAnimado
-                key={soma.rotulo}
-                onPress={() => vm.somarMinutos(soma.minutos)}
-                accessibilityRole="button"
-                accessibilityLabel={`Somar ${soma.rotulo.replace('+', '')}`}
-                style={styles.botaoSoma}
-              >
-                <Text style={styles.textoSoma}>{soma.rotulo}</Text>
-              </ToqueAnimado>
+              {SOMAS_RAPIDAS.map((soma) => (
+              // O View com flex 1 é que divide a largura: o ToqueAnimado aplica o style
+              // por dentro, então o flex 1 do botão sozinho não funcionava.
+              <View key={soma.rotulo} style={styles.itemSoma}>
+                <ToqueAnimado
+                  onPress={() => vm.somarMinutos(soma.minutos)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Somar ${soma.rotulo.replace('+', '')}`}
+                  style={styles.botaoSoma}
+                >
+                  <Text style={styles.textoSoma}>{soma.rotulo}</Text>
+                </ToqueAnimado>
+              </View>
             ))}
           </View>
           <Pressable
@@ -176,8 +179,9 @@ const styles = StyleSheet.create({
 
   secao: { marginTop: espacamentos.gg, gap: espacamentos.p },
   botoes: { flexDirection: 'row', gap: espacamentos.p },
+    itemSoma: { flex: 1 },
+ 
   botaoSoma: {
-    flex: 1,
     minHeight: 52,
     borderRadius: 14,
     borderWidth: 1,

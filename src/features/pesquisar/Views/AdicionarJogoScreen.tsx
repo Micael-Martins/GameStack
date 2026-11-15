@@ -65,8 +65,8 @@ export default function AdicionarJogoScreen({ navigation, route }: Props) {
   async function aoAdicionar() {
     if (await vm.adicionar()) {
       // Volta para as abas já na Biblioteca.
-      navigation.navigate('Abas', { screen: 'Biblioteca' });
-    }
+      navigation.popTo('Abas', { screen: 'Biblioteca' });
+        }
   }
 
   return (

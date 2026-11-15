@@ -93,8 +93,7 @@ export default function App() {
           <Stack.Screen
             name="ConcluirJogo"
             component={ConcluirJogoScreen}
-            options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
-          />
+            options={{ animation: 'slide_from_bottom', gestureEnabled: false }}          />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

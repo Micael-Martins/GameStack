@@ -20,9 +20,9 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  // Filtros (a rolagem vai até a borda da tela)
-  filtros: { flexGrow: 0, marginTop: 18 },
-  conteudoFiltros: { gap: 8, paddingHorizontal: 20 },
+   // flexShrink 0: a lista embaixo não pode "apertar" a faixa dos filtros (cortava os chips)
+  filtros: { flexGrow: 0, flexShrink: 0, marginTop: 18 },
+  conteudoFiltros: { gap: 8, paddingHorizontal: 20, paddingVertical: 2, alignItems: 'center' },
 
   // "Por última sessão · Mostrando X de Y"
   linhaInfo: {

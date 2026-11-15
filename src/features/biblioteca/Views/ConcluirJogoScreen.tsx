@@ -72,8 +72,8 @@ export default function ConcluirJogoScreen({ navigation, route }: Props) {
   async function aoConcluir() {
     if (await vm.concluir()) {
       // Volta para as abas já na Biblioteca (fecha Concluir e Detalhes).
-      navigation.navigate('Abas', { screen: 'Biblioteca' });
-    }
+      navigation.popTo('Abas', { screen: 'Biblioteca' });
+        }
   }
 
   return (
