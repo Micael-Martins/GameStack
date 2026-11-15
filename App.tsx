@@ -22,6 +22,7 @@ import { RootStackParamList } from './src/navigation/tipos';
 import { carregarBiblioteca } from './src/store/bibliotecaStore';
 import { cores } from './src/theme';
 import DetalhesJogoScreen from './src/features/biblioteca/Views/DetalhesJogoScreen';
+import RegistrarHorasScreen from './src/features/biblioteca/Views/RegistrarHorasScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -86,6 +87,7 @@ export default function App() {
           <Stack.Screen name="Configuracoes" component={ConfiguracoesScreen} options={{ animation: 'ios_from_right' }} />
           <Stack.Screen name="AdicionarJogo" component={AdicionarJogoScreen} options={{ animation: 'ios_from_right' }} />
            <Stack.Screen name="DetalhesJogo" component={DetalhesJogoScreen} options={{ animation: 'ios_from_right' }} />
+          <Stack.Screen name="RegistrarHoras" component={RegistrarHorasScreen} options={{ animation: 'ios_from_right' }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
