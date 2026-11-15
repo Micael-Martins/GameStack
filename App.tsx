@@ -23,6 +23,7 @@ import { carregarBiblioteca } from './src/store/bibliotecaStore';
 import { cores } from './src/theme';
 import DetalhesJogoScreen from './src/features/biblioteca/Views/DetalhesJogoScreen';
 import RegistrarHorasScreen from './src/features/biblioteca/Views/RegistrarHorasScreen';
+import ConcluirJogoScreen from './src/features/biblioteca/Views/ConcluirJogoScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -88,6 +89,12 @@ export default function App() {
           <Stack.Screen name="AdicionarJogo" component={AdicionarJogoScreen} options={{ animation: 'ios_from_right' }} />
            <Stack.Screen name="DetalhesJogo" component={DetalhesJogoScreen} options={{ animation: 'ios_from_right' }} />
           <Stack.Screen name="RegistrarHoras" component={RegistrarHorasScreen} options={{ animation: 'ios_from_right' }} />
+          {/* Comemoração: tela cheia subindo de baixo, fecha no X */}
+          <Stack.Screen
+            name="ConcluirJogo"
+            component={ConcluirJogoScreen}
+            options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
