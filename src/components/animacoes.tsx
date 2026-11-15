@@ -22,6 +22,11 @@ AccessibilityInfo.addEventListener?.('reduceMotionChanged', (ativo) => {
   reduzirMovimento = ativo;
 });
 
+// Para animações feitas direto nas telas: true quando o celular pede menos movimento.
+export function movimentoReduzido(): boolean {
+  return reduzirMovimento;
+}
+
 type EntradaAnimadaProps = {
   children: ReactNode;
   atraso?: number; // ms antes de começar (para entrar em sequência)

@@ -155,8 +155,8 @@ export default function DetalhesJogoScreen({ navigation, route }: Props) {
         item={item}
         visivel={vm.painelAberto}
         onFechar={vm.fecharPainel}
-        // TODO: abrir a tela Concluir jogo quando ela existir
-        onConcluir={(jogo) => console.log('TODO: abrir Concluir jogo', jogo.id)}
+        // "Concluir jogo" sempre passa pela tela de conclusão, que pede a nota.
+        onConcluir={(jogo) => navigation.navigate('ConcluirJogo', { id: jogo.id })}
       />
     </KeyboardAvoidingView>
   );
