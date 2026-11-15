@@ -9,11 +9,12 @@ import CardJogo from '../../../components/CardJogo';
 import TituloSecao from '../../../components/TituloSecao';
 import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
 import { useHomeViewModel } from '../ViewModel/useHomeViewModel';
-import { EmptyQueueCard } from './components/EmptyQueueCard';
-import { NowPlayingCarousel } from './components/NowPlayingCarousel';
-import { PopularGamesRow } from './components/PopularGamesRow';
-import { SummaryStrip } from './components/SummaryStrip';
+import { EmptyQueueCard } from './components/CardFilaVazia';
+import { NowPlayingCarousel } from './components/CarrosselJogando';
+import { PopularGamesRow } from './components/LinhaPopulares';
+import { SummaryStrip } from './components/FaixaResumo';
 import { styles } from './InicioScreen.styles';
+import { useInicioViewModel } from '../ViewModel/useInicioViewModel.';
 
 export default function InicioScreen() {
   const insets = useSafeAreaInsets();
@@ -23,7 +24,7 @@ export default function InicioScreen() {
   const goToSearch = () => navigation.navigate('Pesquisar');
   const goToLibrary = () => navigation.navigate('Biblioteca');
 
-  const vm = useHomeViewModel();
+  const vm = useInicioViewModel();
   const hasGames = !vm.isEmpty;
 
   return (

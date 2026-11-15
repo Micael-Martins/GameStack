@@ -13,7 +13,7 @@ import { PrimaryButton } from '../../../../components/PrimaryButton';
 import TituloSecao from '../../../../components/TituloSecao';
 import type { JogoBiblioteca } from '../../../../models/JogoBiblioteca';
 import { cores, tipografia } from '../../../../theme';
-import { NowPlayingCard, nowPlayingCardStyle } from './NowPlayingCard';
+import { NowPlayingCard, nowPlayingCardStyle } from './CardDestaque';
 
 type Props = {
   games: JogoBiblioteca[];

@@ -11,7 +11,7 @@ import CampoTexto from '../../../components/CampoTexto';
 import Interruptor from '../../../components/Interruptor';
 import { useOnBoardingViewModel } from '../ViewModel/useOnBoardingViewModel';
 import { styles } from './OnBoardingScreen.styles';
-import { OnBoardingIllustration } from './OnBoardingIllustration';
+import { OnBoardingIllustration } from './IlustracaoBoasVindas';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BoasVindas'>;
 
