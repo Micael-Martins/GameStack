@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   contagemPorFiltro,
+  estadoDaBiblioteca,
   FILTROS,
   filtrarJogos,
   filtroValido,
