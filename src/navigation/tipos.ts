@@ -10,6 +10,7 @@ export type RootStackParamList = {
   AdicionarJogo: { jogo: Jogo };
    DetalhesJogo: { id: string };
   RegistrarHoras: { id: string };
+  ConcluirJogo: { id: string };
   FormularioDemo: undefined;
 };
 
