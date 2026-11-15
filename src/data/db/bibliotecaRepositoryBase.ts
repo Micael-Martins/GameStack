@@ -1,6 +1,7 @@
 import type { Jogo } from '../../models/Jogo';
 import type { JogoBiblioteca } from '../../models/JogoBiblioteca';
 import type { StatusJogo } from '../../models/StatusJogo';
+import type { Estatisticas } from '../../models/Estatisticas';
 
 // Regras do repositório da biblioteca, sem depender do Expo.
 // O bibliotecaRepository.ts liga estas funções ao expo-sqlite e ao expo-crypto;
@@ -248,6 +249,50 @@ export function criarBibliotecaRepository({ obterBanco, gerarId, agora = () => n
     await banco.runAsync('DELETE FROM jogo_biblioteca WHERE id = ?', [id]);
   }
 
+    // ---------- Cartão: estatísticas da Home ----------
+
+  // Quantos jogos foram concluídos (abandonados não contam).
+  async function totalConcluidos(): Promise<number> {
+    const banco = await obterBanco();
+    const linha = await banco.getFirstAsync<{ total: number }>(
+      "SELECT COUNT(*) AS total FROM jogo_biblioteca WHERE status = 'CONCLUIDO'",
+      [],
+    );
+    return linha?.total ?? 0;
+  }
+
+  // Quantidade de jogos em cada status (GROUP BY). Status sem jogos voltam com 0.
+  async function quantidadePorStatus(): Promise<Record<StatusJogo, number>> {
+    const banco = await obterBanco();
+    const linhas = await banco.getAllAsync<{ status: StatusJogo; total: number }>(
+      'SELECT status, COUNT(*) AS total FROM jogo_biblioteca GROUP BY status',
+      [],
+    );
+    const resultado: Record<StatusJogo, number> = { NA_FILA: 0, JOGANDO: 0, CONCLUIDO: 0, ABANDONADO: 0 };
+    for (const linha of linhas) resultado[linha.status] = linha.total;
+    return resultado;
+  }
+
+  // Soma dos minutos jogados, convertida em horas inteiras.
+  async function horasTotais(): Promise<number> {
+    const banco = await obterBanco();
+    const linha = await banco.getFirstAsync<{ minutos: number | null }>(
+      'SELECT SUM(minutosJogados) AS minutos FROM jogo_biblioteca',
+      [],
+    );
+    return Math.floor((linha?.minutos ?? 0) / 60);
+  }
+
+  // Junta tudo no model Estatisticas (usado pela Home e pela tela Concluir).
+  async function obterEstatisticas(): Promise<Estatisticas> {
+    const [concluidos, porStatus, horas] = await Promise.all([
+      totalConcluidos(),
+      quantidadePorStatus(),
+      horasTotais(),
+    ]);
+    return { totalConcluidos: concluidos, horasTotais: horas, quantidadePorStatus: porStatus };
+  }
+
   return {
     salvarJogo,
     adicionarNaBiblioteca,
@@ -259,5 +304,9 @@ export function criarBibliotecaRepository({ obterBanco, gerarId, agora = () => n
     atualizarMinutos,
     mudarStatus,
     removerJogo,
+    totalConcluidos,
+    quantidadePorStatus,
+    horasTotais,
+    obterEstatisticas,
   };
 }

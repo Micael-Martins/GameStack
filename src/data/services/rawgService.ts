@@ -207,8 +207,9 @@ export async function buscarJogosRawg(
   }
 }
 
-// Capas dos jogos mais adicionados na RAWG (usadas na ilustração do onboarding).
-export async function buscarCapasPopulares(limite = 3): Promise<string[]> {
+// Jogos mais adicionados na RAWG (Home vazia e ilustração do onboarding).
+// Usa o mesmo conversor da pesquisa, então volta no model Jogo.
+export async function buscarJogosPopulares(limite = 10): Promise<Jogo[]> {
   const chave = (await obterChavePadrao()).trim();
   if (!chave) {
     throw new Error('RAWG: chave da API não configurada.');
@@ -222,11 +223,19 @@ export async function buscarCapasPopulares(limite = 3): Promise<string[]> {
 
   const resposta = await fetch(url, { headers: { Accept: 'application/json' } });
   if (!resposta.ok) {
-    throw new Error(`RAWG: falha ao buscar capas (HTTP ${resposta.status}).`);
+    throw new Error(`RAWG: falha ao buscar populares (HTTP ${resposta.status}).`);
   }
 
   const dados: Partial<RespostaRawg> = await resposta.json();
   return (dados.results ?? [])
-    .map((jogo) => jogo.background_image)
+    .filter((item): item is RawgJogo => item != null && typeof item.id === 'number' && typeof item.name === 'string')
+    .map(converterRawgParaJogo);
+}
+
+// Só as capas dos populares (ilustração do onboarding).
+export async function buscarCapasPopulares(limite = 3): Promise<string[]> {
+  const jogos = await buscarJogosPopulares(limite);
+  return jogos
+    .map((jogo) => jogo.imagemURL)
     .filter((url): url is string => typeof url === 'string' && url.length > 0);
 }

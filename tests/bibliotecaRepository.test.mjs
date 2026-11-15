@@ -196,3 +196,28 @@ test('parâmetros protegem contra texto do usuário no SQL', async () => {
   assert.equal(salvo.jogo.nome, "Jogo'; DROP TABLE jogo; --");
   assert.equal(salvo.anotacao, "'); DELETE FROM jogo_biblioteca; --");
 });
+
+// ---------- Cartão: estatísticas da Home ----------
+
+test('estatísticas: abandonado não conta como concluído e Na fila soma 0h', async () => {
+  const { repo } = criarRepositorio();
+  await repo.adicionarNaBiblioteca(jogo('1'), 'CONCLUIDO', 600);
+  await repo.adicionarNaBiblioteca(jogo('2'), 'ABANDONADO', 120);
+  await repo.adicionarNaBiblioteca(jogo('3'), 'NA_FILA', 999); // Na fila sempre entra com 0 minutos
+  await repo.adicionarNaBiblioteca(jogo('4'), 'JOGANDO', 90);
+
+  const estatisticas = await repo.obterEstatisticas();
+
+  assert.equal(estatisticas.totalConcluidos, 1);
+  assert.deepEqual(estatisticas.quantidadePorStatus, { NA_FILA: 1, JOGANDO: 1, CONCLUIDO: 1, ABANDONADO: 1 });
+  assert.equal(estatisticas.horasTotais, 13); // 600 + 120 + 0 + 90 = 810 min = 13h
+});
+
+test('estatísticas com a biblioteca vazia voltam zeradas', async () => {
+  const { repo } = criarRepositorio();
+  const estatisticas = await repo.obterEstatisticas();
+
+  assert.equal(estatisticas.totalConcluidos, 0);
+  assert.equal(estatisticas.horasTotais, 0);
+  assert.deepEqual(estatisticas.quantidadePorStatus, { NA_FILA: 0, JOGANDO: 0, CONCLUIDO: 0, ABANDONADO: 0 });
+});
