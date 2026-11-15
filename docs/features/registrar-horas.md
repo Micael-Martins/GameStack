@@ -1,24 +1,28 @@
 # Registrar horas
 
-## Fluxo
+Tela 08 do protótipo. Abre pelo "Registrar horas" da Home (card "Jogando agora") e dos Detalhes.
 
-A tela é acessada pela ação **Registrar horas** no card de jogo da Home e nos Detalhes. O usuário informa a duração da nova sessão em horas; o app converte o valor para minutos, soma ao total existente e persiste pelo repositório SQLite via store.
+Decisão do cartão: o progresso é medido em **horas informadas pelo usuário**. A barra é só uma estimativa pelo tempo médio da RAWG.
 
-## Arquitetura
+Arquivos (MVVM):
 
-- `Model/registroHoras.ts`: valida e converte horas (ponto ou vírgula decimal) para minutos inteiros e calcula o total acumulado.
-- `ViewModel/useRegistrarHorasViewModel.ts`: lê o jogo da store, valida a sessão, atualiza o total e reagenda os lembretes.
-- `Views/RegistrarHorasScreen.tsx`: mostra o jogo, total atual, campo da nova sessão, prévia do novo total, erros e botão para salvar.
-- `navigation/tipos.ts` e `App.tsx`: rota `RegistrarHoras`, identificada pelo ID do jogo.
+- `Views/RegistrarHorasScreen.tsx`
+- `ViewModel/useProgressoViewModel.ts`: minutos iniciais, minutos atuais e o histórico das mudanças (para o "Desfazer").
+- `Model/registroHoras.ts`: regras puras (testadas no Node).
 
-## Regras
+## O que aparece
 
-- A entrada é o tempo **desta sessão**, não o total histórico.
-- Aceita horas inteiras ou até duas casas decimais, com vírgula ou ponto.
-- A sessão deve resultar em pelo menos um minuto; entrada vazia, zero, negativa ou inválida não é salva.
-- O total persistido fica em minutos e é atualizado pela função existente da store, que atualiza também a data da última interação.
-- Toques repetidos durante o salvamento são ignorados.
+- **Cabeçalho:** "Registrar horas" com o nome do jogo embaixo.
+- **Card central:** "Tempo total" grande, "+Xh nesta sessão" (quando aumentou) ou "Antes: Xh", a barra e "X% do tempo médio" / "~Xh em média". Sem tempo médio, a barra some e aparece um aviso.
+- **"Quanto você jogou hoje?":** botões +30min, +1h e +2h, que somam ao total, e "Desfazer", que volta a última mudança.
+- **"Ou digite o total que aparece no console":** substitui o total (aceita 44, 44,5 e 0). Vale ao sair do campo, ao apertar Enter ou ao salvar; também pode ser desfeito.
+- **Anotação (opcional):** começa com a anotação que o jogo já tinha.
+- **"Salvar progresso":** grava os minutos e a anotação, e **se o jogo estava Na fila, ele passa para Jogando** (pelas regras de status da store). Reagenda o lembrete e volta.
 
-## Verificação
+## Validação
 
-`tests/registroHoras.test.mjs` cobre conversão, validação, arredondamento ao minuto e soma ao histórico. No app, registrar uma sessão deve atualizar o total e o progresso exibido na Home e nos Detalhes.
+Não aceita valor negativo, vazio ou texto no campo do total. Toques repetidos durante o salvamento são ignorados.
+
+## Testes
+
+`tests/registroHoras.test.mjs`: somas, desfazer, substituir o total, validação do campo, linha da sessão e percentual do tempo médio.

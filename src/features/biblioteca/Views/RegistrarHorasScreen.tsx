@@ -1,110 +1,197 @@
-import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { EntradaAnimada, ToqueAnimado } from '../../../components/animacoes';
+import BarraProgresso from '../../../components/BarraProgresso';
 import Cabecalho from '../../../components/Cabecalho';
 import CampoTexto from '../../../components/CampoTexto';
-import Capa from '../../../components/Capa';
 import EstadoVazio from '../../../components/EstadoVazio';
 import { PrimaryButton } from '../../../components/PrimaryButton';
+import TituloSecao from '../../../components/TituloSecao';
 import type { RootStackParamList } from '../../../navigation/tipos';
 import { cores, espacamentos, tipografia } from '../../../theme';
 import { formatarHoras } from '../../../utils/formatarHoras';
-import { calcularTotalMinutos, converterHorasParaMinutos } from '../Model/registroHoras';
-import { useRegistrarHorasViewModel } from '../ViewModel/useRegistrarHorasViewModel';
+import { SOMAS_RAPIDAS } from '../Model/registroHoras';
+import { useProgressoViewModel } from '../ViewModel/useProgressoViewModel';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RegistrarHoras'>;
 
+// Tela 08 do protótipo. Abre pelo "Registrar horas" da Home e dos Detalhes.
+// O progresso é medido em horas informadas pelo usuário; a barra é só uma estimativa
+// pelo tempo médio da RAWG.
 export default function RegistrarHorasScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
-  const vm = useRegistrarHorasViewModel(route.params.id);
+  const vm = useProgressoViewModel(route.params.id);
 
+  // O jogo foi removido enquanto a tela estava aberta.
   if (!vm.item) {
     return (
       <View style={[styles.tela, { paddingTop: insets.top + 8 }]}>
-        <View style={styles.cabecalhoErro}>
+        <View style={styles.margem}>
           <Cabecalho titulo="Registrar horas" onVoltar={navigation.goBack} />
         </View>
-        <View style={styles.estadoSemJogo}>
+        <View style={[styles.margem, styles.centro]}>
           <EstadoVazio titulo="Jogo não encontrado" descricao="Ele pode ter sido removido da sua biblioteca." />
         </View>
       </View>
     );
   }
 
-  const minutosDaSessao = converterHorasParaMinutos(vm.horas);
-  const totalPrevisto = minutosDaSessao === null
-    ? vm.item.minutosJogados
-    : calcularTotalMinutos(vm.item.minutosJogados, minutosDaSessao);
-
-  async function salvar() {
+  async function aoSalvar() {
     if (await vm.salvar()) navigation.goBack();
   }
 
   return (
     <KeyboardAvoidingView style={styles.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
-        contentContainerStyle={[styles.conteudo, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 24 }]}
+        contentContainerStyle={[styles.conteudo, { paddingTop: insets.top + 8 }]}
         keyboardShouldPersistTaps="handled"
       >
-        <Cabecalho titulo="Registrar horas" onVoltar={navigation.goBack} />
+        <Cabecalho titulo="Registrar horas" subtitulo={vm.item.jogo.nome} onVoltar={navigation.goBack} />
 
-        <View style={styles.jogo}>
-          <Capa imagemURL={vm.item.jogo.imagemURL} tamanho="M" descricao={`Capa de ${vm.item.jogo.nome}`} />
-          <View style={styles.dadosJogo}>
-            <Text accessibilityRole="header" style={styles.nomeJogo} numberOfLines={2}>{vm.item.jogo.nome}</Text>
-            <Text style={styles.tempoAtual}>Total atual: {formatarHoras(vm.item.minutosJogados)}</Text>
+        {/* Card central: tempo total */}
+        <EntradaAnimada style={styles.cardTotal}>
+          <Text style={styles.rotuloTotal}>Tempo total</Text>
+          <Text style={styles.total} accessibilityLiveRegion="polite">
+            {formatarHoras(vm.minutos)}
+          </Text>
+          <Text style={styles.sessao}>{vm.textoSessao}</Text>
+          {vm.percentual !== null ? (
+            <View style={styles.areaBarra}>
+              <BarraProgresso
+                valor={vm.progressoBarra}
+                temTempoMedio
+                descricao={`${vm.percentual}% do tempo médio`}
+              />
+              <View style={styles.linhaBarra}>
+                <Text style={styles.legenda}>{vm.percentual}% do tempo médio</Text>
+                <Text style={styles.legenda}>~{vm.tempoMedio}h em média</Text>
+              </View>
+            </View>
+          ) : (
+            <Text style={styles.legenda}>A RAWG não tem o tempo médio deste jogo</Text>
+          )}
+        </EntradaAnimada>
+
+        {/* Somas rápidas */}
+        <EntradaAnimada atraso={70} style={styles.secao}>
+          <TituloSecao titulo="Quanto você jogou hoje?" />
+          <View style={styles.botoes}>
+            {SOMAS_RAPIDAS.map((soma) => (
+              <ToqueAnimado
+                key={soma.rotulo}
+                onPress={() => vm.somarMinutos(soma.minutos)}
+                accessibilityRole="button"
+                accessibilityLabel={`Somar ${soma.rotulo.replace('+', '')}`}
+                style={styles.botaoSoma}
+              >
+                <Text style={styles.textoSoma}>{soma.rotulo}</Text>
+              </ToqueAnimado>
+            ))}
           </View>
-        </View>
+          <Pressable
+            onPress={vm.desfazerUltima}
+            disabled={!vm.podeDesfazer}
+            accessibilityRole="button"
+            accessibilityLabel="Desfazer a última mudança"
+            accessibilityState={{ disabled: !vm.podeDesfazer }}
+            style={({ pressed }) => [styles.desfazer, pressed && styles.pressionado]}
+          >
+            <Text style={[styles.textoDesfazer, !vm.podeDesfazer && styles.desabilitado]}>Desfazer</Text>
+          </Pressable>
+        </EntradaAnimada>
 
-        <View style={styles.cartao}>
-          <View style={styles.iconeTempo}>
-            <Ionicons name="time-outline" size={24} color={cores.texto} />
-          </View>
-          <Text style={styles.titulo}>Quanto tempo você jogou?</Text>
-          <Text style={styles.descricao}>Informe as horas desta sessão. Vamos somá-las ao total já registrado.</Text>
-
+        {/* Total do console: substitui o total */}
+        <EntradaAnimada atraso={140} style={styles.secao}>
           <CampoTexto
-            label="Duração da sessão"
-            value={vm.horas}
-            onChangeText={vm.setHoras}
-            placeholder="Ex.: 1,5"
-            keyboardType="decimal-pad"
+            label="Ou digite o total que aparece no console"
+            placeholder="Ex.: 44"
             sufixo="horas"
+            keyboardType="decimal-pad"
+            value={vm.totalDigitado}
+            onChangeText={vm.alterarTotalDigitado}
+            onBlur={() => vm.aplicarTotalDigitado()}
+            onSubmitEditing={() => vm.aplicarTotalDigitado()}
+            returnKeyType="done"
             maxLength={8}
-            accessibilityLabel="Horas desta sessão"
           />
+          {vm.erroTotal ? (
+            <Text accessibilityRole="alert" style={styles.erro}>
+              {vm.erroTotal}
+            </Text>
+          ) : null}
+        </EntradaAnimada>
 
-          {vm.erro ? <Text accessibilityRole="alert" style={styles.erro}>{vm.erro}</Text> : null}
-
-          <View style={styles.resumo}>
-            <Text style={styles.rotuloResumo}>Novo total</Text>
-            <Text style={styles.valorResumo}>{formatarHoras(totalPrevisto)}</Text>
-          </View>
-        </View>
-
-        <PrimaryButton title="Salvar horas" onPress={() => void salvar()} loading={vm.salvando} />
+        {/* Anotação opcional */}
+        <EntradaAnimada atraso={210} style={styles.secao}>
+          <CampoTexto
+            label="Anotação (opcional)"
+            placeholder="Onde você parou? Alguma meta para a próxima sessão?"
+            value={vm.anotacao}
+            onChangeText={vm.setAnotacao}
+            multiline
+            maxLength={500}
+          />
+        </EntradaAnimada>
       </ScrollView>
+
+      <View style={[styles.rodape, { paddingBottom: insets.bottom + 16 }]}>
+        {vm.vaiComecar ? <Text style={styles.aviso}>Ao salvar, o jogo sai da fila e vai para Jogando.</Text> : null}
+        {vm.erro ? (
+          <Text accessibilityRole="alert" style={styles.erro}>
+            {vm.erro}
+          </Text>
+        ) : null}
+        <PrimaryButton title="Salvar progresso" onPress={() => void aoSalvar()} loading={vm.salvando} />
+      </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
-  cabecalhoErro: { paddingHorizontal: espacamentos.m },
-  estadoSemJogo: { flex: 1, paddingHorizontal: espacamentos.m, justifyContent: 'center' },
-  conteudo: { paddingHorizontal: espacamentos.m, gap: 24 },
-  jogo: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, backgroundColor: cores.card, borderRadius: 18 },
-  dadosJogo: { flex: 1, gap: 6 },
-  nomeJogo: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 18, lineHeight: 24 },
-  tempoAtual: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 14 },
-  cartao: { gap: 16, padding: 20, backgroundColor: cores.card, borderRadius: 20, borderWidth: 1, borderColor: cores.borda },
-  iconeTempo: { width: 48, height: 48, borderRadius: 16, backgroundColor: cores.borda, alignItems: 'center', justifyContent: 'center' },
-  titulo: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 20 },
-  descricao: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 14, lineHeight: 21 },
-  erro: { color: '#FF8A8A', fontFamily: tipografia.fontes.regular, fontSize: 13 },
-  resumo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, borderTopWidth: 1, borderTopColor: cores.borda },
-  rotuloResumo: { color: cores.textoSecundario, fontFamily: tipografia.fontes.semiBold, fontSize: 14 },
-  valorResumo: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 18 },
+  margem: { paddingHorizontal: espacamentos.gg },
+  centro: { flex: 1, justifyContent: 'center' },
+  conteudo: { flexGrow: 1, paddingHorizontal: espacamentos.gg, paddingBottom: espacamentos.gg },
+  pressionado: { opacity: 0.6 },
+
+  cardTotal: {
+    alignItems: 'center',
+    gap: 4,
+    marginTop: espacamentos.m,
+    paddingVertical: 22,
+    paddingHorizontal: espacamentos.g,
+    borderRadius: espacamentos.raios.cards,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    backgroundColor: cores.card,
+  },
+  rotuloTotal: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
+  total: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 44, letterSpacing: -1 },
+  sessao: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
+  areaBarra: { alignSelf: 'stretch', gap: 8, marginTop: 14 },
+  linhaBarra: { flexDirection: 'row', justifyContent: 'space-between' },
+  legenda: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular, fontSize: 12 },
+
+  secao: { marginTop: espacamentos.gg, gap: espacamentos.p },
+  botoes: { flexDirection: 'row', gap: espacamentos.p },
+  botaoSoma: {
+    flex: 1,
+    minHeight: 52,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    backgroundColor: cores.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textoSoma: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 16 },
+  desfazer: { alignSelf: 'center', minHeight: 44, paddingHorizontal: 16, justifyContent: 'center' },
+  textoDesfazer: { color: cores.textoSecundario, fontFamily: tipografia.fontes.semiBold, fontSize: 14 },
+  desabilitado: { opacity: 0.4 },
+
+  rodape: { gap: espacamentos.p, paddingHorizontal: espacamentos.gg, paddingTop: espacamentos.m, backgroundColor: cores.fundo },
+  aviso: { textAlign: 'center', color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
+  erro: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
 });
