@@ -1,17 +1,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import {
-  formatarTempoJogado,
-  prepararDadosCardJogo,
-} from '../src/features/biblioteca/ViewModel/cardJogoUtils.ts';
+import { prepararDadosCardJogo } from '../src/components/cardJogoUtils.ts';
+
+const AGORA = new Date(2026, 10, 15, 10, 0); // 15 nov 2026
 
 function criarItem({
+  status = 'JOGANDO',
   minutosJogados = 0,
-  tempoMedio = 4,
-  genero = 'Aventura',
-  plataformas = ['PC'],
-  anoLancamento = 2020,
+  tempoMedio = 50,
+  genero = 'RPG, Action',
+  plataformas = ['PC', 'PlayStation 5'],
+  ultimaInteracao = new Date(2026, 10, 14, 20, 0).toISOString(), // ontem
 } = {}) {
   return {
     id: 'biblioteca-1',
@@ -23,142 +23,59 @@ function criarItem({
       imagemURL: null,
       genero,
       desenvolvedora: '',
-      anoLancamento,
+      anoLancamento: 2020,
       tempoMedio,
       plataformas,
     },
-    status: 'JOGANDO',
+    status,
     minutosJogados,
     nota: null,
     anotacao: '',
-    dataAdicao: '2026-11-15T10:00:00.000Z',
+    dataAdicao: '2026-11-01T10:00:00.000Z',
     dataConclusao: null,
-    ultimaInteracao: '2026-11-15T10:00:00.000Z',
+    ultimaInteracao,
   };
 }
 
-test('Formata zero e minutos inferiores a uma hora', () => {
-  assert.equal(formatarTempoJogado(0), '0 min');
-  assert.equal(formatarTempoJogado(45), '45 min');
+test('linha "plataforma · gênero" usa só o primeiro de cada', () => {
+  assert.equal(prepararDadosCardJogo(criarItem(), AGORA).plataformaGenero, 'PC · RPG');
+  assert.equal(prepararDadosCardJogo(criarItem({ plataformas: [] }), AGORA).plataformaGenero, 'RPG');
 });
 
-test('Formata horas completas e horas com minutos', () => {
-  assert.equal(formatarTempoJogado(60), '1 h');
-  assert.equal(formatarTempoJogado(135), '2 h 15 min');
-  assert.equal(formatarTempoJogado(180), '3 h');
+test('Jogando com tempo médio: "12h de ~50h" e barra', () => {
+  const dados = prepararDadosCardJogo(criarItem({ minutosJogados: 12 * 60 + 40 }), AGORA);
+  assert.equal(dados.textoHoras, '12h de ~50h');
+  assert.equal(dados.mostrarBarra, true);
+  assert.ok(Math.abs(dados.progresso - 760 / 3000) < 1e-9);
 });
 
-test('Trata minutos negativos e valores inválidos', () => {
-  assert.equal(formatarTempoJogado(-30), '0 min');
-  assert.equal(formatarTempoJogado(Number.NaN), '0 min');
-  assert.equal(formatarTempoJogado(Infinity), '0 min');
+test('Jogando sem tempo médio: só as horas e sem barra', () => {
+  const dados = prepararDadosCardJogo(criarItem({ minutosJogados: 600, tempoMedio: 0 }), AGORA);
+  assert.equal(dados.textoHoras, '10h');
+  assert.equal(dados.mostrarBarra, false);
 });
 
-test('Calcula progresso convertendo horas em minutos', () => {
-  const dados = prepararDadosCardJogo(
-    criarItem({
-      minutosJogados: 120,
-      tempoMedio: 4,
-    }),
-  );
-
-  assert.equal(dados.temTempoMedio, true);
-  assert.equal(dados.progresso, 0.5);
-  assert.equal(dados.percentual, 50);
-  assert.equal(dados.tempoJogado, '2 h');
+test('Na fila: "ainda não começou" e sem barra', () => {
+  const dados = prepararDadosCardJogo(criarItem({ status: 'NA_FILA' }), AGORA);
+  assert.equal(dados.textoHoras, 'ainda não começou');
+  assert.equal(dados.mostrarBarra, false);
 });
 
-test('Limita progresso a 100 por cento', () => {
-  const dados = prepararDadosCardJogo(
-    criarItem({
-      minutosJogados: 600,
-      tempoMedio: 4,
-    }),
-  );
+test('Concluído e Abandonado: horas jogadas e sem barra', () => {
+  const concluido = prepararDadosCardJogo(criarItem({ status: 'CONCLUIDO', minutosJogados: 540 }), AGORA);
+  assert.equal(concluido.textoHoras, '9h');
+  assert.equal(concluido.mostrarBarra, false);
 
+  const abandonado = prepararDadosCardJogo(criarItem({ status: 'ABANDONADO', minutosJogados: 150 }), AGORA);
+  assert.equal(abandonado.textoHoras, '2h 30min');
+});
+
+test('linha compacta: "PC · 18h de ~27h · ontem"', () => {
+  const dados = prepararDadosCardJogo(criarItem({ minutosJogados: 18 * 60, tempoMedio: 27 }), AGORA);
+  assert.equal(dados.linhaCompacta, 'PC · 18h de ~27h · ontem');
+});
+
+test('progresso nunca passa de 100%', () => {
+  const dados = prepararDadosCardJogo(criarItem({ minutosJogados: 100 * 60, tempoMedio: 50 }), AGORA);
   assert.equal(dados.progresso, 1);
-  assert.equal(dados.percentual, 100);
-});
-
-test('Minutos negativos não produzem progresso negativo', () => {
-  const dados = prepararDadosCardJogo(
-    criarItem({
-      minutosJogados: -100,
-      tempoMedio: 4,
-    }),
-  );
-
-  assert.equal(dados.progresso, 0);
-  assert.equal(dados.percentual, 0);
-  assert.equal(dados.tempoJogado, '0 min');
-});
-
-test('Sem tempo médio não calcula porcentagem', () => {
-  const dados = prepararDadosCardJogo(
-    criarItem({
-      minutosJogados: 90,
-      tempoMedio: 0,
-    }),
-  );
-
-  assert.equal(dados.temTempoMedio, false);
-  assert.equal(dados.progresso, 0);
-  assert.equal(dados.percentual, null);
-  assert.equal(dados.tempoJogado, '1 h 30 min');
-});
-
-test('Tempo médio inválido não produz NaN na barra', () => {
-  const dados = prepararDadosCardJogo(
-    criarItem({
-      minutosJogados: 90,
-      tempoMedio: Number.NaN,
-    }),
-  );
-
-  assert.equal(dados.temTempoMedio, false);
-  assert.equal(dados.progresso, 0);
-  assert.equal(dados.percentual, null);
-});
-
-test('Exibe o gênero como informação secundária', () => {
-  const dados = prepararDadosCardJogo(
-    criarItem({
-      genero: 'RPG, Aventura',
-      plataformas: ['PC'],
-    }),
-  );
-
-  assert.equal(dados.resumo, 'RPG, Aventura');
-});
-
-test('Usa plataforma ou ano quando não existe gênero', () => {
-  const comPlataforma = prepararDadosCardJogo(
-    criarItem({
-      genero: '',
-      plataformas: ['PlayStation 5'],
-    }),
-  );
-
-  const comAno = prepararDadosCardJogo(
-    criarItem({
-      genero: '',
-      plataformas: [],
-      anoLancamento: 2020,
-    }),
-  );
-
-  assert.equal(comPlataforma.resumo, 'PlayStation 5');
-  assert.equal(comAno.resumo, '2020');
-});
-
-test('Sem gênero, plataforma e ano mantém resumo vazio', () => {
-  const dados = prepararDadosCardJogo(
-    criarItem({
-      genero: '',
-      plataformas: [],
-      anoLancamento: null,
-    }),
-  );
-
-  assert.equal(dados.resumo, '');
 });
