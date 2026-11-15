@@ -21,6 +21,7 @@ import TabRouter from './src/navigation/TabRouter';
 import { RootStackParamList } from './src/navigation/tipos';
 import { carregarBiblioteca } from './src/store/bibliotecaStore';
 import { cores } from './src/theme';
+import DetalhesJogoScreen from './src/features/biblioteca/Views/DetalhesJogoScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -84,6 +85,7 @@ export default function App() {
           <Stack.Screen name="Abas" component={TabRouter} />
           <Stack.Screen name="Configuracoes" component={ConfiguracoesScreen} options={{ animation: 'ios_from_right' }} />
           <Stack.Screen name="AdicionarJogo" component={AdicionarJogoScreen} options={{ animation: 'ios_from_right' }} />
+           <Stack.Screen name="DetalhesJogo" component={DetalhesJogoScreen} options={{ animation: 'ios_from_right' }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

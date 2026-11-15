@@ -14,6 +14,7 @@ import { PopularGamesRow } from './components/LinhaPopulares';
 import { SummaryStrip } from './components/FaixaResumo';
 import { styles } from './InicioScreen.styles';
 import { useInicioViewModel } from '../ViewModel/useInicioViewModel';
+import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
 
 export default function InicioScreen() {
   const insets = useSafeAreaInsets();
@@ -22,7 +23,7 @@ export default function InicioScreen() {
   const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const goToSearch = () => navigation.navigate('Pesquisar');
   const goToLibrary = () => navigation.navigate('Biblioteca');
-
+  const openDetails = (game: JogoBiblioteca) => rootNavigation.navigate('DetalhesJogo', { id: game.id });
   const vm = useInicioViewModel();
   const hasGames = !vm.isEmpty;
 
@@ -57,6 +58,7 @@ export default function InicioScreen() {
           <NowPlayingCarousel
             games={vm.playingGames}
             onLogHours={() => console.log('TODO: abrir Registrar horas')}
+            onOpenGame={openDetails}
             onOpenLibrary={goToLibrary}
           />
           {vm.recentGames.length > 0 && (
@@ -64,8 +66,7 @@ export default function InicioScreen() {
               <TituloSecao titulo="Jogados recentemente" link={{ texto: 'Ver todos', onPress: goToLibrary }} />
               <View style={styles.recentList}>
                 {vm.recentGames.map((game) => (
-                  <CardJogo key={game.id} item={game} variante="compacto" />
-                ))}
+<CardJogo key={game.id} item={game} variante="compacto" onPress={openDetails} />                ))}
               </View>
             </View>
           )}
