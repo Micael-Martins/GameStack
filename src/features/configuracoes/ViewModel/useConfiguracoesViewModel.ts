@@ -31,18 +31,39 @@ export function useConfiguracoesViewModel() {
   const [erroHorario, setErroHorario] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [apagando, setApagando] = useState(false);
+  const [carregando, setCarregando] = useState(true);
+  const [erroCarregamento, setErroCarregamento] = useState<string | null>(null);
+  const [tentativa, setTentativa] = useState(0);
 
-  // Lê o usuário do SQLite quando a tela abre.
+  // Lê o usuário do SQLite e permite uma nova tentativa em caso de falha.
   useEffect(() => {
+    let ativo = true;
+    setCarregando(true);
+    setErroCarregamento(null);
+
     obterUsuario()
       .then((u) => {
-        if (!u) return;
+        if (!u) throw new Error("Usuário não encontrado.");
+        if (!ativo) return;
+
         setUsuario(u);
         setNome(u.nome);
         setHorario(u.horarioNotificacao);
       })
-      .catch((e) => console.warn("Erro ao ler o usuário.", e));
-  }, []);
+      .catch((e) => {
+        console.warn("Erro ao ler o usuário.", e);
+        if (ativo) {
+          setErroCarregamento("Não foi possível carregar as configurações.");
+        }
+      })
+      .finally(() => {
+        if (ativo) setCarregando(false);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, [tentativa]);
 
   const lembretesAtivos = usuario?.notificacaoAtiva ?? false;
 
@@ -127,6 +148,9 @@ export function useConfiguracoesViewModel() {
 
   return {
     carregado: usuario !== null,
+    carregando,
+    erroCarregamento,
+    tentarNovamente: () => setTentativa((atual) => atual + 1),
     nome,
     setNome,
     salvarNome,

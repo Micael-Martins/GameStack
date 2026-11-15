@@ -19,6 +19,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EntradaAnimada } from '../../../components/animacoes';
 import Cabecalho from '../../../components/Cabecalho';
 import CampoTexto from '../../../components/CampoTexto';
+import EstadoCarregando from '../../../components/EstadoCarregando';
+import EstadoVazio from '../../../components/EstadoVazio';
 import Interruptor from '../../../components/Interruptor';
 import TituloSecao from '../../../components/TituloSecao';
 import { RootStackParamList } from '../../../navigation/tipos';
@@ -62,6 +64,20 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
       >
         <Cabecalho titulo="Configurações" onVoltar={navigation.goBack} />
 
+        {vm.carregando ? (
+          <EstadoCarregando mensagem="Carregando configurações..." />
+        ) : vm.erroCarregamento ? (
+          <EstadoVazio
+            titulo="Não foi possível carregar as configurações"
+            descricao="Tente novamente em instantes."
+            icone="alert-circle-outline"
+            acao={{
+              titulo: 'Tentar de novo',
+              onPress: vm.tentarNovamente,
+            }}
+          />
+        ) : (
+          <>
         <EntradaAnimada atraso={0} style={styles.secao}>
           <TituloSecao titulo="Perfil" />
           <CampoTexto
@@ -151,6 +167,9 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
             </Pressable>
           </View>
         </EntradaAnimada>
+
+          </>
+        )}
 
         <View style={styles.flex} />
         <Text style={styles.versao}>{NOME_APP} · versão 1.0</Text>
