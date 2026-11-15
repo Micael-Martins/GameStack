@@ -1,6 +1,7 @@
 export type RootStackParamList = {
   Abas: undefined;
   BoasVindas: undefined;
+  Configuracoes: undefined;
   FormularioDemo: undefined;
 };
 

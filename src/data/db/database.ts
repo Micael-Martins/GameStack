@@ -5,7 +5,7 @@
 import * as SQLite from 'expo-sqlite';
 import * as Crypto from 'expo-crypto';
 
-import { CRIAR_TABELAS } from './esquema';
+import { APAGAR_DADOS, CRIAR_TABELAS } from './esquema';
 
 // Abre o banco, cria as tabelas e o usuário padrão (só na primeira vez).
 export const initDatabase = async () => {
@@ -47,4 +47,10 @@ export function obterBanco(): ReturnType<typeof initDatabase> {
     });
   }
   return bancoPromise;
+}
+
+// Usado pelo "Apagar todos os dados" das Configurações.
+export async function apagarDadosDoBanco(): Promise<void> {
+  const db = await obterBanco();
+  await db.execAsync(APAGAR_DADOS);
 }

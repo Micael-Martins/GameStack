@@ -34,6 +34,7 @@ export interface EstadoBiblioteca {
   atualizar: (id: string, campos: AtualizacaoJogo) => Promise<void>;
   mudarStatus: (id: string, novoStatus: StatusJogo, nota?: number | null) => Promise<void>;
   remover: (id: string) => Promise<void>;
+  limpar: () => void;
 }
 
 // Mais recente primeiro (as datas são texto ISO, então dá para comparar como texto).
@@ -103,6 +104,9 @@ export function criarBibliotecaStore({ repositorio, regras, agora = () => new Da
         await repositorio.removerJogo(id);
         set({ jogos: get().jogos.filter((j) => j.id !== id) });
       },
+
+      // Esvazia a lista (usado pelo "Apagar todos os dados", depois de limpar o banco).
+      limpar: () => set({ jogos: [], carregando: false, erro: null }),
     };
   });
 }

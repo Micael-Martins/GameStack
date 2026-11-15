@@ -44,3 +44,11 @@ export const CRIAR_TABELAS = `
       FOREIGN KEY (jogoId) REFERENCES jogo (id) ON DELETE CASCADE
     );
 `;
+
+// "Apagar todos os dados" (Configurações): apaga os jogos e volta o usuário ao
+// padrão. O usuário e a biblioteca continuam existindo (o app precisa deles).
+export const APAGAR_DADOS = `
+    DELETE FROM jogo_biblioteca;
+    DELETE FROM jogo;
+    UPDATE usuario SET nome = 'Jogador', notificacaoAtiva = 0, horarioNotificacao = NULL;
+`;

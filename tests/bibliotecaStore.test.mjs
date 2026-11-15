@@ -132,3 +132,12 @@ test('seletores: jogandoAgora, recentes(n) e porStatus(status)', async () => {
   assert.deepEqual(porStatus(jogos, 'JOGANDO').map((j) => j.jogo.apiId), ['3', '1']);
   assert.equal(jogandoAgora([]), null);
 });
+
+test('limpar esvazia a lista (usado pelo Apagar todos os dados)', async () => {
+  const store = criarStore();
+  await store.getState().adicionar(jogo('1'), 'JOGANDO');
+
+  store.getState().limpar();
+
+  assert.deepEqual(store.getState().jogos, []);
+});
