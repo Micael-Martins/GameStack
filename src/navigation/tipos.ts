@@ -1,6 +1,7 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
 
 import type { Jogo } from '../models/Jogo';
+import type { FiltroBiblioteca } from '../features/biblioteca/Model/filtrosBiblioteca';
 
 export type RootStackParamList = {
   Abas: NavigatorScreenParams<TabParamList> | undefined;
@@ -15,6 +16,5 @@ export type RootStackParamList = {
 export type TabParamList = {
   Inicio: undefined;
   Pesquisar: undefined;
-  Biblioteca: undefined;
-  Componentes: undefined;
-};
+  Biblioteca: { filtro?: FiltroBiblioteca } | undefined; 
+}
