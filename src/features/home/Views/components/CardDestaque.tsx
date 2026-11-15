@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
 import BarraProgresso from '../../../../components/BarraProgresso';
 import Capa from '../../../../components/Capa';
@@ -13,14 +13,20 @@ type Props = {
   game: JogoBiblioteca;
   width?: number; // no carrossel, cada card tem largura fixa
   onLogHours: () => void;
+  onOpen: () => void; // tocar na capa ou no nome abre os Detalhes
 };
 
-export function NowPlayingCard({ game, width, onLogHours }: Props) {
+export function NowPlayingCard({ game, width, onLogHours, onOpen }: Props) {
   const data = prepararDadosCardJogo(game);
 
   return (
     <View style={[styles.card, width ? { width } : null]}>
-      <View style={styles.top}>
+      <Pressable
+        onPress={onOpen}
+        accessibilityRole="button"
+        accessibilityLabel={`Ver detalhes de ${game.jogo.nome}`}
+        style={({ pressed }) => [styles.top, pressed && styles.pressed]}
+      >
         <Capa imagemURL={game.jogo.imagemURL} tamanho="G" descricao={`Capa de ${game.jogo.nome}`} />
         <View style={styles.info}>
           <StatusChip status={game.status} />
@@ -33,7 +39,7 @@ export function NowPlayingCard({ game, width, onLogHours }: Props) {
             </Text>
           ) : null}
         </View>
-      </View>
+      </Pressable>
 
       <View style={styles.progress}>
         <View style={styles.progressTexts}>
@@ -64,6 +70,7 @@ export const nowPlayingCardStyle: ViewStyle = {
 const styles = StyleSheet.create({
   card: nowPlayingCardStyle,
   top: { flexDirection: 'row', gap: 14 },
+  pressed: { opacity: 0.7 },
   info: { flex: 1, minWidth: 0, gap: 6, alignItems: 'flex-start' },
   title: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 19, lineHeight: 24 },
   details: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },

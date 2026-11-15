@@ -7,6 +7,7 @@ export type RootStackParamList = {
   BoasVindas: undefined;
   Configuracoes: undefined;
   AdicionarJogo: { jogo: Jogo };
+   DetalhesJogo: { id: string };
   FormularioDemo: undefined;
 };
 

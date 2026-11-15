@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { buscarDetalhes } from '../../../data/services/rawgService';
+import { buscarDetalhes, type SobreJogo } from '../../../data/services/rawgService';
 import { reagendarLembrete } from '../../../data/services/notificationService';
 import type { Jogo } from '../../../models/Jogo';
 import type { StatusJogo } from '../../../models/StatusJogo';
@@ -13,20 +13,24 @@ export function useAdicionarViewModel(jogoInicial: Jogo) {
 
   const [jogo, setJogo] = useState<Jogo>(jogoInicial);
   const [carregandoDetalhes, setCarregandoDetalhes] = useState(true);
+  const [sobre, setSobre] = useState<SobreJogo | null>(null); // seção "Sobre o jogo"
   const [status, setStatus] = useState<StatusJogo>(STATUS_INICIAL_PADRAO);
   const [horas, setHoras] = useState('');
   const [erroHoras, setErroHoras] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  // Ao abrir, busca a desenvolvedora. Se falhar, mostra sem ela e salva assim mesmo.
+  // Ao abrir, busca a desenvolvedora e o "Sobre o jogo".
+  // Se falhar, mostra sem eles e salva assim mesmo.
   useEffect(() => {
     let ativo = true;
     buscarDetalhes(jogoInicial.apiId)
       .then((detalhes) => {
-        if (ativo && detalhes.desenvolvedora) {
+        if (!ativo) return;
+        if (detalhes.desenvolvedora) {
           setJogo((atual) => ({ ...atual, desenvolvedora: detalhes.desenvolvedora }));
         }
+        setSobre(detalhes.sobre);
       })
       .catch((e) => console.warn('Sem detalhes da RAWG:', e))
       .finally(() => {
@@ -72,6 +76,7 @@ export function useAdicionarViewModel(jogoInicial: Jogo) {
   return {
     jogo,
     carregandoDetalhes,
+    sobre,
     status,
     setStatus,
     horas,
