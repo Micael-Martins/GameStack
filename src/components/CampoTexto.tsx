@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ComponentProps, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
-import { cores, tipografia } from '../theme';
+import { bordas, cores, tipografia } from '../theme';
 
+// Campo de texto do app: rótulo, ícone, sufixo ("horas") e botão de limpar opcionais.
 type CampoTextoProps = TextInputProps & {
   label?: string;
   sufixo?: string;
@@ -24,7 +25,7 @@ export default function CampoTexto({
   accessibilityLabel,
   ...props
 }: CampoTextoProps) {
-  const [focado, setFocado] = useState(false);
+  const [focado, setFocado] = useState(false); // borda branca enquanto digita
 
   return (
     <View style={styles.grupo}>
@@ -54,14 +55,14 @@ export default function CampoTexto({
 
 const styles = StyleSheet.create({
   grupo: { gap: 8 },
-  label: { color: '#D4D4D4', fontFamily: tipografia.fontes.semiBold, fontSize: 14 },
+  label: { color: cores.textoClaro, fontFamily: tipografia.fontes.semiBold, fontSize: 14 },
   campo: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: cores.card,
-    borderWidth: 1,
-    borderColor: '#2E2E2E',
-    borderRadius: 14,
+    borderWidth: bordas.fina,
+    borderColor: cores.bordaCampo,
+    borderRadius: bordas.raios.campos,
     paddingHorizontal: 16,
   },
   focado: { borderColor: cores.texto },

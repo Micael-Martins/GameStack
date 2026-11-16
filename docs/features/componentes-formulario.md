@@ -7,7 +7,7 @@ Cartão: https://trello.com/c/tpqPUahj — implementação baseada no protótipo
 - `Cabecalho`: título, subtítulo opcional, retorno por callback com área mínima 44px e ação direita opcional. A tela decide o destino da navegação e fornece acessibilidade para sua ação.
 - `TituloSecao`: título cinza em caixa alta e link opcional `{ texto, onPress }`.
 
-Os componentes ficam em `src/views/components`, exibem dados e emitem eventos; regras e persistência pertencem aos ViewModels e data.
+Os componentes ficam em `src/components`, exibem dados e emitem eventos; regras e persistência pertencem aos ViewModels e data.
 
 ## Conferência manual
 

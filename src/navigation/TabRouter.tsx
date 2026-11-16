@@ -2,12 +2,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import BibliotecaScreen from '../features/biblioteca/Views/BibliotecaScreen';
-import InicioScreen from '../features/home/Views/InicioScreen';
+import InicioScreen from '../features/inicio/Views/InicioScreen';
 import PesquisarScreen from '../features/pesquisar/Views/PesquisarScreen';
 import { cores } from '../theme';
 import { TabParamList } from './tipos';
 
 const Tab = createBottomTabNavigator<TabParamList>();
+
+// Barra de abas de baixo: Início, Pesquisar e Biblioteca.
 
 export default function TabRouter() {
   return (
@@ -48,7 +50,6 @@ export default function TabRouter() {
           tabBarIcon: ({ color, size }) => <Ionicons name="library-outline" size={size} color={color} />,
         }}
       />
-      
     </Tab.Navigator>
   );
 }

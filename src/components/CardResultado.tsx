@@ -1,12 +1,12 @@
-import { Ionicons } from '@expo/vector-icons';
-import { memo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { memo } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
-import type { Jogo } from '../models/Jogo';
-import { cores, espacamentos, tipografia } from '../theme';
-import { EntradaAnimada, ToqueAnimado } from './animacoes';
-import Capa from './Capa';
-import { linhaResultado, textoTempoMedio } from './cardResultadoUtils';
+import type { Jogo } from "../models/Jogo";
+import { bordas, cores, espacamentos, tipografia } from "../theme";
+import { linhaResultado, textoTempoMedio } from "../utils/cardResultadoUtils";
+import { EntradaAnimada, ToqueAnimado } from "./animacoes";
+import Capa from "./Capa";
 
 type CardResultadoProps = {
   jogo: Jogo;
@@ -25,10 +25,18 @@ function CardResultado({ jogo, naBiblioteca, onTocar }: CardResultadoProps) {
     <ToqueAnimado
       onPress={() => onTocar(jogo)}
       accessibilityRole="button"
-      accessibilityLabel={naBiblioteca ? `${jogo.nome}, já na biblioteca. Ver detalhes` : `${jogo.nome}. Ver e adicionar`}
+      accessibilityLabel={
+        naBiblioteca
+          ? `${jogo.nome}, já na biblioteca. Ver detalhes`
+          : `${jogo.nome}. Ver e adicionar`
+      }
       style={styles.card}
     >
-      <Capa imagemURL={jogo.imagemURL} tamanho="M" descricao={`Capa de ${jogo.nome}`} />
+      <Capa
+        imagemURL={jogo.imagemURL}
+        tamanho="M"
+        descricao={`Capa de ${jogo.nome}`}
+      />
 
       <View style={styles.textos}>
         <Text style={styles.nome} numberOfLines={2}>
@@ -41,7 +49,11 @@ function CardResultado({ jogo, naBiblioteca, onTocar }: CardResultadoProps) {
         ) : null}
         {tempoMedio ? (
           <View style={styles.linhaTempo}>
-            <Ionicons name="time-outline" size={14} color={cores.textoSecundario} />
+            <Ionicons
+              name="time-outline"
+              size={14}
+              color={cores.textoSecundario}
+            />
             <Text style={styles.detalhes}>{tempoMedio}</Text>
           </View>
         ) : null}
@@ -50,7 +62,11 @@ function CardResultado({ jogo, naBiblioteca, onTocar }: CardResultadoProps) {
       {naBiblioteca ? (
         <EntradaAnimada key="na-biblioteca" deslocamento={0}>
           <View style={styles.naBiblioteca}>
-            <Ionicons name="checkmark" size={15} color={cores.textoSecundario} />
+            <Ionicons
+              name="checkmark"
+              size={15}
+              color={cores.textoSecundario}
+            />
             <Text style={styles.textoNaBiblioteca}>Na biblioteca</Text>
           </View>
         </EntradaAnimada>
@@ -69,27 +85,45 @@ export default memo(CardResultado);
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 14,
     padding: espacamentos.m,
-    borderRadius: espacamentos.raios.cards,
-    borderWidth: 1,
+    borderRadius: bordas.raios.cards,
+    borderWidth: bordas.fina,
     borderColor: cores.borda,
     backgroundColor: cores.card,
   },
   textos: { flex: 1, minWidth: 0, gap: 3 },
-  nome: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 16, lineHeight: 21 },
-  detalhes: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
-  linhaTempo: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 1 },
+  nome: {
+    color: cores.texto,
+    fontFamily: tipografia.fontes.extraBold,
+    fontSize: 16,
+    lineHeight: 21,
+  },
+  detalhes: {
+    color: cores.textoSecundario,
+    fontFamily: tipografia.fontes.regular,
+    fontSize: 13,
+  },
+  linhaTempo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginTop: 1,
+  },
   botaoMais: {
     width: 44,
     height: 44,
-    borderRadius: 12,
+    borderRadius: bordas.raios.pequeno,
     backgroundColor: cores.borda,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
-  naBiblioteca: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  textoNaBiblioteca: { color: cores.textoSecundario, fontFamily: tipografia.fontes.semiBold, fontSize: 13 },
+  naBiblioteca: { flexDirection: "row", alignItems: "center", gap: 4 },
+  textoNaBiblioteca: {
+    color: cores.textoSecundario,
+    fontFamily: tipografia.fontes.semiBold,
+    fontSize: 13,
+  },
 });

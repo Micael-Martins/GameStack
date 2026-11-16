@@ -12,10 +12,10 @@ import EstadoVazio from '../../../components/EstadoVazio';
 import EstadoCarregando from '../../../components/EstadoCarregando';
 import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
 import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
-import { cores } from '../../../theme';
+import { cores, estilosGlobais } from '../../../theme';
 import { FILTROS } from '../Model/filtrosBiblioteca';
 import { useBibliotecaViewModel } from '../ViewModel/useBibliotecaViewModel';
-import { styles } from './BibliotecaScreen.styles';
+import { styles } from './styles/BibliotecaScreen.styles';
 // Aba das abas (Biblioteca) que também abre telas da pilha principal (Detalhes).
 type Props = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, 'Biblioteca'>,
@@ -40,7 +40,7 @@ export default function BibliotecaScreen({ navigation, route }: Props) {
   const rotuloFiltro = FILTROS.find((item) => item.filtro === vm.filtro)?.rotulo ?? '';
 
   return (
-    <View style={[styles.tela, { paddingTop: insets.top + 16 }]}>
+    <View style={[estilosGlobais.tela, { paddingTop: insets.top + 16 }]}>
       {/* Topo: título, resumo e "+" */}
       <View style={styles.topo}>
         <View style={styles.textosTopo}>
@@ -53,7 +53,7 @@ export default function BibliotecaScreen({ navigation, route }: Props) {
           onPress={irParaPesquisa}
           accessibilityRole="button"
           accessibilityLabel="Adicionar jogo"
-          style={({ pressed }) => [styles.botaoAdicionar, pressed && styles.pressionado]}
+          style={({ pressed }) => [styles.botaoAdicionar, pressed && estilosGlobais.pressionado]}
         >
           <Ionicons name="add" size={28} color={cores.fundo} />
         </Pressable>

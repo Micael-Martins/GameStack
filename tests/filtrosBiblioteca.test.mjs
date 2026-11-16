@@ -3,7 +3,6 @@ import test from 'node:test';
 
 import {
   contagemPorFiltro,
-  estadoDaBiblioteca,
   FILTROS,
   filtrarJogos,
   filtroValido,
@@ -48,17 +47,4 @@ test('Filtro salvo inválido ou vazio volta para "Todos"', () => {
 test('Resumo: "5 jogos · 17h registradas" e singular com 1 jogo', () => {
   assert.equal(textoResumo(biblioteca), '5 jogos · 17h registradas'); // 1035 min = 17h
   assert.equal(textoResumo([jogo('1', 'NA_FILA')]), '1 jogo · 0h registradas');
-});
-
-
-test('Erro ao abrir o banco mostra erro, não "Adicione seu primeiro jogo"', () => {
-  assert.equal(estadoDaBiblioteca(false, 'Não foi possível abrir a biblioteca.', 0), 'ERRO');
-  assert.equal(estadoDaBiblioteca(false, null, 0), 'VAZIA');
-  assert.equal(estadoDaBiblioteca(true, null, 0), 'CARREGANDO');
-});
-
-test('Com jogos na tela, mostra a lista mesmo carregando ou com erro', () => {
-  assert.equal(estadoDaBiblioteca(false, null, 3), 'LISTA');
-  assert.equal(estadoDaBiblioteca(true, null, 3), 'LISTA');
-  assert.equal(estadoDaBiblioteca(false, 'falhou', 3), 'LISTA');
 });

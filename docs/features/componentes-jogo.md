@@ -2,7 +2,7 @@
 
 Cartão: https://trello.com/c/efI222yg
 
-Os componentes ficam em `src/views/components/` e usam os tokens de `src/theme/`. Eles são visuais: acesso à RAWG, persistência e cálculo de tempo pertencem aos repositórios e ViewModels.
+Os componentes ficam em `src/components/` e usam os tokens de `src/theme/`. Eles são visuais: acesso à RAWG, persistência e cálculo de tempo pertencem aos repositórios e ViewModels.
 
 ## Capa
 

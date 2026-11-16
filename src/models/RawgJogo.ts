@@ -1,3 +1,4 @@
+// Um jogo do jeito que a RAWG manda (nomes em inglês). O rawgMapper converte para Jogo.
 export interface RawgJogo {
     id: number;
     name: string;

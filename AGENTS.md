@@ -55,7 +55,14 @@ Run lint and typecheck before declaring any task done.
 
 ## MVVM structure
 
-Shared visual game components are in `src/views/components/`. Their development-only catalog is `src/features/componentes/Views/ComponentesDemoScreen.tsx`, exposed by a `__DEV__` tab. Contracts and manual checks are documented in `docs/features/componentes-jogo.md`.
+Shared visual components are in `src/components/` (checked on 2026-11-16). The former development-only component catalog and demo screens were removed. Contracts and manual checks are documented in `docs/features/componentes-jogo.md`.
+
+### Styles (checked on 2026-11-16)
+
+- Design tokens live in `src/theme/`: `cores.ts`, `tipografia.ts`, `espacamentos.ts`, `bordas.ts` (border width and radii). Import them from `src/theme` (`import { cores, bordas } from '../theme'`). Never hard-code a color, font name or radius that exists as a token.
+- Patterns repeated across screens (screen background, card, pressed opacity, outline button, secondary text, error text) live in `src/theme/estilosGlobais.ts`.
+- Each screen keeps its own styles in `src/features/<feature>/Views/styles/<Name>Screen.styles.ts`. Small components (`src/components/` and `Views/components/`) keep their `StyleSheet` in the same file.
+- Each screen has one ViewModel named after it (`<Name>Screen` → `use<Name>ViewModel`); shared game rules live in the Zustand store (`src/store/`) and `regrasStatus.ts`.
 
 Keep the product's MVVM responsibilities: models define types, data modules own persistence and services, view models own screen logic, and views display data. In `origin/develop` at `da5b0ab` (checked on 2026-11-15), shared models are in `src/models/`, SQLite code is in `src/data/db/`, and feature directories use `src/features/<feature>/Views`, `ViewModel`, and `Model`. Recheck the active branch and follow its existing organization before adding files.
 

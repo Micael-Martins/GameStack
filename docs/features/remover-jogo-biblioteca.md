@@ -10,7 +10,7 @@ Permitir remover um jogo da biblioteca mediante confirmação.
 ## Arquivos
 
 - `src/features/biblioteca/Model/remocaoJogo.ts`
-- `src/features/biblioteca/ViewModel/useRemoverJogoBiblioteca.ts`
+- `src/features/biblioteca/ViewModel/useBotaoRemoverViewModel.ts`
 - `src/features/biblioteca/Views/BotaoRemoverJogo.tsx`
 - `tests/removerJogoBiblioteca.test.mjs`
 

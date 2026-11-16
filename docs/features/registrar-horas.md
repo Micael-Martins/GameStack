@@ -7,7 +7,7 @@ Decisão do cartão: o progresso é medido em **horas informadas pelo usuário**
 Arquivos (MVVM):
 
 - `Views/RegistrarHorasScreen.tsx`
-- `ViewModel/useProgressoViewModel.ts`: minutos iniciais, minutos atuais e o histórico das mudanças (para o "Desfazer").
+- `ViewModel/useRegistrarHorasViewModel.ts`: minutos iniciais, minutos atuais e o histórico das mudanças (para o "Desfazer").
 - `Model/registroHoras.ts`: regras puras (testadas no Node).
 
 ## O que aparece

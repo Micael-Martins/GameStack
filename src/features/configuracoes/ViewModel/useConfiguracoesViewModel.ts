@@ -2,17 +2,16 @@ import { useEffect, useState } from "react";
 
 import { apagarDadosDoBanco } from "../../../data/db/database";
 import {
-    obterUsuario,
-    salvarLembretes,
-    salvarPerfil,
-} from "../../../data/db/userRepository";
+  obterUsuario,
+  salvarLembretes,
+  salvarPerfil,
+} from "../../../data/db/usuarioRepository";
 import { apagarChaveApi } from "../../../data/secure/credenciais";
 import {
-    cancelarLembretes,
-    pedirPermissao,
-    reagendarLembrete,
-} from "../../../data/services/notificationService";
-import { HORARIO_LEMBRETE_PADRAO } from "../../../data/services/regrasLembrete";
+  pedirPermissao,
+  atualizarLembrete,
+} from "../../../data/services/notificacaoService";
+import { HORARIO_LEMBRETE_PADRAO, NOME_APP } from "../../../data/services/regrasLembrete";
 import { limparTudo } from "../../../data/storage/preferencias";
 import { Usuario } from "../../../models/Usuario";
 import { useBibliotecaStore } from "../../../store/bibliotecaStore";
@@ -95,8 +94,9 @@ export function useConfiguracoesViewModel() {
     try {
       await salvarLembretes(ligar, usuario.horarioNotificacao);
       setUsuario({ ...usuario, notificacaoAtiva: ligar });
-      if (ligar) await reagendarLembrete();
-      else await cancelarLembretes();
+        // Ligou: agenda. Desligou: cancela. Se outra atualização estiver rodando,
+      // espera ela terminar (senão ela poderia agendar depois de desligar).
+      await atualizarLembrete();
     } catch (e) {
       console.warn("Erro ao salvar os lembretes.", e);
       setAviso("Não foi possível salvar os lembretes.");
@@ -118,8 +118,8 @@ export function useConfiguracoesViewModel() {
     try {
       await salvarLembretes(usuario.notificacaoAtiva, horario);
       setUsuario({ ...usuario, horarioNotificacao: horario });
-      await reagendarLembrete();
-    } catch (e) {
+      await atualizarLembrete();
+      } catch (e) {
       console.warn("Erro ao salvar o horário.", e);
       setAviso("Não foi possível salvar o horário.");
     }
@@ -131,8 +131,8 @@ export function useConfiguracoesViewModel() {
     setApagando(true);
     setAviso(null);
     try {
-      await cancelarLembretes();
       await apagarDadosDoBanco();
+      await atualizarLembrete();
       await limparTudo();
       await apagarChaveApi();
       limparStore();
@@ -164,5 +164,6 @@ export function useConfiguracoesViewModel() {
     totalJogos,
     apagando,
     apagarTudo,
+    nomeApp: NOME_APP,
   };
 }

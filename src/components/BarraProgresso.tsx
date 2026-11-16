@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import { cores, espacamentos } from '../theme';
+import { bordas, cores } from '../theme';
 
 export type BarraProgressoProps = {
   /** Fração já calculada: minutos jogados / tempo médio convertido para minutos. */
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   trilho: {
     width: '100%',
     backgroundColor: cores.borda,
-    borderRadius: espacamentos.raios.chips,
+    borderRadius: bordas.raios.chips,
     overflow: 'hidden',
   },
   preenchimento: { height: '100%', backgroundColor: cores.texto },

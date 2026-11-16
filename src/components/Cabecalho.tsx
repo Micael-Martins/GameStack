@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { cores, tipografia } from '../theme';
 
+// Topo das telas internas: botão voltar, título e uma ação opcional à direita.
 type CabecalhoProps = { titulo: string; subtitulo?: string; onVoltar?: () => void; acaoDireita?: ReactNode };
 
 export default function Cabecalho({ titulo, subtitulo, onVoltar, acaoDireita }: CabecalhoProps) {

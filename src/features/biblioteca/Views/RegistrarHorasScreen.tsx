@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EntradaAnimada, ToqueAnimado } from '../../../components/animacoes';
@@ -10,10 +10,11 @@ import EstadoVazio from '../../../components/EstadoVazio';
 import { PrimaryButton } from '../../../components/PrimaryButton';
 import TituloSecao from '../../../components/TituloSecao';
 import type { RootStackParamList } from '../../../navigation/tipos';
-import { cores, espacamentos, tipografia } from '../../../theme';
+import { estilosGlobais } from '../../../theme';
 import { formatarHoras } from '../../../utils/formatarHoras';
 import { SOMAS_RAPIDAS } from '../Model/registroHoras';
-import { useProgressoViewModel } from '../ViewModel/useProgressoViewModel';
+import { useRegistrarHorasViewModel } from '../ViewModel/useRegistrarHorasViewModel';
+import { styles } from './styles/RegistrarHorasScreen.styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RegistrarHoras'>;
 
@@ -22,12 +23,12 @@ type Props = NativeStackScreenProps<RootStackParamList, 'RegistrarHoras'>;
 // pelo tempo médio da RAWG.
 export default function RegistrarHorasScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
-  const vm = useProgressoViewModel(route.params.id);
+  const vm = useRegistrarHorasViewModel(route.params.id);
 
   // O jogo foi removido enquanto a tela estava aberta.
   if (!vm.item) {
     return (
-      <View style={[styles.tela, { paddingTop: insets.top + 8 }]}>
+      <View style={[estilosGlobais.tela, { paddingTop: insets.top + 8 }]}>
         <View style={styles.margem}>
           <Cabecalho titulo="Registrar horas" onVoltar={navigation.goBack} />
         </View>
@@ -43,7 +44,7 @@ export default function RegistrarHorasScreen({ navigation, route }: Props) {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={estilosGlobais.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerStyle={[styles.conteudo, { paddingTop: insets.top + 8 }]}
         keyboardShouldPersistTaps="handled"
@@ -151,51 +152,3 @@ export default function RegistrarHorasScreen({ navigation, route }: Props) {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.fundo },
-  margem: { paddingHorizontal: espacamentos.gg },
-  centro: { flex: 1, justifyContent: 'center' },
-  conteudo: { flexGrow: 1, paddingHorizontal: espacamentos.gg, paddingBottom: espacamentos.gg },
-  pressionado: { opacity: 0.6 },
-
-  cardTotal: {
-    alignItems: 'center',
-    gap: 4,
-    marginTop: espacamentos.m,
-    paddingVertical: 22,
-    paddingHorizontal: espacamentos.g,
-    borderRadius: espacamentos.raios.cards,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.card,
-  },
-  rotuloTotal: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
-  total: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 44, letterSpacing: -1 },
-  sessao: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
-  areaBarra: { alignSelf: 'stretch', gap: 8, marginTop: 14 },
-  linhaBarra: { flexDirection: 'row', justifyContent: 'space-between' },
-  legenda: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular, fontSize: 12 },
-
-  secao: { marginTop: espacamentos.gg, gap: espacamentos.p },
-  botoes: { flexDirection: 'row', gap: espacamentos.p },
-    itemSoma: { flex: 1 },
- 
-  botaoSoma: {
-    minHeight: 52,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  textoSoma: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 16 },
-  desfazer: { alignSelf: 'center', minHeight: 44, paddingHorizontal: 16, justifyContent: 'center' },
-  textoDesfazer: { color: cores.textoSecundario, fontFamily: tipografia.fontes.semiBold, fontSize: 14 },
-  desabilitado: { opacity: 0.4 },
-
-  rodape: { gap: espacamentos.p, paddingHorizontal: espacamentos.gg, paddingTop: espacamentos.m, backgroundColor: cores.fundo },
-  aviso: { textAlign: 'center', color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
-  erro: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
-});

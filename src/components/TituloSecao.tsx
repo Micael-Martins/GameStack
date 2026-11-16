@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { cores, tipografia } from '../theme';
 
+// Título de seção em maiúsculas ("JOGANDO AGORA") com um link opcional ("Ver todos").
 type TituloSecaoProps = { titulo: string; link?: { texto: string; onPress: () => void } };
 
 export default function TituloSecao({ titulo, link }: TituloSecaoProps) {

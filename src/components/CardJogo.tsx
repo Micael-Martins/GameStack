@@ -1,16 +1,22 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import type { JogoBiblioteca } from '../models/JogoBiblioteca';
-import { cores, espacamentos, tipografia } from '../theme';
-import BarraProgresso from './BarraProgresso';
-import Capa from './Capa';
-import { prepararDadosCardJogo } from './cardJogoUtils';
-import Estrelas from './Estrelas';
-import StatusChip from './StatusChip';
+import type { JogoBiblioteca } from "../models/JogoBiblioteca";
+import {
+  bordas,
+  cores,
+  espacamentos,
+  estilosGlobais,
+  tipografia,
+} from "../theme";
+import { prepararDadosCardJogo } from "../utils/cardJogoUtils";
+import BarraProgresso from "./BarraProgresso";
+import Capa from "./Capa";
+import Estrelas from "./Estrelas";
+import StatusChip from "./StatusChip";
 
 export interface CardJogoProps {
   item: JogoBiblioteca;
-  variante?: 'normal' | 'compacto';
+  variante?: "normal" | "compacto";
   onPress?: (item: JogoBiblioteca) => void;
 }
 
@@ -20,13 +26,21 @@ export interface CardJogoProps {
  * - compacto: "Jogados recentemente" na Home (capa P, uma linha de texto, status à direita)
  * Só mostra dados: não consulta a API nem grava no banco.
  */
-export default function CardJogo({ item, variante = 'normal', onPress }: CardJogoProps) {
+export default function CardJogo({
+  item,
+  variante = "normal",
+  onPress,
+}: CardJogoProps) {
   const dados = prepararDadosCardJogo(item);
-  const compacto = variante === 'compacto';
+  const compacto = variante === "compacto";
 
   const conteudo = compacto ? (
     <View style={[styles.card, styles.cardCompacto]}>
-      <Capa imagemURL={item.jogo.imagemURL} tamanho="P" descricao={`Capa de ${item.jogo.nome}`} />
+      <Capa
+        imagemURL={item.jogo.imagemURL}
+        tamanho="P"
+        descricao={`Capa de ${item.jogo.nome}`}
+      />
       <View style={styles.informacoes}>
         <Text style={styles.nomeCompacto} numberOfLines={1}>
           {item.jogo.nome}
@@ -39,7 +53,11 @@ export default function CardJogo({ item, variante = 'normal', onPress }: CardJog
     </View>
   ) : (
     <View style={[styles.card, styles.cardNormal]}>
-      <Capa imagemURL={item.jogo.imagemURL} tamanho="M" descricao={`Capa de ${item.jogo.nome}`} />
+      <Capa
+        imagemURL={item.jogo.imagemURL}
+        tamanho="M"
+        descricao={`Capa de ${item.jogo.nome}`}
+      />
       <View style={styles.informacoes}>
         <Text style={styles.nome} numberOfLines={2}>
           {item.jogo.nome}
@@ -77,7 +95,7 @@ export default function CardJogo({ item, variante = 'normal', onPress }: CardJog
       accessibilityRole="button"
       accessibilityLabel={`Ver detalhes de ${item.jogo.nome}`}
       onPress={() => onPress(item)}
-      style={({ pressed }) => pressed && styles.pressionado}
+      style={({ pressed }) => pressed && estilosGlobais.pressionado}
     >
       {conteudo}
     </Pressable>
@@ -86,19 +104,36 @@ export default function CardJogo({ item, variante = 'normal', onPress }: CardJog
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    borderWidth: 1,
+    flexDirection: "row",
+    borderWidth: bordas.fina,
     borderColor: cores.borda,
-    borderRadius: espacamentos.raios.cards,
+    borderRadius: bordas.raios.cards,
     backgroundColor: cores.card,
     gap: espacamentos.m,
   },
-  cardNormal: { alignItems: 'flex-start', padding: espacamentos.m },
-  cardCompacto: { alignItems: 'center', padding: 10 },
+  cardNormal: { alignItems: "flex-start", padding: espacamentos.m },
+  cardCompacto: { alignItems: "center", padding: 10 },
   informacoes: { flex: 1, minWidth: 0, gap: 6 },
-  nome: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: 16, lineHeight: 22 },
-  nomeCompacto: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: 15 },
-  linhaStatus: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: espacamentos.p },
-  textoSecundario: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 12 },
-  pressionado: { opacity: 0.7 },
+  nome: {
+    color: cores.texto,
+    fontFamily: tipografia.fontes.semiBold,
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  nomeCompacto: {
+    color: cores.texto,
+    fontFamily: tipografia.fontes.semiBold,
+    fontSize: 15,
+  },
+  linhaStatus: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: espacamentos.p,
+  },
+  textoSecundario: {
+    color: cores.textoSecundario,
+    fontFamily: tipografia.fontes.regular,
+    fontSize: 12,
+  },
 });

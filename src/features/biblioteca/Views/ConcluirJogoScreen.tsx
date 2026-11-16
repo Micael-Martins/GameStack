@@ -8,7 +8,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from 'react-native';
@@ -21,8 +20,9 @@ import Estrelas from '../../../components/Estrelas';
 import Fogos from '../../../components/Fogos';
 import { PrimaryButton } from '../../../components/PrimaryButton';
 import type { RootStackParamList } from '../../../navigation/tipos';
-import { cores, espacamentos, tipografia } from '../../../theme';
+import { cores, estilosGlobais } from '../../../theme';
 import { useConcluirViewModel } from '../ViewModel/useConcluirViewModel';
+import { styles } from './styles/ConcluirJogoScreen.styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ConcluirJogo'>;
 
@@ -62,7 +62,7 @@ export default function ConcluirJogoScreen({ navigation, route }: Props) {
   // O jogo foi removido enquanto a tela estava aberta: só fecha.
   if (!vm.item) {
     return (
-      <View style={[styles.tela, styles.centro]}>
+      <View style={[estilosGlobais.tela, styles.centro]}>
         <PrimaryButton title="Voltar" onPress={navigation.goBack} style={styles.botaoVoltar} />
       </View>
     );
@@ -77,7 +77,7 @@ export default function ConcluirJogoScreen({ navigation, route }: Props) {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={estilosGlobais.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerStyle={[styles.conteudo, { paddingTop: insets.top + 8 }]}
         keyboardShouldPersistTaps="handled"
@@ -182,97 +182,3 @@ export default function ConcluirJogoScreen({ navigation, route }: Props) {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.fundo },
-  centro: { justifyContent: 'center', paddingHorizontal: espacamentos.gg },
-  botaoVoltar: { alignSelf: 'stretch' },
-  conteudo: { flexGrow: 1, paddingHorizontal: espacamentos.gg, paddingBottom: espacamentos.g },
-  topo: { flexDirection: 'row', justifyContent: 'flex-end' },
-  fechar: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  pressionado: { opacity: 0.6 },
-
-  cabecalho: { alignItems: 'center', gap: 6, marginTop: 4 },
-  anel: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
-    borderWidth: 8,
-    borderColor: cores.texto,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 14,
-  },
-  selo: {
-    textAlign: 'center',
-    color: cores.textoSecundario,
-    fontFamily: tipografia.fontes.semiBold,
-    fontSize: 12,
-    letterSpacing: 1.6,
-  },
-  titulo: {
-    textAlign: 'center',
-    color: cores.texto,
-    fontFamily: tipografia.fontes.extraBold,
-    fontSize: 34,
-    letterSpacing: -0.5,
-    marginTop: 4,
-  },
-  nomeJogo: {
-    textAlign: 'center',
-    color: '#D4D4D4',
-    fontFamily: tipografia.fontes.regular,
-    fontSize: 15,
-    marginTop: 4,
-  },
-  resumo: {
-    textAlign: 'center',
-    color: cores.textoSecundario,
-    fontFamily: tipografia.fontes.regular,
-    fontSize: 13,
-    marginTop: 4,
-  },
-
-  cardNota: {
-    alignItems: 'center',
-    gap: 8,
-    marginTop: espacamentos.gg,
-    paddingVertical: 18,
-    paddingHorizontal: espacamentos.g,
-    borderRadius: espacamentos.raios.cards,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.card,
-  },
-  tituloNota: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 16 },
-  textoNota: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
-  textoNotaEscolhida: { color: cores.texto, fontFamily: tipografia.fontes.semiBold },
-
-  secao: { marginTop: espacamentos.gg },
-
-  rodape: { gap: espacamentos.m, paddingHorizontal: espacamentos.gg, paddingTop: espacamentos.m, backgroundColor: cores.fundo },
-  cardProximo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: espacamentos.m,
-    padding: espacamentos.m,
-    borderRadius: espacamentos.raios.cards,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: '#3A3A3A',
-  },
-  textosProximo: { flex: 1, minWidth: 0, gap: 2 },
-  rotuloProximo: { color: cores.textoSecundario, fontFamily: tipografia.fontes.semiBold, fontSize: 11, letterSpacing: 1 },
-  nomeProximo: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 15 },
-  botaoComecar: {
-    minWidth: 92,
-    minHeight: 44,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    backgroundColor: cores.borda,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  textoComecar: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: 14 },
-  erro: { textAlign: 'center', color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
-});
