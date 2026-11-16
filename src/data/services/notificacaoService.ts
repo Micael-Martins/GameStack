@@ -1,6 +1,6 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-
+import { semSobrepor } from "../../utils/semSobrepor";
 import { jogandoAgora } from "../../store/bibliotecaStoreBase";
 import { listarBiblioteca } from "../db/bibliotecaRepository";
 import { obterUsuario } from "../db/usuarioRepository";
@@ -79,8 +79,8 @@ export async function cancelarLembretes(): Promise<void> {
 
 // Cancela o que estava agendado e agenda de novo. Não agenda se os lembretes
 // estiverem desligados, sem permissão ou se não houver jogo "Jogando".
-export async function reagendarLembrete(): Promise<void> {
-  if (!disponivel) return;
+async function reagendarAgora(): Promise<void> {
+    if (!disponivel) return;
   try {
     await cancelarLembretes();
 
@@ -107,7 +107,7 @@ export async function reagendarLembrete(): Promise<void> {
           channelId: CANAL_ANDROID,
         };
 
-    await Notifications.scheduleNotificationAsync({
+        await Notifications.scheduleNotificationAsync({
       content: {
         title: NOME_APP,
         body: mensagemLembrete(jogo.jogo.nome),
@@ -119,3 +119,9 @@ export async function reagendarLembrete(): Promise<void> {
     console.warn("Não foi possível agendar o lembrete.", erro);
   }
 }
+
+// Versão usada pelo app. Duas mudanças seguidas na store (ex.: concluir salva as
+// horas e depois o status) pediriam dois reagendamentos ao mesmo tempo; os dois
+// cancelariam antes de agendar e o lembrete sairia duplicado. Com semSobrepor
+// eles rodam um depois do outro.
+export const reagendarLembrete = semSobrepor(reagendarAgora);

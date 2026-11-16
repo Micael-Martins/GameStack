@@ -138,27 +138,36 @@ GameStack/
 ├── assets/
 ├── docs/
 ├── src/
-│   ├── components/
+│   ├── components/          # componentes reutilizáveis (estilo no próprio arquivo)
 │   ├── data/
-│   │   ├── db/
-│   │   ├── secure/
-│   │   ├── services/
-│   │   └── storage/
+│   │   ├── db/              # SQLite: esquema e repositórios
+│   │   ├── secure/          # SecureStore (chave da API)
+│   │   ├── services/        # RAWG e notificações
+│   │   └── storage/         # AsyncStorage (preferências)
 │   ├── features/
 │   │   ├── biblioteca/
+│   │   │   ├── Model/       # regras puras da feature (testadas em tests/)
+│   │   │   ├── ViewModel/   # um hook use<Tela>ViewModel por tela
+│   │   │   └── Views/
+│   │   │       ├── components/  # componentes só desta feature
+│   │   │       └── styles/      # <Tela>Screen.styles.ts
 │   │   ├── configuracoes/
-│   │   ├── home/
+│   │   ├── inicio/
 │   │   ├── onboarding/
 │   │   └── pesquisar/
-│   ├── models/
-│   ├── navigation/
-│   ├── store/
-│   ├── theme/
-│   └── utils/
+│   ├── inicializacao/       # useIniciarApp: fontes, banco, notificações, splash
+│   ├── models/              # tipos de dados (Jogo, JogoBiblioteca, Usuario...)
+│   ├── navigation/          # rotas (RotasPrincipais, abas, tipos)
+│   ├── store/               # store da biblioteca (Zustand) e regras de status
+│   ├── theme/               # cores, tipografia, espaçamentos, bordas
+│   └── utils/               # funções puras usadas por várias telas
 ├── tests/
 ├── App.tsx
 └── package.json
 ```
+
+Todas as features seguem a mesma divisão de `biblioteca/` (as pastas `Model/`,
+`components/` e `styles/` só existem quando a feature precisa delas).
 
 | Camada | Responsabilidade |
 | --- | --- |
@@ -166,7 +175,7 @@ GameStack/
 | Data | Banco de dados, repositórios e serviços externos |
 | ViewModel | Estado das telas e regras de interação |
 | Views | Interface visual e interação com o usuário |
-| Store | Estado compartilhado da biblioteca |
+| Store | Estado compartilhado da biblioteca; depois de cada mudança nos jogos, reagenda o lembrete |
 | Components | Componentes visuais reutilizáveis |
 
 ### Exemplo: pesquisa de jogos
