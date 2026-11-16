@@ -7,7 +7,7 @@ import {
   linhaResultado,
   textoLancamento,
   textoTempoMedio,
-} from '../src/components/cardResultadoUtils.ts';
+} from '../src/components/utils/cardResultadoUtils.ts';
 import { buscarDetalhes, converterRawgParaJogo, extrairSobre } from '../src/data/services/rawgService.ts';
 import {
   horasParaMinutos,

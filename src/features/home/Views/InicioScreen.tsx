@@ -4,60 +4,64 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { Jogo } from '../../../models/Jogo';
+
 import CardJogo from '../../../components/CardJogo';
 import EstadoCarregando from '../../../components/EstadoCarregando';
 import EstadoVazio from '../../../components/EstadoVazio';
 import TituloSecao from '../../../components/TituloSecao';
-import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
-import { EmptyQueueCard } from './components/CardFilaVazia';
-import { NowPlayingCarousel } from './components/CarrosselJogando';
-import { PopularGamesRow } from './components/LinhaPopulares';
-import { SummaryStrip } from './components/FaixaResumo';
-import { styles } from './InicioScreen.styles';
-import { useInicioViewModel } from '../ViewModel/useInicioViewModel';
+import type { Jogo } from '../../../models/Jogo';
 import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
+import type { RootStackParamList, TabParamList } from '../../../navigation/tipos';
+import { cores, estilosGlobais } from '../../../theme';
+import { useInicioViewModel } from '../ViewModel/useInicioViewModel';
+import { CardFilaVazia } from './components/CardFilaVazia';
+import { CarrosselJogando } from './components/CarrosselJogando';
+import { FaixaResumo } from './components/FaixaResumo';
+import { LinhaPopulares } from './components/LinhaPopulares';
+import { styles } from './styles/InicioScreen.styles';
 
 export default function InicioScreen() {
   const insets = useSafeAreaInsets();
-  // Duas navegações: a das abas (Pesquisar, Biblioteca) e a da pilha principal (Configurações)
-  const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
-  const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const goToSearch = () => navigation.navigate('Pesquisar');
-  const goToLibrary = () => navigation.navigate('Biblioteca');
-  const openDetails = (game: JogoBiblioteca) => rootNavigation.navigate('DetalhesJogo', { id: game.id });
-    const openAdd = (game: Jogo) => rootNavigation.navigate('AdicionarJogo', { jogo: game });
+  // Duas navegações: a das abas (Pesquisar, Biblioteca) e a da pilha principal (Configurações, Detalhes...)
+  const navegacaoAbas = useNavigation<BottomTabNavigationProp<TabParamList>>();
+  const navegacaoPrincipal = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const irParaPesquisa = () => navegacaoAbas.navigate('Pesquisar');
+  const irParaBiblioteca = () => navegacaoAbas.navigate('Biblioteca');
+  const abrirDetalhes = (item: JogoBiblioteca) => navegacaoPrincipal.navigate('DetalhesJogo', { id: item.id });
+  const abrirAdicionar = (jogo: Jogo) => navegacaoPrincipal.navigate('AdicionarJogo', { jogo });
+
   const vm = useInicioViewModel();
-  const hasGames = vm.estadoBiblioteca === 'LISTA';
+  const temJogos = vm.estadoBiblioteca === 'LISTA';
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={[styles.content, { paddingTop: insets.top + 16 }]}>
-      <View style={styles.header}>
-        <View style={styles.headerTexts}>
-          <Text style={styles.greeting} numberOfLines={1}>
-            Olá, {vm.name}!
+    <ScrollView style={estilosGlobais.tela} contentContainerStyle={[styles.conteudo, { paddingTop: insets.top + 16 }]}>
+      <View style={styles.topo}>
+        <View style={styles.textosTopo}>
+          <Text style={styles.saudacao} numberOfLines={1}>
+            Olá, {vm.nome}!
           </Text>
-          <Text style={styles.subtitle}>{hasGames ? 'Bom te ver de novo.' : 'Sua pilha de jogos começa aqui.'}</Text>
+          <Text style={styles.subtitulo}>{temJogos ? 'Bom te ver de novo.' : 'Sua pilha de jogos começa aqui.'}</Text>
         </View>
 
         {/* Engrenagem: abre as Configurações */}
         <Pressable
-          onPress={() => rootNavigation.navigate('Configuracoes')}
+          onPress={() => navegacaoPrincipal.navigate('Configuracoes')}
           accessibilityRole="button"
           accessibilityLabel="Configurações"
-          style={({ pressed }) => [styles.settingsButton, pressed && styles.pressed]}
+          style={({ pressed }) => [styles.botaoConfiguracoes, pressed && estilosGlobais.pressionado]}
         >
-          <Ionicons name="settings-outline" size={20} color="#D4D4D4" />
+          <Ionicons name="settings-outline" size={20} color={cores.textoClaro} />
         </Pressable>
       </View>
 
       {/* Mesma faixa nos dois estados: sem jogos, os números aparecem apagados */}
-      {(hasGames || vm.isEmpty) && (
-        <View style={styles.summary}>
+      {(temJogos || vm.bibliotecaVazia) && (
+        <View style={styles.resumo}>
           {vm.carregandoDados ? (
             <EstadoCarregando mensagem="Carregando informações..." />
           ) : (
-            <SummaryStrip {...vm.summary} dimmed={!hasGames} />
+            <FaixaResumo {...vm.resumo} apagado={!temJogos} />
           )}
         </View>
       )}
@@ -69,38 +73,35 @@ export default function InicioScreen() {
           titulo="Não foi possível abrir a biblioteca"
           descricao={vm.erroBiblioteca ?? 'Tente novamente em instantes.'}
           icone="alert-circle-outline"
-          acao={{
-            titulo: 'Tentar de novo',
-            onPress: vm.tentarNovamente,
-          }}
+          acao={{ titulo: 'Tentar de novo', onPress: vm.tentarNovamente }}
         />
-      ) : hasGames ? (
+      ) : temJogos ? (
         <>
-          <NowPlayingCarousel
-            games={vm.playingGames}
-            onLogHours={(game) => rootNavigation.navigate('RegistrarHoras', { id: game.id })}
-            onOpenGame={openDetails}
-            onOpenLibrary={() => navigation.navigate('Biblioteca', { filtro: 'NA_FILA' })}          />
-          {vm.recentGames.length > 0 && (
+          <CarrosselJogando
+            jogos={vm.jogando}
+            onRegistrarHoras={(item) => navegacaoPrincipal.navigate('RegistrarHoras', { id: item.id })}
+            onAbrirJogo={abrirDetalhes}
+            onAbrirBiblioteca={() => navegacaoAbas.navigate('Biblioteca', { filtro: 'NA_FILA' })}
+          />
+          {vm.jogadosRecentemente.length > 0 && (
             <View>
-              <TituloSecao titulo="Jogados recentemente" link={{ texto: 'Ver todos', onPress: goToLibrary }} />
-              <View style={styles.recentList}>
-                {vm.recentGames.map((game) => (
-                  <CardJogo key={game.id} item={game} variante="compacto" onPress={openDetails} />                ))}
+              <TituloSecao titulo="Jogados recentemente" link={{ texto: 'Ver todos', onPress: irParaBiblioteca }} />
+              <View style={styles.listaRecentes}>
+                {vm.jogadosRecentemente.map((item) => (
+                  <CardJogo key={item.id} item={item} variante="compacto" onPress={abrirDetalhes} />
+                ))}
               </View>
             </View>
           )}
         </>
       ) : (
         <>
-          <EmptyQueueCard onSearch={goToSearch} />
+          <CardFilaVazia onPesquisar={irParaPesquisa} />
           {/* Populares só com a biblioteca vazia; sem internet, a seção some */}
-          {vm.carregandoPopulares && (
-            <EstadoCarregando mensagem="Buscando jogos populares..." />
+          {vm.carregandoPopulares && <EstadoCarregando mensagem="Buscando jogos populares..." />}
+          {vm.populares.length > 0 && (
+            <LinhaPopulares jogos={vm.populares} onVerMais={irParaPesquisa} onSelecionar={abrirAdicionar} />
           )}
-
-          {vm.popularGames.length > 0 && (
-            <PopularGamesRow games={vm.popularGames} onSeeMore={goToSearch} onSelect={openAdd} />          )}
         </>
       )}
     </ScrollView>

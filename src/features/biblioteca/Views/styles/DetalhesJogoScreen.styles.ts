@@ -1,11 +1,9 @@
 import { StyleSheet } from 'react-native';
 
-import { cores, tipografia } from '../../../theme';
+import { bordas, cores, tipografia } from '../../../../theme';
 
 export const styles = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.fundo },
   conteudo: { paddingHorizontal: 20, paddingBottom: 24, gap: 16 },
-  pressionado: { opacity: 0.7 },
 
   // Topo: voltar e lixeira
   topo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
@@ -20,9 +18,9 @@ export const styles = StyleSheet.create({
   // Cards (status e tempo)
   card: {
     backgroundColor: cores.card,
-    borderWidth: 1,
+    borderWidth: bordas.fina,
     borderColor: cores.borda,
-    borderRadius: 18,
+    borderRadius: bordas.raios.cards,
     padding: 16,
     gap: 10,
   },
@@ -32,29 +30,18 @@ export const styles = StyleSheet.create({
   horas: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 28, letterSpacing: -0.5 },
   legenda: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular, fontSize: 12 },
 
-  // Botão com borda branca (Registrar horas e Mudar status)
-  botaoContorno: {
-    height: 46,
-    marginTop: 4,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: cores.texto,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  textoBotaoContorno: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: 15 },
+  // Botão com borda branca: o visual vem do estilosGlobais.botaoContorno; aqui só o tamanho
+  botaoContorno: { height: 46, marginTop: 4 },
 
   // Lista de datas
-  informacoes: { borderTopWidth: 1, borderTopColor: '#222222' },
+  informacoes: { borderTopWidth: bordas.fina, borderTopColor: cores.divisoria },
   linhaInformacao: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#222222',
+    borderBottomWidth: bordas.fina,
+    borderBottomColor: cores.divisoria,
   },
   rotuloInformacao: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 14 },
   valorInformacao: { color: cores.texto, fontFamily: tipografia.fontes.regular, fontSize: 14 },
@@ -70,9 +57,9 @@ export const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 20,
     paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#222222',
+    borderTopWidth: bordas.fina,
+    borderTopColor: cores.divisoria,
     backgroundColor: cores.fundo,
   },
-  botaoRodape: { flex: 1, height: 54, marginTop: 0, borderRadius: 16 },
+  botaoRodape: { flex: 1, height: 54, marginTop: 0, borderRadius: bordas.raios.botoes },
 });

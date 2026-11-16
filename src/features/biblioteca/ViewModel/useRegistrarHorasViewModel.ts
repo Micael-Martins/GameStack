@@ -15,7 +15,7 @@ import {
 
 // Toda a lógica da tela Registrar horas (tela 08). A View só mostra o que este hook devolve.
 // Guarda os minutos iniciais, os atuais e o histórico das mudanças (para o "Desfazer").
-export function useProgressoViewModel(id: string) {
+export function useRegistrarHorasViewModel(id: string) {
   const item = useBibliotecaStore((s) => s.jogos.find((jogo) => jogo.id === id));
   const atualizar = useBibliotecaStore((s) => s.atualizar);
   const mudarStatus = useBibliotecaStore((s) => s.mudarStatus);

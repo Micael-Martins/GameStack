@@ -1,5 +1,6 @@
-import type { Jogo } from '../models/Jogo';
-import { MESES } from '../utils/formatarHoras.ts';
+import type { Jogo } from '../../models/Jogo';
+import { MESES } from '../../utils/formatarHoras.ts';
+
 // Textos do CardResultado e do card da tela Adicionar, sem React (testados no Node).
 
 function primeiroGenero(genero: string): string {
@@ -34,7 +35,6 @@ export function linhaPlataformasGenero(jogo: Jogo): string {
 export function textoTempoMedio(tempoMedio: number): string {
   return Number.isFinite(tempoMedio) && tempoMedio > 0 ? `~${tempoMedio}h em média` : '';
 }
-
 
 // "Lançado em 03 mar 2017". A RAWG manda só a data ("2017-03-03"), sem hora:
 // montamos o texto direto, sem passar por Date (que mudaria o dia por causa do fuso).

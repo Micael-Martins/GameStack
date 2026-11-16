@@ -2,10 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
-import { cores, espacamentos, tipografia } from '../../../theme';
-import { nomeDoStatus, OPCOES_PAINEL_STATUS } from '../Model/opcoesPainelStatus';
-import { usePainelMudarStatusViewModel } from '../ViewModel/usePainelMudarStatusViewModel';
+import type { JogoBiblioteca } from '../../../../models/JogoBiblioteca';
+import { bordas, cores, espacamentos, estilosGlobais, tipografia } from '../../../../theme';
+import { nomeDoStatus, OPCOES_PAINEL_STATUS } from '../../Model/opcoesPainelStatus';
+import { usePainelMudarStatusViewModel } from '../../ViewModel/usePainelMudarStatusViewModel';
 
 export interface PainelMudarStatusProps {
   item: JogoBiblioteca | null;
@@ -75,7 +75,7 @@ export default function PainelMudarStatus({ item, visivel, onFechar, onConcluir 
                     styles.opcao,
                     destaque && styles.opcaoDestaque,
                     atual && styles.opcaoAtual,
-                    pressed && styles.pressionado,
+                    pressed && estilosGlobais.pressionado,
                   ]}
                 >
                   <View style={styles.opcaoTextos}>
@@ -111,18 +111,18 @@ export default function PainelMudarStatus({ item, visivel, onFechar, onConcluir 
 
 const styles = StyleSheet.create({
   area: { flex: 1, justifyContent: 'flex-end' },
-  fundo: { backgroundColor: 'rgba(0, 0, 0, 0.72)' },
+  fundo: { backgroundColor: cores.sobreposicao },
   painel: {
     backgroundColor: cores.card,
-    borderTopLeftRadius: espacamentos.raios.cards,
-    borderTopRightRadius: espacamentos.raios.cards,
-    borderWidth: 1,
+    borderTopLeftRadius: bordas.raios.cards,
+    borderTopRightRadius: bordas.raios.cards,
+    borderWidth: bordas.fina,
     borderColor: cores.borda,
     paddingHorizontal: espacamentos.gg,
     paddingTop: 10,
     gap: espacamentos.g,
   },
-  alca: { alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: '#3A3A3A' },
+  alca: { alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: cores.bordaForte },
   titulo: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 22 },
   agora: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 14, marginTop: 4 },
   opcoes: { gap: 10 },
@@ -132,14 +132,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: espacamentos.m,
     padding: espacamentos.g,
-    borderRadius: espacamentos.raios.botoes,
-    borderWidth: 1,
+    borderRadius: bordas.raios.botoes,
+    borderWidth: bordas.fina,
     borderColor: cores.borda,
     backgroundColor: cores.fundo,
   },
   opcaoDestaque: { backgroundColor: cores.texto, borderColor: cores.texto },
   opcaoAtual: { borderColor: cores.texto },
-  pressionado: { opacity: 0.7 },
   opcaoTextos: { flex: 1, gap: 3 },
   opcaoTitulo: { fontFamily: tipografia.fontes.semiBold, fontSize: 15 },
   opcaoDescricao: { fontFamily: tipografia.fontes.regular, fontSize: 12 },

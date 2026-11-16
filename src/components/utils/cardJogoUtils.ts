@@ -1,9 +1,9 @@
-import type { JogoBiblioteca } from "../models/JogoBiblioteca";
+import type { JogoBiblioteca } from "../../models/JogoBiblioteca";
 import {
   formatarHoras,
   formatarQuando,
   horasInteiras,
-} from "../utils/formatarHoras.ts";
+} from "../../utils/formatarHoras.ts";
 
 // Textos e decisões do CardJogo, sem React (testados no Node).
 

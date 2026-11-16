@@ -3,10 +3,10 @@ import { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { Jogo } from '../models/Jogo';
-import { cores, espacamentos, tipografia } from '../theme';
+import { bordas, cores, espacamentos, tipografia } from '../theme';
 import { EntradaAnimada, ToqueAnimado } from './animacoes';
 import Capa from './Capa';
-import { linhaResultado, textoTempoMedio } from './cardResultadoUtils';
+import { linhaResultado, textoTempoMedio } from './utils/cardResultadoUtils';
 
 type CardResultadoProps = {
   jogo: Jogo;
@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 14,
     padding: espacamentos.m,
-    borderRadius: espacamentos.raios.cards,
-    borderWidth: 1,
+    borderRadius: bordas.raios.cards,
+    borderWidth: bordas.fina,
     borderColor: cores.borda,
     backgroundColor: cores.card,
   },
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   botaoMais: {
     width: 44,
     height: 44,
-    borderRadius: 12,
+    borderRadius: bordas.raios.pequeno,
     backgroundColor: cores.borda,
     alignItems: 'center',
     justifyContent: 'center',

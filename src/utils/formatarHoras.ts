@@ -31,7 +31,6 @@ export function formatarQuando(dataISO: string, agora: Date = new Date()): strin
   return `${String(data.getDate()).padStart(2, '0')} ${MESES[data.getMonth()]}`;
 }
 
-
 // Data completa: "12 ago 2026" (Detalhes: adicionado em, concluído em).
 export function formatarData(dataISO: string | null): string {
   if (!dataISO) return '';

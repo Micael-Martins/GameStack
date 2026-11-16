@@ -1,10 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { JogoBiblioteca } from '../models/JogoBiblioteca';
-import { cores, espacamentos, tipografia } from '../theme';
+import { bordas, cores, espacamentos, estilosGlobais, tipografia } from '../theme';
 import BarraProgresso from './BarraProgresso';
 import Capa from './Capa';
-import { prepararDadosCardJogo } from './cardJogoUtils';
+import { prepararDadosCardJogo } from './utils/cardJogoUtils';
 import Estrelas from './Estrelas';
 import StatusChip from './StatusChip';
 
@@ -77,7 +77,7 @@ export default function CardJogo({ item, variante = 'normal', onPress }: CardJog
       accessibilityRole="button"
       accessibilityLabel={`Ver detalhes de ${item.jogo.nome}`}
       onPress={() => onPress(item)}
-      style={({ pressed }) => pressed && styles.pressionado}
+      style={({ pressed }) => pressed && estilosGlobais.pressionado}
     >
       {conteudo}
     </Pressable>
@@ -87,9 +87,9 @@ export default function CardJogo({ item, variante = 'normal', onPress }: CardJog
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    borderWidth: 1,
+    borderWidth: bordas.fina,
     borderColor: cores.borda,
-    borderRadius: espacamentos.raios.cards,
+    borderRadius: bordas.raios.cards,
     backgroundColor: cores.card,
     gap: espacamentos.m,
   },
@@ -100,5 +100,4 @@ const styles = StyleSheet.create({
   nomeCompacto: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: 15 },
   linhaStatus: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: espacamentos.p },
   textoSecundario: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 12 },
-  pressionado: { opacity: 0.7 },
 });

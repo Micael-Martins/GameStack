@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { prepararDadosCardJogo } from '../src/components/cardJogoUtils.ts';
+import { prepararDadosCardJogo } from '../src/components/utils/cardJogoUtils.ts';
 
 const AGORA = new Date(2026, 10, 15, 10, 0); // 15 nov 2026
 

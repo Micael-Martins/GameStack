@@ -2,44 +2,45 @@ import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native
 
 import TituloSecao from '../../../../components/TituloSecao';
 import type { Jogo } from '../../../../models/Jogo';
-import { cores, tipografia } from '../../../../theme';
+import { bordas, cores, estilosGlobais, tipografia } from '../../../../theme';
 
 type Props = {
-  games: Jogo[];
-  onSeeMore: () => void;
-  onSelect: (game: Jogo) => void;
+  jogos: Jogo[];
+  onVerMais: () => void;
+  onSelecionar: (jogo: Jogo) => void;
 };
 
-export function PopularGamesRow({ games, onSeeMore, onSelect }: Props) {
+// "Populares agora": capas da RAWG, só com a biblioteca vazia.
+export function LinhaPopulares({ jogos, onVerMais, onSelecionar }: Props) {
   return (
     <View>
-      <TituloSecao titulo="Populares agora" link={{ texto: 'Ver mais', onPress: onSeeMore }} />
+      <TituloSecao titulo="Populares agora" link={{ texto: 'Ver mais', onPress: onVerMais }} />
       <FlatList
-        data={games}
-        keyExtractor={(game) => game.apiId}
+        data={jogos}
+        keyExtractor={(jogo) => jogo.apiId}
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.row}
-        contentContainerStyle={styles.list}
+        style={styles.linha}
+        contentContainerStyle={styles.lista}
         renderItem={({ item }) => {
-          const genre = item.genero.split(',')[0];
+          const genero = item.genero.split(',')[0]; // só o primeiro gênero
           return (
             <Pressable
-              onPress={() => onSelect(item)}
+              onPress={() => onSelecionar(item)}
               accessibilityRole="button"
-              accessibilityLabel={`${item.nome}, ${genre}`}
-              style={({ pressed }) => [styles.item, pressed && styles.pressed]}
+              accessibilityLabel={`${item.nome}, ${genero}`}
+              style={({ pressed }) => [styles.item, pressed && estilosGlobais.pressionado]}
             >
               {item.imagemURL ? (
-                <Image source={{ uri: item.imagemURL }} style={styles.cover} />
+                <Image source={{ uri: item.imagemURL }} style={styles.capa} />
               ) : (
-                <View style={styles.cover} />
+                <View style={styles.capa} />
               )}
-              <Text style={styles.name} numberOfLines={1}>
+              <Text style={styles.nome} numberOfLines={1}>
                 {item.nome}
               </Text>
-              <Text style={styles.genre} numberOfLines={1}>
-                {genre}
+              <Text style={styles.genero} numberOfLines={1}>
+                {genero}
               </Text>
             </Pressable>
           );
@@ -50,18 +51,17 @@ export function PopularGamesRow({ games, onSeeMore, onSelect }: Props) {
 }
 
 const styles = StyleSheet.create({
-  row: { marginRight: -20 }, 
-  list: { gap: 12, paddingRight: 20 },
+  linha: { marginRight: -20 }, // as capas vão até a borda da tela
+  lista: { gap: 12, paddingRight: 20 },
   item: { width: 92, gap: 4 },
-  pressed: { opacity: 0.7 },
-  cover: {
+  capa: {
     width: 92,
     height: 122,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: bordas.raios.pequeno,
+    borderWidth: bordas.fina,
     borderColor: cores.borda,
     backgroundColor: cores.borda,
   },
-  name: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: 13, marginTop: 2 },
-  genre: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular, fontSize: 11 },
+  nome: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: 13, marginTop: 2 },
+  genero: { color: cores.textoFraco, fontFamily: tipografia.fontes.regular, fontSize: 11 },
 });

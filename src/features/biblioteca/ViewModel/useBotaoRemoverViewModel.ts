@@ -4,12 +4,13 @@ import { reagendarLembrete } from '../../../data/services/notificationService';
 import { useBibliotecaStore } from '../../../store/bibliotecaStore';
 import { executarRemocaoJogo } from '../Model/remocaoJogo';
 
-export function useRemoverJogoBiblioteca(
+// Lógica do botão de remover (lixeira da tela Detalhes).
+export function useBotaoRemoverViewModel(
   jogoId: string,
   onRemovido: () => void,
 ) {
   const remover = useBibliotecaStore((s) => s.remover);
-  const emExecucao = useRef(false);
+  const emExecucao = useRef(false); // evita remover duas vezes com toques rápidos
 
   const [removendo, setRemovendo] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -24,6 +25,7 @@ export function useRemoverJogoBiblioteca(
     let sucesso = false;
 
     try {
+      // Remove da store/banco e depois reagenda o lembrete dos 5 dias
       await executarRemocaoJogo(jogoId, {
         remover,
         reagendarLembrete,

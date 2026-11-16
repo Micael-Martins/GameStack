@@ -29,9 +29,8 @@ export function usePainelMudarStatusViewModel(
 
   const salvando = salvandoStatus !== null;
 
-
-  // No iPhone, a tela Concluir (fullScreenModal) não abre enquanto o painel ainda
-  // está fechando: o iOS ignora uma tela nova por cima de outra que está saindo.
+  // No iPhone, abrir a tela Concluir enquanto o painel (Modal) ainda está fechando
+  // pode falhar: o iOS ignora uma tela nova por cima de outra que está saindo.
   // Por isso o jogo fica guardado aqui e a navegação só acontece quando o painel
   // terminar de fechar (onDismiss do Modal, ver aoTerminarDeFechar).
   const concluirPendente = useRef<JogoBiblioteca | null>(null);

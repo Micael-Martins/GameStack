@@ -9,7 +9,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -24,9 +23,10 @@ import EstadoVazio from '../../../components/EstadoVazio';
 import Interruptor from '../../../components/Interruptor';
 import TituloSecao from '../../../components/TituloSecao';
 import { RootStackParamList } from '../../../navigation/tipos';
-import { cores, espacamentos, tipografia } from '../../../theme';
+import { cores, estilosGlobais } from '../../../theme';
 import { NOME_APP } from '../../../data/services/regrasLembrete';
 import { useConfiguracoesViewModel } from '../ViewModel/useConfiguracoesViewModel';
+import { styles } from './styles/ConfiguracoesScreen.styles';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Configuracoes'>;
 
@@ -57,7 +57,7 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={estilosGlobais.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerStyle={[styles.conteudo, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 24 }]}
         keyboardShouldPersistTaps="handled"
@@ -160,7 +160,7 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
               disabled={vm.apagando}
               accessibilityRole="button"
               accessibilityLabel="Apagar todos os dados"
-              style={({ pressed }) => [styles.linha, styles.divisor, pressed && styles.pressionado]}
+              style={({ pressed }) => [styles.linha, styles.divisor, pressed && estilosGlobais.pressionado]}
             >
               <Text style={[styles.valor, styles.flex]}>Apagar todos os dados</Text>
               {vm.apagando ? <ActivityIndicator color={cores.textoSecundario} /> : null}
@@ -223,65 +223,3 @@ function useHorarioAnimado(ligado: boolean, carregado: boolean) {
     deslize: progresso.interpolate({ inputRange: [0, 1], outputRange: [-10, 0] }),
   };
 }
-
-const styles = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.fundo },
-  conteudo: { flexGrow: 1, paddingHorizontal: espacamentos.gg },
-  flex: { flex: 1 },
-  secao: { marginTop: espacamentos.gg, gap: espacamentos.p },
-  card: {
-    borderRadius: espacamentos.raios.cards,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.card,
-    overflow: 'hidden',
-  },
-  linha: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: espacamentos.m,
-    minHeight: 56,
-    paddingHorizontal: espacamentos.g,
-    paddingVertical: espacamentos.m,
-  },
-  divisor: { borderTopWidth: 1, borderTopColor: cores.borda },
-  linhaAnimada: { minHeight: 0, paddingVertical: 0, overflow: 'hidden' },
-  texto: { color: cores.texto, fontFamily: tipografia.fontes.regular, fontSize: tipografia.tamanhos.corpo },
-  textoForte: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: tipografia.tamanhos.corpo },
-  descricao: {
-    color: cores.textoSecundario,
-    fontFamily: tipografia.fontes.regular,
-    fontSize: tipografia.tamanhos.legenda,
-    marginTop: 2,
-  },
-  valor: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: tipografia.tamanhos.corpo },
-  horario: {
-    width: 84,
-    height: 44,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.fundo,
-    color: cores.texto,
-    fontFamily: tipografia.fontes.semiBold,
-    fontSize: tipografia.tamanhos.corpo,
-  },
-  horarioErro: { borderColor: cores.textoSecundario, borderStyle: 'dashed' },
-  erro: {
-    color: cores.textoSecundario,
-    fontFamily: tipografia.fontes.regular,
-    fontSize: tipografia.tamanhos.legenda,
-    paddingHorizontal: espacamentos.g,
-    paddingBottom: espacamentos.m,
-  },
-  aviso: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: tipografia.tamanhos.legenda },
-  pressionado: { opacity: 0.7 },
-  versao: {
-    marginTop: 32,
-    textAlign: 'center',
-    color: cores.textoFraco,
-    fontFamily: tipografia.fontes.regular,
-    fontSize: tipografia.tamanhos.legenda,
-  },
-});

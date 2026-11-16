@@ -3,28 +3,32 @@ import { useEffect, useRef } from 'react';
 import { AccessibilityInfo, Animated, Image, View } from 'react-native';
 
 import { cores } from '../../../theme';
-import { styles } from './OnBoardingScreen.styles';
+import { styles } from './styles/BoasVindasScreen.styles';
 
-type Props = { top: number; covers: string[] };
+type Props = { topo: number; capas: string[] };
 
-const FAN = {
-  left: { x: -76, deg: -14 },
-  center: { x: 0, deg: -3 },
-  right: { x: 76, deg: 13 },
+// Posição final de cada carta no leque (deslocamento para o lado e inclinação).
+const LEQUE = {
+  esquerda: { x: -76, graus: -14 },
+  centro: { x: 0, graus: -3 },
+  direita: { x: 76, graus: 13 },
 };
 
-const CHIP_TILT = [-10, 7, -8, 6];
+// Inclinação de cada chip flutuante: controle, concluído, +2h, estrelas.
+const INCLINACAO_CHIPS = [-10, 7, -8, 6];
 
-export function OnBoardingIllustration({ top, covers }: Props) {
-  const cards = useRef([0, 1, 2].map(() => new Animated.Value(0))).current;
-  const chips = useRef(CHIP_TILT.map(() => new Animated.Value(0))).current;
+// Ilustração do topo: 3 capas da RAWG em leque + chips flutuando, com animação de entrada.
+export function IlustracaoBoasVindas({ topo, capas }: Props) {
+  const cartas = useRef([0, 1, 2].map(() => new Animated.Value(0))).current;
+  const chips = useRef(INCLINACAO_CHIPS.map(() => new Animated.Value(0))).current;
 
   useEffect(() => {
-    const all = [...cards, ...chips];
+    const todos = [...cartas, ...chips];
 
-    AccessibilityInfo.isReduceMotionEnabled().then((reduceMotion) => {
-      if (reduceMotion) {
-        all.forEach((value) => value.setValue(1));
+    // Acessibilidade: quem pediu "reduzir movimento" vê tudo já no lugar.
+    AccessibilityInfo.isReduceMotionEnabled().then((reduzirMovimento) => {
+      if (reduzirMovimento) {
+        todos.forEach((valor) => valor.setValue(1));
         return;
       }
 
@@ -32,68 +36,69 @@ export function OnBoardingIllustration({ top, covers }: Props) {
         // 1. cartas, uma de cada vez, da esquerda para a direita
         Animated.stagger(
           140,
-          cards.map((value) => Animated.spring(value, { toValue: 1, friction: 7, tension: 60, useNativeDriver: true })),
+          cartas.map((valor) => Animated.spring(valor, { toValue: 1, friction: 7, tension: 60, useNativeDriver: true })),
         ),
         // 2. chips pulando, um depois do outro
         Animated.stagger(
           90,
-          chips.map((value) => Animated.spring(value, { toValue: 1, friction: 4, tension: 120, useNativeDriver: true })),
+          chips.map((valor) => Animated.spring(valor, { toValue: 1, friction: 4, tension: 120, useNativeDriver: true })),
         ),
       ]).start();
     });
-  }, [cards, chips]);
+  }, [cartas, chips]);
 
   // Carta: sobe de baixo e gira até a posição do leque
-  const cardAnim = (value: Animated.Value, { x, deg }: { x: number; deg: number }) => ({
-    opacity: value.interpolate({ inputRange: [0, 0.2], outputRange: [0, 1], extrapolate: 'clamp' }),
+  const animacaoCarta = (valor: Animated.Value, { x, graus }: { x: number; graus: number }) => ({
+    opacity: valor.interpolate({ inputRange: [0, 0.2], outputRange: [0, 1], extrapolate: 'clamp' }),
     transform: [
       { translateX: x },
-      { translateY: value.interpolate({ inputRange: [0, 1], outputRange: [220, 0] }) },
-      { rotate: value.interpolate({ inputRange: [0, 1], outputRange: ['0deg', `${deg}deg`] }) },
+      { translateY: valor.interpolate({ inputRange: [0, 1], outputRange: [220, 0] }) },
+      { rotate: valor.interpolate({ inputRange: [0, 1], outputRange: ['0deg', `${graus}deg`] }) },
     ],
   });
 
   // Chip: surge no próprio lugar com um pulinho
-  const chipAnim = (index: number) => ({
-    opacity: chips[index].interpolate({ inputRange: [0, 0.2], outputRange: [0, 1], extrapolate: 'clamp' }),
+  const animacaoChip = (indice: number) => ({
+    opacity: chips[indice].interpolate({ inputRange: [0, 0.2], outputRange: [0, 1], extrapolate: 'clamp' }),
     transform: [
-      { rotate: `${CHIP_TILT[index]}deg` },
-      { translateY: chips[index].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) },
-      { scale: chips[index].interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) },
+      { rotate: `${INCLINACAO_CHIPS[indice]}deg` },
+      { translateY: chips[indice].interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) },
+      { scale: chips[indice].interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) },
     ],
   });
 
   return (
     <View
-      style={[styles.illustration, { paddingTop: top }]}
+      style={[styles.ilustracao, { paddingTop: topo }]}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >
-      <View style={styles.stage}>
-        <Animated.View style={[styles.cover, cardAnim(cards[0], FAN.left)]}>
-          {covers[1] && <Image source={{ uri: covers[1] }} style={styles.coverImage} />}
+      <View style={styles.palco}>
+        <Animated.View style={[styles.capa, animacaoCarta(cartas[0], LEQUE.esquerda)]}>
+          {capas[1] && <Image source={{ uri: capas[1] }} style={styles.imagemCapa} />}
         </Animated.View>
-        <Animated.View style={[styles.cover, cardAnim(cards[2], FAN.right)]}>
-          {covers[2] && <Image source={{ uri: covers[2] }} style={styles.coverImage} />}
+        <Animated.View style={[styles.capa, animacaoCarta(cartas[2], LEQUE.direita)]}>
+          {capas[2] && <Image source={{ uri: capas[2] }} style={styles.imagemCapa} />}
         </Animated.View>
-        <Animated.View style={[styles.cover, styles.coverCenter, cardAnim(cards[1], FAN.center)]}>
-          {covers[0] && <Image source={{ uri: covers[0] }} style={styles.coverImageCenter} />}
-          <Animated.Text style={styles.playingChip}>• JOGANDO</Animated.Text>
-          <View style={styles.progressTrack}>
-            <View style={styles.progressFill} />
+        <Animated.View style={[styles.capa, styles.capaCentro, animacaoCarta(cartas[1], LEQUE.centro)]}>
+          {capas[0] && <Image source={{ uri: capas[0] }} style={styles.imagemCapaCentro} />}
+          <Animated.Text style={styles.chipJogando}>• JOGANDO</Animated.Text>
+          <View style={styles.trilhoProgresso}>
+            <View style={styles.preenchimentoProgresso} />
           </View>
         </Animated.View>
 
-        <Animated.View style={[styles.iconBadge, chipAnim(0)]}>
+        <Animated.View style={[styles.seloControle, animacaoChip(0)]}>
           <Ionicons name="game-controller" size={26} color={cores.texto} />
         </Animated.View>
-        <Animated.Text style={[styles.floating, styles.doneChip, chipAnim(1)]}>✓ CONCLUÍDO</Animated.Text>
-        <Animated.Text style={[styles.floating, styles.hoursChip, chipAnim(2)]}>+2h</Animated.Text>
-        <Animated.Text style={[styles.floating, styles.stars, chipAnim(3)]}>★★★★★</Animated.Text>
+        <Animated.Text style={[styles.flutuante, styles.chipConcluido, animacaoChip(1)]}>✓ CONCLUÍDO</Animated.Text>
+        <Animated.Text style={[styles.flutuante, styles.chipHoras, animacaoChip(2)]}>+2h</Animated.Text>
+        <Animated.Text style={[styles.flutuante, styles.estrelas, animacaoChip(3)]}>★★★★★</Animated.Text>
       </View>
 
-      <View style={styles.curve}>
-        <View style={styles.curveCircle} />
+      {/* Curva preta que separa a ilustração do formulário */}
+      <View style={styles.curva}>
+        <View style={styles.circuloCurva} />
       </View>
     </View>
   );

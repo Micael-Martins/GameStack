@@ -39,7 +39,6 @@ export function textoResumo(jogos: JogoBiblioteca[]): string {
   return `${quantidade} · ${horasInteiras(minutos)}h registradas`;
 }
 
-
 // O que a tela mostra no lugar da lista. A ordem importa: se a leitura do banco
 // falhou, a lista também vem vazia, mas a mensagem certa é a de erro (e não
 // "Adicione seu primeiro jogo", que faria parecer que os jogos sumiram).

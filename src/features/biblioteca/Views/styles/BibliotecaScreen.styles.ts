@@ -1,10 +1,8 @@
 import { StyleSheet } from 'react-native';
 
-import { cores, tipografia } from '../../../theme';
+import { bordas, cores, tipografia } from '../../../../theme';
 
 export const styles = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.fundo },
-  pressionado: { opacity: 0.7 },
 
   // Topo
   topo: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, paddingHorizontal: 20 },
@@ -14,7 +12,7 @@ export const styles = StyleSheet.create({
   botaoAdicionar: {
     width: 52,
     height: 52,
-    borderRadius: 16,
+    borderRadius: bordas.raios.botoes,
     backgroundColor: cores.texto,
     alignItems: 'center',
     justifyContent: 'center',

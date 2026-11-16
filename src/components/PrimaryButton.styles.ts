@@ -1,11 +1,12 @@
 import { StyleSheet } from 'react-native';
 
-import { cores, tipografia } from '../theme';
+import { bordas, cores, tipografia } from '../theme';
 
+// Estilos do PrimaryButton.
 export const styles = StyleSheet.create({
   button: {
     height: 54,
-    borderRadius: 16,
+    borderRadius: bordas.raios.botoes,
     backgroundColor: cores.texto,
     alignItems: 'center',
     justifyContent: 'center',

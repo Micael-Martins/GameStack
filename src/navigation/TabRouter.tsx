@@ -9,6 +9,8 @@ import { TabParamList } from './tipos';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
+// Barra de abas de baixo: Início, Pesquisar e Biblioteca.
+
 export default function TabRouter() {
   return (
     <Tab.Navigator
@@ -48,7 +50,6 @@ export default function TabRouter() {
           tabBarIcon: ({ color, size }) => <Ionicons name="library-outline" size={size} color={color} />,
         }}
       />
-      
     </Tab.Navigator>
   );
 }

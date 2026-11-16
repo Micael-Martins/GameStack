@@ -68,8 +68,8 @@ A checklist abaixo enumera cada arquivo-fonte revisado quanto Ã  camada MVVM e Ã
 - [x] `src/features/biblioteca/ViewModel/useConcluirViewModel.ts`
 - [x] `src/features/biblioteca/ViewModel/useDetalhesViewModel.ts`
 - [x] `src/features/biblioteca/ViewModel/usePainelMudarStatusViewModel.ts`
-- [x] `src/features/biblioteca/ViewModel/useProgressoViewModel.ts`
-- [x] `src/features/biblioteca/ViewModel/useRemoverJogoBiblioteca.ts`
+- [x] `src/features/biblioteca/ViewModel/useRegistrarHorasViewModel.ts`
+- [x] `src/features/biblioteca/ViewModel/useBotaoRemoverViewModel.ts`
 - [x] `src/features/biblioteca/Views/BibliotecaScreen.styles.ts`
 - [x] `src/features/biblioteca/Views/BibliotecaScreen.tsx`
 - [x] `src/features/biblioteca/Views/BotaoRemoverJogo.tsx`

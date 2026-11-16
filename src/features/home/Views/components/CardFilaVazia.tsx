@@ -2,31 +2,32 @@ import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton } from '../../../../components/PrimaryButton';
-import { cores, tipografia } from '../../../../theme';
+import { bordas, cores, tipografia } from '../../../../theme';
 
-type Props = { onSearch: () => void };
+type Props = { onPesquisar: () => void };
 
 // Biblioteca vazia: convite para pesquisar o primeiro jogo.
-export function EmptyQueueCard({ onSearch }: Props) {
+export function CardFilaVazia({ onPesquisar }: Props) {
   return (
     <View style={styles.card}>
-      <View style={styles.art} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        <View style={[styles.ghostCover, styles.ghostLeft]} />
-        <View style={[styles.ghostCover, styles.ghostRight]} />
-        <View style={styles.ghostCenter}>
+      {/* Desenho de capas tracejadas (só decoração, o leitor de tela ignora) */}
+      <View style={styles.desenho} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        <View style={[styles.capaFantasma, styles.capaEsquerda]} />
+        <View style={[styles.capaFantasma, styles.capaDireita]} />
+        <View style={styles.capaCentro}>
           <Ionicons name="add" size={22} color={cores.textoFraco} />
         </View>
-        <View style={styles.ghostRing} />
+        <View style={styles.anel} />
       </View>
 
-      <View style={styles.texts}>
-        <Text style={styles.title}>Sua fila está vazia</Text>
-        <Text style={styles.description}>
+      <View style={styles.textos}>
+        <Text style={styles.titulo}>Sua fila está vazia</Text>
+        <Text style={styles.descricao}>
           Adicione os jogos que você já tem e ainda não terminou. Comece pelo que mais tem vontade de zerar.
         </Text>
       </View>
 
-      <PrimaryButton title="Pesquisar jogos" onPress={onSearch} style={styles.button} />
+      <PrimaryButton title="Pesquisar jogos" onPress={onPesquisar} style={styles.botao} />
     </View>
   );
 }
@@ -34,7 +35,7 @@ export function EmptyQueueCard({ onSearch }: Props) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: cores.card,
-    borderWidth: 1,
+    borderWidth: bordas.fina,
     borderColor: cores.borda,
     borderRadius: 24,
     paddingTop: 20,
@@ -43,8 +44,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  art: { width: 136, height: 96 },
-  ghostCover: {
+  desenho: { width: 136, height: 96 },
+  capaFantasma: {
     position: 'absolute',
     top: 16,
     width: 48,
@@ -52,44 +53,44 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     borderStyle: 'dashed',
-    borderColor: '#3A3A3A',
+    borderColor: cores.bordaForte,
   },
-  ghostLeft: { left: 6, transform: [{ rotate: '-12deg' }] },
-  ghostRight: { right: 6, transform: [{ rotate: '12deg' }] },
-  ghostCenter: {
+  capaEsquerda: { left: 6, transform: [{ rotate: '-12deg' }] },
+  capaDireita: { right: 6, transform: [{ rotate: '12deg' }] },
+  capaCentro: {
     position: 'absolute',
     left: 40,
     top: 2,
     width: 56,
     height: 76,
-    borderRadius: 12,
+    borderRadius: bordas.raios.pequeno,
     borderWidth: 2,
     borderStyle: 'dashed',
-    borderColor: '#5A5A5A',
-    backgroundColor: '#0F0F0F',
+    borderColor: cores.bordaTracejada,
+    backgroundColor: cores.fundoProfundo,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ghostRing: {
+  anel: {
     position: 'absolute',
     left: 50,
     bottom: -4,
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: bordas.raios.cards,
     borderWidth: 6,
-    borderColor: '#3A3A3A',
+    borderColor: cores.bordaForte,
     backgroundColor: cores.card,
   },
-  texts: { alignItems: 'center', gap: 8 },
-  title: {
+  textos: { alignItems: 'center', gap: 8 },
+  titulo: {
     color: cores.texto,
     fontFamily: tipografia.fontes.extraBold,
     fontSize: 22,
     letterSpacing: -0.4,
     textAlign: 'center',
   },
-  description: {
+  descricao: {
     color: cores.textoSecundario,
     fontFamily: tipografia.fontes.regular,
     fontSize: 14,
@@ -97,5 +98,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: 270,
   },
-  button: { alignSelf: 'stretch' },
+  botao: { alignSelf: 'stretch' },
 });

@@ -1,6 +1,6 @@
+// Fontes e tamanhos de texto. No Android, o peso (fontWeight) não funciona com fonte
+// personalizada: por isso cada peso é uma fonte diferente (regular, semiBold, extraBold).
 export const tipografia = {
-  fonte: 'PlusJakartaSans_400Regular',
-
   fontes: {
     regular: 'PlusJakartaSans_400Regular',
     semiBold: 'PlusJakartaSans_600SemiBold',
@@ -11,10 +11,5 @@ export const tipografia = {
     secao: 13,
     corpo: 15,
     legenda: 12,
-  },
-  pesos: {
-    regular: '400',
-    semiBold: '600',
-    bold: '800',
   },
 } as const;

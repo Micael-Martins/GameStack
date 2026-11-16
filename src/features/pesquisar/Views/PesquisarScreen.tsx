@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback } from 'react';
-import { ActivityIndicator, FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { atrasoDaLista, EntradaAnimada } from '../../../components/animacoes';
@@ -13,8 +13,9 @@ import EstadoCarregando from '../../../components/EstadoCarregando';
 import TituloSecao from '../../../components/TituloSecao';
 import type { Jogo } from '../../../models/Jogo';
 import type { RootStackParamList } from '../../../navigation/tipos';
-import { cores, espacamentos, tipografia } from '../../../theme';
+import { cores, estilosGlobais } from '../../../theme';
 import { usePesquisaViewModel } from '../ViewModel/usePesquisaViewModel';
+import { styles } from './styles/PesquisarScreen.styles';
 
 // A RAWG exige o crédito nas telas que mostram os dados dela.
 function CreditoRawg() {
@@ -172,7 +173,7 @@ export default function PesquisarScreen() {
   }
 
   return (
-    <View style={[styles.tela, { paddingTop: insets.top + 16 }]}>
+    <View style={[estilosGlobais.tela, { paddingTop: insets.top + 16 }]}>
       <View style={styles.topo}>
         <Text accessibilityRole="header" style={styles.titulo}>
           Pesquisar jogos
@@ -200,45 +201,3 @@ export default function PesquisarScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  tela: { flex: 1, backgroundColor: cores.fundo },
-  topo: { paddingHorizontal: espacamentos.gg, paddingBottom: espacamentos.g },
-  titulo: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: tipografia.tamanhos.titulo },
-  subtitulo: {
-    color: cores.textoSecundario,
-    fontFamily: tipografia.fontes.regular,
-    fontSize: 14,
-    marginTop: 2,
-    marginBottom: espacamentos.gg,
-  },
-  conteudo: { flex: 1 },
-  rolagem: { flexGrow: 1, paddingHorizontal: espacamentos.gg, paddingBottom: espacamentos.g },
-  aviso: {
-    color: cores.textoSecundario,
-    fontFamily: tipografia.fontes.regular,
-    fontSize: 13,
-    marginBottom: espacamentos.m,
-    textAlign: 'center',
-  },
-  recentes: { marginBottom: espacamentos.gg },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: espacamentos.p, marginTop: espacamentos.p },
-  vazio: { flexGrow: 1, minHeight: 280 },
-  lista: { paddingHorizontal: espacamentos.gg, paddingBottom: espacamentos.g },
-  separador: { height: espacamentos.m },
-  centro: { flex: 1, justifyContent: 'center', paddingHorizontal: espacamentos.gg, paddingBottom: 60 },
-  textoCarregando: {
-    marginTop: espacamentos.m,
-    textAlign: 'center',
-    color: cores.textoSecundario,
-    fontFamily: tipografia.fontes.regular,
-  },
-  mais: { marginTop: espacamentos.g },
-  credito: {
-    marginTop: espacamentos.gg,
-    textAlign: 'center',
-    color: cores.textoFraco,
-    fontFamily: tipografia.fontes.regular,
-    fontSize: tipografia.tamanhos.legenda,
-  },
-});

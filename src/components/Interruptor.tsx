@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet } from 'react-native';
-import { cores } from '../theme';
+import { bordas, cores } from '../theme';
 
 type InterruptorProps = {
   value: boolean;
@@ -10,7 +10,7 @@ type InterruptorProps = {
 };
 
 const DESLOCAMENTO = 20; // trilho 52 - botão 26 - padding 3 * 2
-const COR_DESLIGADO = '#3A3A3A';
+const COR_DESLIGADO = cores.bordaForte;
 
 export default function Interruptor({ value, onValueChange, accessibilityLabel, disabled = false }: InterruptorProps) {
   // 0 = desligado, 1 = ligado. A mola faz o botão deslizar com um leve quique.
@@ -48,7 +48,7 @@ export default function Interruptor({ value, onValueChange, accessibilityLabel, 
 
 const styles = StyleSheet.create({
   toque: { minWidth: 52, minHeight: 44, justifyContent: 'center', alignItems: 'center' },
-  trilho: { width: 52, height: 32, borderRadius: 16, padding: 3 },
+  trilho: { width: 52, height: 32, borderRadius: bordas.raios.botoes, padding: 3 },
   botao: { width: 26, height: 26, borderRadius: 13 },
   desabilitado: { opacity: 0.5 },
 });

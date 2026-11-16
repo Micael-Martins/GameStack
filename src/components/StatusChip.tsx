@@ -3,7 +3,7 @@ import type { ComponentProps } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { StatusJogo } from '../models/StatusJogo';
-import { cores, espacamentos } from '../theme';
+import { bordas, cores, tipografia } from '../theme';
 
 type NomeIcone = ComponentProps<typeof Ionicons>['name'];
 
@@ -12,6 +12,8 @@ interface StatusChipProps {
   grande?: boolean; // versão maior, para o card de status da tela Detalhes
 }
 
+// Texto e ícone de cada status. Como o app é preto e branco, os status se
+// diferenciam pela forma (ícone, fundo cheio, borda tracejada), não pela cor.
 const configuracoes: Record<
   StatusJogo,
   { rotulo: string; icone: NomeIcone; tamanho: number }
@@ -38,10 +40,12 @@ const configuracoes: Record<
   },
 };
 
+// Etiqueta com o status do jogo (NA FILA, JOGANDO, CONCLUÍDO, ABANDONADO).
 export default function StatusChip({ status, grande = false }: StatusChipProps) {
   const { rotulo, icone, tamanho } = configuracoes[status];
   const concluido = status === 'CONCLUIDO';
 
+  // Concluído tem fundo branco, então o texto fica escuro
   const corConteudo = concluido
     ? cores.fundo
     : status === 'ABANDONADO'
@@ -80,8 +84,8 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: espacamentos.raios.chips,
-    borderWidth: 1,
+    borderRadius: bordas.raios.chips,
+    borderWidth: bordas.fina,
   },
 
   NA_FILA: {
@@ -106,7 +110,7 @@ const styles = StyleSheet.create({
   },
 
   rotulo: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: tipografia.fontes.semiBold,
     fontSize: 12,
     letterSpacing: 0.4,
   },
@@ -117,7 +121,7 @@ const styles = StyleSheet.create({
   },
 
   rotuloGrande: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontFamily: tipografia.fontes.extraBold,
     fontSize: 13,
     letterSpacing: 0.8,
   },

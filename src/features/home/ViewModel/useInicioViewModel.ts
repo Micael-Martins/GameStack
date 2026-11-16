@@ -1,87 +1,81 @@
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { obterEstatisticas } from "../../../data/db/bibliotecaRepository";
-import { estadoDaBiblioteca } from "../../biblioteca/Model/filtrosBiblioteca";
-import { obterUsuario } from "../../../data/db/userRepository";
-import { buscarJogosPopulares } from "../../../data/services/rawgService";
-import type { Estatisticas } from "../../../models/Estatisticas";
-import type { Jogo } from "../../../models/Jogo";
-import {
-  porStatus,
-  recentes,
-  useBibliotecaStore,
-} from "../../../store/bibliotecaStore";
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-const DEFAULT_NAME = "Jogador";
+import { obterEstatisticas } from '../../../data/db/bibliotecaRepository';
+import { obterUsuario } from '../../../data/db/userRepository';
+import { buscarJogosPopulares } from '../../../data/services/rawgService';
+import type { Estatisticas } from '../../../models/Estatisticas';
+import type { Jogo } from '../../../models/Jogo';
+import { porStatus, recentes, useBibliotecaStore } from '../../../store/bibliotecaStore';
+import { estadoDaBiblioteca } from '../../biblioteca/Model/filtrosBiblioteca';
 
-const EMPTY_STATS: Estatisticas = {
+const NOME_PADRAO = 'Jogador';
+const QUANTIDADE_RECENTES = 5;
+
+const ESTATISTICAS_ZERADAS: Estatisticas = {
   totalConcluidos: 0,
   horasTotais: 0,
   quantidadePorStatus: { NA_FILA: 0, JOGANDO: 0, CONCLUIDO: 0, ABANDONADO: 0 },
 };
 
-// Toda a lógica da Home. A View só mostra o que este hook devolve.
+// Toda a lógica da tela Início (Home). A View só mostra o que este hook devolve.
 export function useInicioViewModel() {
   // Jogos vêm da store compartilhada: mudou em qualquer tela, a Home atualiza sozinha.
-  const games = useBibliotecaStore((s) => s.jogos);
-  const loading = useBibliotecaStore((s) => s.carregando);
+  const jogos = useBibliotecaStore((s) => s.jogos);
+  const carregandoBiblioteca = useBibliotecaStore((s) => s.carregando);
   const erroBiblioteca = useBibliotecaStore((s) => s.erro);
   const recarregarBiblioteca = useBibliotecaStore((s) => s.carregar);
-  const addGame = useBibliotecaStore((s) => s.adicionar);
 
-  const [name, setName] = useState(DEFAULT_NAME);
-  const [stats, setStats] = useState<Estatisticas>(EMPTY_STATS);
-  const [popularGames, setPopularGames] = useState<Jogo[]>([]);
-  const [carregandoPerfil, setCarregandoPerfil] = useState(true);
-  const [carregandoEstatisticas, setCarregandoEstatisticas] = useState(true);
+  const [nome, setNome] = useState(NOME_PADRAO);
+  const [estatisticas, setEstatisticas] = useState<Estatisticas>(ESTATISTICAS_ZERADAS);
+  const [populares, setPopulares] = useState<Jogo[]>([]);
+  // Só a PRIMEIRA leitura mostra "carregando". Nas próximas (voltar para a aba,
+  // registrar horas), os números antigos ficam na tela até os novos chegarem.
+  const [perfilPronto, setPerfilPronto] = useState(false);
+  const [estatisticasProntas, setEstatisticasProntas] = useState(false);
   const [carregandoPopulares, setCarregandoPopulares] = useState(false);
 
-  const estadoBiblioteca = estadoDaBiblioteca(loading, erroBiblioteca, games.length);
-  const isEmpty = estadoBiblioteca === "VAZIA";
+  const estadoBiblioteca = estadoDaBiblioteca(carregandoBiblioteca, erroBiblioteca, jogos.length);
+  const bibliotecaVazia = estadoBiblioteca === 'VAZIA';
 
-  // Atualiza o perfil quando a Home recebe foco.
+  // Nome: relê quando a aba ganha foco (pode ter mudado em Configurações).
   useFocusEffect(
     useCallback(() => {
       let ativo = true;
-      setCarregandoPerfil(true);
-
       obterUsuario()
-        .then((user) => {
-          if (ativo) setName(user?.nome || DEFAULT_NAME);
+        .then((usuario) => {
+          if (ativo) setNome(usuario?.nome || NOME_PADRAO);
         })
-        .catch((e) => console.warn("Erro ao ler o usuário:", e))
+        .catch((e) => console.warn('Erro ao ler o usuário:', e))
         .finally(() => {
-          if (ativo) setCarregandoPerfil(false);
+          if (ativo) setPerfilPronto(true);
         });
-
       return () => {
         ativo = false;
       };
     }, []),
   );
 
-  // Atualiza as estatísticas quando a biblioteca muda.
+  // Estatísticas (SQL): recalcula toda vez que a lista de jogos muda.
   useEffect(() => {
     let ativo = true;
-    setCarregandoEstatisticas(true);
-
     obterEstatisticas()
       .then((dados) => {
-        if (ativo) setStats(dados);
+        if (ativo) setEstatisticas(dados);
       })
-      .catch((e) => console.warn("Erro ao calcular estatísticas:", e))
+      .catch((e) => console.warn('Erro ao calcular estatísticas:', e))
       .finally(() => {
-        if (ativo) setCarregandoEstatisticas(false);
+        if (ativo) setEstatisticasProntas(true);
       });
-
     return () => {
       ativo = false;
     };
-  }, [games]);
+  }, [jogos]);
 
-  // Os populares são opcionais: a Home continua funcionando sem internet.
+  // Populares da RAWG: só com a biblioteca vazia, e uma vez só. São opcionais:
+  // sem internet a seção some e a Home continua funcionando.
   useEffect(() => {
-    if (!isEmpty || popularGames.length > 0) {
+    if (!bibliotecaVazia || populares.length > 0) {
       setCarregandoPopulares(false);
       return;
     }
@@ -91,11 +85,11 @@ export function useInicioViewModel() {
     setCarregandoPopulares(true);
 
     buscarJogosPopulares(10, { signal: controller.signal })
-      .then((jogos) => {
-        if (ativo) setPopularGames(jogos);
+      .then((lista) => {
+        if (ativo) setPopulares(lista);
       })
       .catch((e) => {
-        if (ativo) console.warn("Sem populares da RAWG:", e);
+        if (ativo) console.warn('Sem populares da RAWG:', e);
       })
       .finally(() => {
         if (ativo) setCarregandoPopulares(false);
@@ -103,47 +97,34 @@ export function useInicioViewModel() {
 
     return () => {
       ativo = false;
-      controller.abort();
+      controller.abort(); // saiu da tela: cancela a busca
     };
-  }, [isEmpty, popularGames.length]);
+  }, [bibliotecaVazia, populares.length]);
 
   // Carrossel: todos os "Jogando", do mais recente para o mais antigo.
-  const playingGames = useMemo(() => porStatus(games, "JOGANDO"), [games]);
+  const jogando = useMemo(() => porStatus(jogos, 'JOGANDO'), [jogos]);
   // Recentes: os que NÃO estão no carrossel, para não repetir.
-  const recentGames = useMemo(
-    () =>
-      recentes(
-        games.filter((j) => j.status !== "JOGANDO"),
-        5,
-      ),
-    [games],
+  const jogadosRecentemente = useMemo(
+    () => recentes(jogos.filter((j) => j.status !== 'JOGANDO'), QUANTIDADE_RECENTES),
+    [jogos],
   );
 
-  // SÓ EM DESENVOLVIMENTO: põe 3 jogos populares na biblioteca para testar a Home cheia.
-  async function addTestGames() {
-    const [first, second, third] = popularGames;
-    if (first) await addGame(first, "JOGANDO", 42 * 60);
-    if (second) await addGame(second, "CONCLUIDO", 9 * 60);
-    if (third) await addGame(third, "NA_FILA");
-  }
-
   return {
-    name,
-    isEmpty,
+    nome,
+    bibliotecaVazia,
     estadoBiblioteca,
-    carregandoDados: carregandoPerfil || carregandoEstatisticas,
+    carregandoDados: !perfilPronto || !estatisticasProntas,
     carregandoPopulares,
     erroBiblioteca,
     tentarNovamente: () => void recarregarBiblioteca(),
-    summary: {
-      completed: stats.totalConcluidos,
-      playing: stats.quantidadePorStatus.JOGANDO ?? 0,
-      queued: stats.quantidadePorStatus.NA_FILA ?? 0,
-      hours: stats.horasTotais,
+    resumo: {
+      zerados: estatisticas.totalConcluidos,
+      emAndamento: estatisticas.quantidadePorStatus.JOGANDO ?? 0,
+      naFila: estatisticas.quantidadePorStatus.NA_FILA ?? 0,
+      horas: estatisticas.horasTotais,
     },
-    playingGames,
-    recentGames,
-    popularGames,
-    addTestGames: __DEV__ ? addTestGames : undefined,
+    jogando,
+    jogadosRecentemente,
+    populares,
   };
 }

@@ -5,19 +5,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BarraProgresso from '../../../components/BarraProgresso';
 import Capa from '../../../components/Capa';
-import { prepararDadosCardJogo } from '../../../components/cardJogoUtils';
+import { prepararDadosCardJogo } from '../../../components/utils/cardJogoUtils';
 import CampoTexto from '../../../components/CampoTexto';
-import { linhaDesenvolvedora, linhaPlataformasGenero } from '../../../components/cardResultadoUtils';
+import { linhaDesenvolvedora, linhaPlataformasGenero } from '../../../components/utils/cardResultadoUtils';
 import Estrelas from '../../../components/Estrelas';
 import { PrimaryButton } from '../../../components/PrimaryButton';
 import StatusChip from '../../../components/StatusChip';
 import type { RootStackParamList } from '../../../navigation/tipos';
-import { cores } from '../../../theme';
+import { cores, estilosGlobais } from '../../../theme';
 import { formatarHoras } from '../../../utils/formatarHoras';
 import { useDetalhesViewModel } from '../ViewModel/useDetalhesViewModel';
-import BotaoRemoverJogo from './BotaoRemoverJogo';
-import { styles } from './DetalhesJogoScreen.styles';
-import PainelMudarStatus from './PainelMudarStatus';
+import BotaoRemoverJogo from './components/BotaoRemoverJogo';
+import { styles } from './styles/DetalhesJogoScreen.styles';
+import PainelMudarStatus from './components/PainelMudarStatus';
 import { progressoDoTempo } from '../Model/detalhesJogo';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DetalhesJogo'>;
@@ -29,7 +29,7 @@ export default function DetalhesJogoScreen({ navigation, route }: Props) {
   const item = vm.item;
 
   // Depois de remover, o jogo some da store: a tela só espera o "voltar".
-  if (!item) return <View style={styles.tela} />;
+  if (!item) return <View style={estilosGlobais.tela} />;
 
   const dados = prepararDadosCardJogo(item);
   const desenvolvedoraAno = linhaDesenvolvedora(item.jogo);
@@ -40,7 +40,7 @@ export default function DetalhesJogoScreen({ navigation, route }: Props) {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={estilosGlobais.tela} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerStyle={[styles.conteudo, { paddingTop: insets.top + 8 }]}
         keyboardShouldPersistTaps="handled"
@@ -51,7 +51,7 @@ export default function DetalhesJogoScreen({ navigation, route }: Props) {
             accessibilityRole="button"
             accessibilityLabel="Voltar"
             onPress={navigation.goBack}
-            style={({ pressed }) => [styles.botaoVoltar, pressed && styles.pressionado]}
+            style={({ pressed }) => [styles.botaoVoltar, pressed && estilosGlobais.pressionado]}
           >
             <Ionicons name="chevron-back" size={24} color={cores.texto} />
           </Pressable>
@@ -97,10 +97,10 @@ export default function DetalhesJogoScreen({ navigation, route }: Props) {
           <Pressable
             accessibilityRole="button"
             onPress={() => navigation.navigate('RegistrarHoras', { id: item.id })}
-            style={({ pressed }) => [styles.botaoContorno, pressed && styles.pressionado]}
+            style={({ pressed }) => [estilosGlobais.botaoContorno, styles.botaoContorno, pressed && estilosGlobais.pressionado]}
           >
             <Ionicons name="time-outline" size={18} color={cores.texto} />
-            <Text style={styles.textoBotaoContorno}>Registrar horas</Text>
+            <Text style={estilosGlobais.textoBotaoContorno}>Registrar horas</Text>
           </Pressable>
         </View>
 
@@ -144,10 +144,10 @@ export default function DetalhesJogoScreen({ navigation, route }: Props) {
         <Pressable
           accessibilityRole="button"
           onPress={vm.abrirPainel}
-          style={({ pressed }) => [styles.botaoContorno, styles.botaoRodape, pressed && styles.pressionado]}
+          style={({ pressed }) => [estilosGlobais.botaoContorno, styles.botaoContorno, styles.botaoRodape, pressed && estilosGlobais.pressionado]}
         >
           <Ionicons name="swap-horizontal" size={18} color={cores.texto} />
-          <Text style={styles.textoBotaoContorno}>Mudar status</Text>
+          <Text style={estilosGlobais.textoBotaoContorno}>Mudar status</Text>
         </Pressable>
         <PrimaryButton title="Salvar" onPress={() => void aoSalvar()} loading={vm.salvando} style={styles.botaoRodape} />
       </View>

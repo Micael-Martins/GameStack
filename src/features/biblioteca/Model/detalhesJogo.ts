@@ -37,7 +37,6 @@ export function anotacaoMudou(original: string, digitada: string): boolean {
   return original.trim() !== digitada.trim();
 }
 
-
 // Barra do card de tempo na Detalhes: horas jogadas ÷ tempo médio da RAWG, de 0 a 1.
 // Diferente do CardJogo (que só mostra a barra em Jogando), aqui vale para qualquer
 // status: um jogo concluído continua mostrando quanto do tempo médio foi jogado.

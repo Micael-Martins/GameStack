@@ -15,7 +15,7 @@ import { configurarNotificacoes, reagendarLembrete } from './src/data/services/n
 import { CHAVES, ler } from './src/data/storage/preferencias';
 import ConfiguracoesScreen from './src/features/configuracoes/Views/ConfiguracoesScreen';
 import AdicionarJogoScreen from './src/features/pesquisar/Views/AdicionarJogoScreen';
-import OnBoardingScreen from './src/features/onboarding/Views/OnBoardingScreen';
+import BoasVindasScreen from './src/features/onboarding/Views/BoasVindasScreen';
 import TabRouter from './src/navigation/TabRouter';
 import { RootStackParamList } from './src/navigation/tipos';
 import { carregarBiblioteca } from './src/store/bibliotecaStore';
@@ -82,7 +82,7 @@ export default function App() {
       <NavigationContainer theme={navigationTheme}>
         <StatusBar style="light" />
         <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="BoasVindas" component={OnBoardingScreen} />
+          <Stack.Screen name="BoasVindas" component={BoasVindasScreen} />
           <Stack.Screen name="Abas" component={TabRouter} />
           <Stack.Screen name="Configuracoes" component={ConfiguracoesScreen} options={{ animation: 'ios_from_right' }} />
           <Stack.Screen name="AdicionarJogo" component={AdicionarJogoScreen} options={{ animation: 'ios_from_right' }} />
@@ -92,7 +92,8 @@ export default function App() {
           <Stack.Screen
             name="ConcluirJogo"
             component={ConcluirJogoScreen}
-            options={{ animation: 'slide_from_bottom', gestureEnabled: false }}          />
+            options={{ animation: 'slide_from_bottom', gestureEnabled: false }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

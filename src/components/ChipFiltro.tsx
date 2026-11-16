@@ -1,16 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
-import { cores, espacamentos } from '../theme';
+import { bordas, cores, tipografia } from '../theme';
 
 type NomeIcone = ComponentProps<typeof Ionicons>['name'];
 
+// Chip de filtro em forma de pílula (filtros da Biblioteca e pesquisas recentes).
 export interface ChipFiltroProps {
   texto: string;
   selecionado: boolean;
   onPress: () => void;
-  quantidade?: number;
+  quantidade?: number; // número ao lado do texto (ex.: "Jogando 3")
   icone?: NomeIcone;
   desabilitado?: boolean;
 }
@@ -69,8 +70,8 @@ const styles = StyleSheet.create({
     gap: 7,
     paddingHorizontal: 15,
     paddingVertical: 9,
-    borderRadius: espacamentos.raios.chips,
-    borderWidth: 1,
+    borderRadius: bordas.raios.chips,
+    borderWidth: bordas.fina,
     borderColor: cores.borda,
     backgroundColor: cores.card,
   },
@@ -90,13 +91,13 @@ const styles = StyleSheet.create({
 
   rotulo: {
     color: cores.texto,
-    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontFamily: tipografia.fontes.semiBold,
     fontSize: 13,
   },
 
   quantidade: {
     color: cores.textoSecundario,
-    fontFamily: 'PlusJakartaSans_400Regular',
+    fontFamily: tipografia.fontes.regular,
     fontSize: 12,
   },
 });

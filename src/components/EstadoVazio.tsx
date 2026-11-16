@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 
-import { cores, espacamentos, tipografia } from '../theme';
+import { bordas, cores, tipografia } from '../theme';
 import { PrimaryButton } from './PrimaryButton';
 
 type EstadoVazioProps = {
@@ -41,15 +41,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 28,
     paddingVertical: 40,
-    borderRadius: espacamentos.raios.cards,
-    borderWidth: 1,
+    borderRadius: bordas.raios.cards,
+    borderWidth: bordas.fina,
     borderStyle: 'dashed',
-    borderColor: '#3A3A3A',
+    borderColor: cores.bordaForte,
   },
   icone: {
     width: 64,
     height: 64,
-    borderRadius: 18,
+    borderRadius: bordas.raios.cards,
     backgroundColor: cores.borda,
     alignItems: 'center',
     justifyContent: 'center',

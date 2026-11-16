@@ -2,6 +2,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { cores, espacamentos, tipografia } from '../theme';
 
+// Indicador de carregando com mensagem, igual em todas as telas.
 interface EstadoCarregandoProps {
   mensagem?: string;
 }

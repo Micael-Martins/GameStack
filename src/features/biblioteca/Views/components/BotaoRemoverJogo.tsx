@@ -9,11 +9,12 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
-import { cores } from '../../../theme';
-import { textoConfirmacaoRemocao } from '../Model/remocaoJogo';
-import { useRemoverJogoBiblioteca } from '../ViewModel/useRemoverJogoBiblioteca';
+import type { JogoBiblioteca } from '../../../../models/JogoBiblioteca';
+import { bordas, cores } from '../../../../theme';
+import { textoConfirmacaoRemocao } from '../../Model/remocaoJogo';
+import { useBotaoRemoverViewModel } from '../../ViewModel/useBotaoRemoverViewModel';
 
+// Lixeira da tela Detalhes: pede confirmação e remove o jogo da biblioteca.
 export interface BotaoRemoverJogoProps {
   item: JogoBiblioteca;
   onRemovido: () => void;
@@ -25,7 +26,7 @@ export default function BotaoRemoverJogo({
   onRemovido,
   style,
 }: BotaoRemoverJogoProps) {
-  const vm = useRemoverJogoBiblioteca(item.id, onRemovido);
+  const vm = useBotaoRemoverViewModel(item.id, onRemovido);
 
   async function executarRemocao(): Promise<void> {
     const sucesso = await vm.removerConfirmado();
@@ -41,6 +42,7 @@ export default function BotaoRemoverJogo({
     }
   }
 
+  // Na web não existe Alert com botões, então usa o confirm do navegador
   function solicitarConfirmacao(): void {
     if (vm.removendo) return;
 
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 12,
+    borderRadius: bordas.raios.pequeno,
   },
   pressionado: {
     backgroundColor: cores.borda,

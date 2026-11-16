@@ -2,65 +2,67 @@ import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native'
 
 import BarraProgresso from '../../../../components/BarraProgresso';
 import Capa from '../../../../components/Capa';
-import { prepararDadosCardJogo } from '../../../../components/cardJogoUtils';
+import { prepararDadosCardJogo } from '../../../../components/utils/cardJogoUtils';
 import { PrimaryButton } from '../../../../components/PrimaryButton';
 import StatusChip from '../../../../components/StatusChip';
 import type { JogoBiblioteca } from '../../../../models/JogoBiblioteca';
-import { cores, tipografia } from '../../../../theme';
+import { bordas, cores, estilosGlobais, tipografia } from '../../../../theme';
 import { horasInteiras } from '../../../../utils/formatarHoras';
 
 type Props = {
-  game: JogoBiblioteca;
-  width?: number; // no carrossel, cada card tem largura fixa
-  onLogHours: () => void;
-  onOpen: () => void; // tocar na capa ou no nome abre os Detalhes
+  item: JogoBiblioteca;
+  largura?: number; // no carrossel, cada card tem largura fixa
+  onRegistrarHoras: () => void;
+  onAbrir: () => void; // tocar na capa ou no nome abre os Detalhes
 };
 
-export function NowPlayingCard({ game, width, onLogHours, onOpen }: Props) {
-  const data = prepararDadosCardJogo(game);
+// Card grande de um jogo em andamento ("Jogando agora").
+export function CardDestaque({ item, largura, onRegistrarHoras, onAbrir }: Props) {
+  const dados = prepararDadosCardJogo(item);
 
   return (
-    <View style={[styles.card, width ? { width } : null]}>
+    <View style={[styles.card, largura ? { width: largura } : null]}>
       <Pressable
-        onPress={onOpen}
+        onPress={onAbrir}
         accessibilityRole="button"
-        accessibilityLabel={`Ver detalhes de ${game.jogo.nome}`}
-        style={({ pressed }) => [styles.top, pressed && styles.pressed]}
+        accessibilityLabel={`Ver detalhes de ${item.jogo.nome}`}
+        style={({ pressed }) => [styles.topo, pressed && estilosGlobais.pressionado]}
       >
-        <Capa imagemURL={game.jogo.imagemURL} tamanho="G" descricao={`Capa de ${game.jogo.nome}`} />
+        <Capa imagemURL={item.jogo.imagemURL} tamanho="G" descricao={`Capa de ${item.jogo.nome}`} />
         <View style={styles.info}>
-          <StatusChip status={game.status} />
-          <Text style={styles.title} numberOfLines={2}>
-            {game.jogo.nome}
+          <StatusChip status={item.status} />
+          <Text style={styles.nome} numberOfLines={2}>
+            {item.jogo.nome}
           </Text>
-          {data.plataformaGenero ? (
-            <Text style={styles.details} numberOfLines={1}>
-              {data.plataformaGenero}
+          {dados.plataformaGenero ? (
+            <Text style={styles.detalhes} numberOfLines={1}>
+              {dados.plataformaGenero}
             </Text>
           ) : null}
         </View>
       </Pressable>
 
-      <View style={styles.progress}>
-        <View style={styles.progressTexts}>
-          <Text style={styles.hours}>{horasInteiras(game.minutosJogados)}h jogadas</Text>
-          {game.jogo.tempoMedio > 0 ? <Text style={styles.total}>~{game.jogo.tempoMedio}h no total</Text> : null}
+      <View style={styles.progresso}>
+        <View style={styles.textosProgresso}>
+          <Text style={styles.horas}>{horasInteiras(item.minutosJogados)}h jogadas</Text>
+          {item.jogo.tempoMedio > 0 ? <Text style={styles.total}>~{item.jogo.tempoMedio}h no total</Text> : null}
         </View>
         <BarraProgresso
-          valor={data.progresso}
-          temTempoMedio={data.mostrarBarra}
-          descricao={`Progresso de ${game.jogo.nome}: ${data.textoHoras}`}
+          valor={dados.progresso}
+          temTempoMedio={dados.mostrarBarra}
+          descricao={`Progresso de ${item.jogo.nome}: ${dados.textoHoras}`}
         />
       </View>
 
-      <PrimaryButton title="Registrar horas" onPress={onLogHours} />
+      <PrimaryButton title="Registrar horas" onPress={onRegistrarHoras} />
     </View>
   );
 }
 
-export const nowPlayingCardStyle: ViewStyle = {
+// Visual do card (fundo, borda e cantos), reaproveitado pelo carrossel no caso "nenhum jogando".
+export const estiloCardDestaque: ViewStyle = {
   backgroundColor: cores.card,
-  borderWidth: 1,
+  borderWidth: bordas.fina,
   borderColor: cores.borda,
   borderRadius: 20,
   padding: 16,
@@ -68,14 +70,13 @@ export const nowPlayingCardStyle: ViewStyle = {
 };
 
 const styles = StyleSheet.create({
-  card: nowPlayingCardStyle,
-  top: { flexDirection: 'row', gap: 14 },
-  pressed: { opacity: 0.7 },
+  card: estiloCardDestaque,
+  topo: { flexDirection: 'row', gap: 14 },
   info: { flex: 1, minWidth: 0, gap: 6, alignItems: 'flex-start' },
-  title: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 19, lineHeight: 24 },
-  details: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
-  progress: { gap: 6 },
-  progressTexts: { flexDirection: 'row', justifyContent: 'space-between' },
-  hours: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: 13 },
+  nome: { color: cores.texto, fontFamily: tipografia.fontes.extraBold, fontSize: 19, lineHeight: 24 },
+  detalhes: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
+  progresso: { gap: 6 },
+  textosProgresso: { flexDirection: 'row', justifyContent: 'space-between' },
+  horas: { color: cores.texto, fontFamily: tipografia.fontes.semiBold, fontSize: 13 },
   total: { color: cores.textoSecundario, fontFamily: tipografia.fontes.regular, fontSize: 13 },
 });

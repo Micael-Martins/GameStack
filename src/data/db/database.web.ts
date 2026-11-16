@@ -1,3 +1,4 @@
+// Versão para a web: o SQLite só existe no celular, então aqui as funções avisam ou dão erro.
 import { Platform } from 'react-native';
 
 export const initDatabase = async () => {
