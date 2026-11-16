@@ -91,6 +91,15 @@ test('Trata erros de autenticação', async () => {
   );
 });
 
+test('Preserva erro específico quando a resposta HTTP contém JSON inválido', async () => {
+  const fetcher = async () => new Response('{ inválido', { status: 200 });
+
+  await assert.rejects(
+    buscarJogosRawg('Zelda', { chave: 'chave-de-teste', fetcher }),
+    /RAWG: resposta JSON inválida/,
+  );
+});
+
 test('Trata resultados sem jogos', async () => {
   const fetcher = async () =>
     new Response(
