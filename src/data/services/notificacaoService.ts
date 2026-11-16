@@ -68,7 +68,8 @@ export async function pedirPermissao(): Promise<boolean> {
   }
 }
 
-export async function cancelarLembretes(): Promise<void> {
+// Só o atualizarAgora usa. De fora, use atualizarLembrete (que respeita a fila).
+async function cancelarLembretes(): Promise<void> {
   if (!disponivel) return;
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
@@ -77,10 +78,11 @@ export async function cancelarLembretes(): Promise<void> {
   }
 }
 
-// Cancela o que estava agendado e agenda de novo. Não agenda se os lembretes
-// estiverem desligados, sem permissão ou se não houver jogo "Jogando".
-async function reagendarAgora(): Promise<void> {
-    if (!disponivel) return;
+// Deixa o lembrete igual ao que está salvo: cancela o que estava agendado e,
+// se os lembretes estiverem ligados, com permissão e com um jogo "Jogando",
+// agenda um novo. Desligado ou banco vazio: só cancela.
+async function atualizarAgora(): Promise<void> {
+  if (!disponivel) return;
   try {
     await cancelarLembretes();
 
@@ -107,7 +109,7 @@ async function reagendarAgora(): Promise<void> {
           channelId: CANAL_ANDROID,
         };
 
-        await Notifications.scheduleNotificationAsync({
+    await Notifications.scheduleNotificationAsync({
       content: {
         title: NOME_APP,
         body: mensagemLembrete(jogo.jogo.nome),
@@ -120,8 +122,9 @@ async function reagendarAgora(): Promise<void> {
   }
 }
 
-// Versão usada pelo app. Duas mudanças seguidas na store (ex.: concluir salva as
-// horas e depois o status) pediriam dois reagendamentos ao mesmo tempo; os dois
-// cancelariam antes de agendar e o lembrete sairia duplicado. Com semSobrepor
-// eles rodam um depois do outro.
-export const reagendarLembrete = semSobrepor(reagendarAgora);
+// Versão usada pelo app (abrir o app, store, Configurações, Boas-vindas).
+// Uma atualização de cada vez: se pedirem outra enquanto uma roda (ex.: concluir
+// salva as horas e depois o status, ou o usuário desliga os lembretes no meio),
+// a nova espera e roda por último, lendo o banco já atualizado. Assim não sobra
+// lembrete duplicado nem lembrete agendado com os lembretes desligados.
+export const atualizarLembrete = semSobrepor(atualizarAgora);

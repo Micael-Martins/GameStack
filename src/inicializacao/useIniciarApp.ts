@@ -7,7 +7,7 @@ import {
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 
-import { configurarNotificacoes, reagendarLembrete } from '../data/services/notificacaoService';
+import { atualizarLembrete, configurarNotificacoes } from '../data/services/notificacaoService';
 import { CHAVES, ler } from '../data/storage/preferencias';
 import type { RootStackParamList } from '../navigation/tipos';
 import { carregarBiblioteca } from '../store/bibliotecaStore';
@@ -31,7 +31,7 @@ export function useIniciarApp() {
       try {
         await carregarBiblioteca(); // jogos do SQLite para a store
         await configurarNotificacoes();
-        await reagendarLembrete(); // lembrete dos 5 dias (conta da última interação)
+         await atualizarLembrete(); // lembrete dos 5 dias (conta da última interação)
       } catch (erro) {
         // Se algo falhar, o app abre assim mesmo (as telas mostram o erro)
         console.error('Erro ao iniciar o app:', erro);

@@ -1,7 +1,7 @@
 import { useStore } from 'zustand';
 
 import * as repositorio from '../data/db/bibliotecaRepository';
-import { reagendarLembrete } from '../data/services/notificacaoService';
+import { atualizarLembrete } from '../data/services/notificacaoService';
 import { criarBibliotecaStore, EstadoBiblioteca } from './bibliotecaStoreBase';
 import { aplicarMudancaStatus } from './regrasStatus';
 
@@ -14,7 +14,7 @@ export type { AtualizacaoJogo, EstadoBiblioteca, EstadoTelaBiblioteca } from './
 export const bibliotecaStore = criarBibliotecaStore({
   repositorio,
   regras: aplicarMudancaStatus,
-  aoMudarJogos: reagendarLembrete,
+  aoMudarJogos: atualizarLembrete,
 });
 
 // Hook para as telas: const jogos = useBibliotecaStore((s) => s.jogos);

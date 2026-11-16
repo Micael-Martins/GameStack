@@ -47,7 +47,6 @@ export interface DependenciasStore {
   // As regras de status entram por aqui (assim a store usa sempre a mesma função).
   regras: typeof aplicarMudancaStatus;
   agora?: () => Date;
-  // Chamada depois de toda mudança nos jogos (o app liga ao reagendarLembrete).
   aoMudarJogos?: () => Promise<void>;
 }
 

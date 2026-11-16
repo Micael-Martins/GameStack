@@ -58,3 +58,24 @@ test('se a tarefa falhar, a repetição ainda roda', async () => {
   await segunda;
   assert.equal(vezes, 2);
 });
+
+
+test('desligar os lembretes durante uma atualização não deixa lembrete agendado', async () => {
+  let lembretesAtivos = true;
+  let agendados = 0;
+
+  const atualizar = semSobrepor(async () => {
+    agendados = 0; // cancela
+    const ativo = lembretesAtivos; // lê o usuário do banco
+    await new Promise((resolver) => setTimeout(resolver, 10)); // demora (permissão, banco...)
+    if (ativo) agendados++; // agenda com o que leu lá no começo
+  });
+
+  const primeira = atualizar(); // ex.: o jogo acabou de mudar de status
+  lembretesAtivos = false; // o usuário desliga os lembretes no meio
+  const segunda = atualizar(); // Configurações pede a atualização
+
+  await Promise.all([primeira, segunda]);
+
+  assert.equal(agendados, 0);
+});

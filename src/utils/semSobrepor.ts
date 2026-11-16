@@ -17,7 +17,7 @@ export function semSobrepor(tarefa: () => Promise<void>): () => Promise<void> {
     // Já tem uma rodando: agenda uma repetição para quando ela terminar.
     if (!repeticao) {
       repeticao = rodando
-        .catch(() => {}) 
+        .catch(() => {})
         .then(() => {
           repeticao = null;
           return executar();

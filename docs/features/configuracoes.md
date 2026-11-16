@@ -27,7 +27,7 @@ Pede confirmação e então:
 
 ## Notificações
 
-O `src/data/services/notificacaoService.ts` (pedirPermissao, cancelarLembretes, reagendarLembrete, configurarNotificacoes) entrou aqui porque a tela precisa dele. As regras puras ficam em `regrasLembrete.ts` (com a constante `MODO_TESTE`). O App já reagenda o lembrete ao abrir. Os 5 dias contam a partir da `ultimaInteracao` do jogo "Jogando" mais recente (abrir o app sem jogar não empurra o lembrete); se já passaram, o lembrete vai para o próximo horário escolhido. Título: "GameStack"; texto: "Há quanto tempo você não salva o mundo em [jogo]? Vai jogar um pouco!".
+O `src/data/services/notificacaoService.ts` (pedirPermissao, atualizarLembrete, configurarNotificacoes) entrou aqui porque a tela precisa dele. As regras puras ficam em `regrasLembrete.ts` (com a constante `MODO_TESTE`). O App já reagenda o lembrete ao abrir. Os 5 dias contam a partir da `ultimaInteracao` do jogo "Jogando" mais recente (abrir o app sem jogar não empurra o lembrete); se já passaram, o lembrete vai para o próximo horário escolhido. Título: "GameStack"; texto: "Há quanto tempo você não salva o mundo em [jogo]? Vai jogar um pouco!".
 
 A store da biblioteca reagenda o lembrete sozinha depois de adicionar, atualizar, mudar status ou remover um jogo (`aoMudarJogos` em `src/store/bibliotecaStore.ts`), então as telas não chamam `reagendarLembrete`. Configurações e Boas-vindas ainda chamam direto, porque mudam o usuário (lembrete ligado/desligado, horário), não os jogos.
 

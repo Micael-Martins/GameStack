@@ -4,7 +4,7 @@ import { Image } from "react-native";
 import { salvarPerfil } from "../../../data/db/usuarioRepository";
 import {
     pedirPermissao,
-    reagendarLembrete,
+    atualizarLembrete,
 } from "../../../data/services/notificacaoService";
 import { buscarCapasPopulares } from "../../../data/services/rawgService";
 import { CHAVES, salvar } from "../../../data/storage/preferencias";
@@ -63,7 +63,7 @@ export function useBoasVindasViewModel(aoTerminar: () => void) {
 
       await salvarPerfil(nome.trim() || NOME_PADRAO, lembretes);
       await salvar(CHAVES.onboardingVisto, true);
-      await reagendarLembrete(); // agenda o lembrete se tiver permissão e jogo "Jogando"
+      await  atualizarLembrete(); // agenda o lembrete se tiver permissão e jogo "Jogando"
       aoTerminar();
     } catch (e) {
       setErro("Não foi possível salvar. Tente de novo.");
