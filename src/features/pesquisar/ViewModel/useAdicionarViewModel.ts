@@ -1,11 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { buscarDetalhes, type SobreJogo } from '../../../data/services/rawgService';
-import { reagendarLembrete } from '../../../data/services/notificationService';
-import type { Jogo } from '../../../models/Jogo';
-import type { StatusJogo } from '../../../models/StatusJogo';
-import { useBibliotecaStore } from '../../../store/bibliotecaStore';
-import { minutosIniciais, mostraCampoHoras, STATUS_INICIAL_PADRAO } from '../Model/adicionarJogo';
+import { reagendarLembrete } from "../../../data/services/notificacaoService";
+import {
+  buscarDetalhes,
+  type SobreJogo,
+} from "../../../data/services/rawgService";
+import type { Jogo } from "../../../models/Jogo";
+import type { StatusJogo } from "../../../models/StatusJogo";
+import { useBibliotecaStore } from "../../../store/bibliotecaStore";
+import {
+  minutosIniciais,
+  mostraCampoHoras,
+  STATUS_INICIAL_PADRAO,
+} from "../Model/adicionarJogo";
 
 // Toda a lógica da tela Adicionar jogo (tela 05). A View só mostra o que este hook devolve.
 export function useAdicionarViewModel(jogoInicial: Jogo) {
@@ -15,7 +22,7 @@ export function useAdicionarViewModel(jogoInicial: Jogo) {
   const [carregandoDetalhes, setCarregandoDetalhes] = useState(true);
   const [sobre, setSobre] = useState<SobreJogo | null>(null); // seção "Sobre o jogo"
   const [status, setStatus] = useState<StatusJogo>(STATUS_INICIAL_PADRAO);
-  const [horas, setHoras] = useState('');
+  const [horas, setHoras] = useState("");
   const [erroHoras, setErroHoras] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -28,11 +35,14 @@ export function useAdicionarViewModel(jogoInicial: Jogo) {
       .then((detalhes) => {
         if (!ativo) return;
         if (detalhes.desenvolvedora) {
-          setJogo((atual) => ({ ...atual, desenvolvedora: detalhes.desenvolvedora }));
+          setJogo((atual) => ({
+            ...atual,
+            desenvolvedora: detalhes.desenvolvedora,
+          }));
         }
         setSobre(detalhes.sobre);
       })
-      .catch((e) => console.warn('Sem detalhes da RAWG:', e))
+      .catch((e) => console.warn("Sem detalhes da RAWG:", e))
       .finally(() => {
         if (ativo) setCarregandoDetalhes(false);
       });
@@ -52,7 +62,7 @@ export function useAdicionarViewModel(jogoInicial: Jogo) {
 
     const minutos = minutosIniciais(status, horas);
     if (minutos === null) {
-      setErroHoras('Digite um número de horas válido, como 12 ou 12,5.');
+      setErroHoras("Digite um número de horas válido, como 12 ou 12,5.");
       return false;
     }
 
@@ -61,15 +71,19 @@ export function useAdicionarViewModel(jogoInicial: Jogo) {
     try {
       await adicionarNaStore(jogo, status, minutos);
     } catch (e) {
-      console.warn('Erro ao adicionar o jogo.', e);
-      setErro(e instanceof Error ? e.message : 'Não foi possível adicionar o jogo.');
+      console.warn("Erro ao adicionar o jogo.", e);
+      setErro(
+        e instanceof Error ? e.message : "Não foi possível adicionar o jogo.",
+      );
       return false;
     } finally {
       setSalvando(false);
     }
 
     // Um jogo novo em Jogando muda o lembrete dos 5 dias.
-    reagendarLembrete().catch((e) => console.warn('Erro ao reagendar o lembrete.', e));
+    reagendarLembrete().catch((e) =>
+      console.warn("Erro ao reagendar o lembrete.", e),
+    );
     return true;
   }
 

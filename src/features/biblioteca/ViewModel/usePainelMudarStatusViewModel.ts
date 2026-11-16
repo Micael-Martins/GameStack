@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
-import { reagendarLembrete } from '../../../data/services/notificationService';
-import type { JogoBiblioteca } from '../../../models/JogoBiblioteca';
-import type { StatusJogo } from '../../../models/StatusJogo';
-import { useBibliotecaStore } from '../../../store/bibliotecaStore';
-import { acaoDaOpcao } from '../Model/opcoesPainelStatus';
+import { useEffect, useRef, useState } from "react";
+import { Platform } from "react-native";
+import { reagendarLembrete } from "../../../data/services/notificacaoService";
+import type { JogoBiblioteca } from "../../../models/JogoBiblioteca";
+import type { StatusJogo } from "../../../models/StatusJogo";
+import { useBibliotecaStore } from "../../../store/bibliotecaStore";
+import { acaoDaOpcao } from "../Model/opcoesPainelStatus";
 
 export function usePainelMudarStatusViewModel(
   item: JogoBiblioteca | null,
@@ -15,7 +15,9 @@ export function usePainelMudarStatusViewModel(
   const mudarStatus = useBibliotecaStore((s) => s.mudarStatus);
 
   // Prioriza a versão atualizada que estiver na store.
-  const jogoNaStore = useBibliotecaStore((s) => s.jogos.find((jogo) => jogo.id === item?.id));
+  const jogoNaStore = useBibliotecaStore((s) =>
+    s.jogos.find((jogo) => jogo.id === item?.id),
+  );
   const jogoAtual = jogoNaStore ?? item;
 
   // Qual opção está salvando agora (mostra o carregando só nela).
@@ -46,10 +48,10 @@ export function usePainelMudarStatusViewModel(
 
     const acao = acaoDaOpcao(jogoAtual.status, status);
 
-    if (acao === 'nada') return;
+    if (acao === "nada") return;
 
-        if (acao === 'concluir') {
-      if (Platform.OS === 'ios') {
+    if (acao === "concluir") {
+      if (Platform.OS === "ios") {
         concluirPendente.current = jogoAtual; // abre quando o painel terminar de fechar
         onFechar();
       } else {
@@ -65,20 +67,22 @@ export function usePainelMudarStatusViewModel(
     try {
       await mudarStatus(jogoAtual.id, status);
     } catch (e) {
-      console.warn('Erro ao mudar o status do jogo.', e);
-      setErro('Não foi possível mudar o status. Tente novamente.');
+      console.warn("Erro ao mudar o status do jogo.", e);
+      setErro("Não foi possível mudar o status. Tente novamente.");
       return;
     } finally {
       setSalvandoStatus(null);
     }
 
     // Mexeu no jogo: o lembrete dos 5 dias volta a contar a partir de agora.
-    reagendarLembrete().catch((e) => console.warn('Erro ao reagendar o lembrete.', e));
+    reagendarLembrete().catch((e) =>
+      console.warn("Erro ao reagendar o lembrete.", e),
+    );
 
     onFechar();
   }
 
-    return {
+  return {
     jogoAtual,
     escolher,
     salvando,

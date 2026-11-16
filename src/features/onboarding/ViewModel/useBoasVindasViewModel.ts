@@ -1,18 +1,21 @@
-import { useEffect, useState } from 'react';
-import { Image } from 'react-native';
+import { useEffect, useState } from "react";
+import { Image } from "react-native";
 
-import { salvarPerfil } from '../../../data/db/userRepository';
-import { buscarCapasPopulares } from '../../../data/services/rawgService';
-import { pedirPermissao, reagendarLembrete } from '../../../data/services/notificationService';
-import { CHAVES, salvar } from '../../../data/storage/preferencias';
+import { salvarPerfil } from "../../../data/db/usuarioRepository";
+import {
+    pedirPermissao,
+    reagendarLembrete,
+} from "../../../data/services/notificacaoService";
+import { buscarCapasPopulares } from "../../../data/services/rawgService";
+import { CHAVES, salvar } from "../../../data/storage/preferencias";
 
-const NOME_PADRAO = 'Jogador';
+const NOME_PADRAO = "Jogador";
 const ESPERA_MAXIMA_CAPAS = 2500; // ms: sem internet, a animação começa assim mesmo
 
 // Toda a lógica da tela de boas-vindas. A View só mostra o que este hook devolve.
 // aoTerminar: o que fazer depois de salvar (ir para as abas).
 export function useBoasVindasViewModel(aoTerminar: () => void) {
-  const [nome, setNome] = useState('');
+  const [nome, setNome] = useState("");
   const [lembretesAtivos, setLembretesAtivos] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -32,10 +35,12 @@ export function useBoasVindasViewModel(aoTerminar: () => void) {
 
     buscarCapasPopulares(3)
       .then(async (urls) => {
-        await Promise.all(urls.map((url) => Image.prefetch(url).catch(() => false)));
+        await Promise.all(
+          urls.map((url) => Image.prefetch(url).catch(() => false)),
+        );
         setCapas(urls);
       })
-      .catch((e) => console.warn('Sem capas da RAWG:', e))
+      .catch((e) => console.warn("Sem capas da RAWG:", e))
       .finally(() => {
         clearTimeout(limite);
         liberar();
@@ -61,11 +66,21 @@ export function useBoasVindasViewModel(aoTerminar: () => void) {
       await reagendarLembrete(); // agenda o lembrete se tiver permissão e jogo "Jogando"
       aoTerminar();
     } catch (e) {
-      setErro('Não foi possível salvar. Tente de novo.');
+      setErro("Não foi possível salvar. Tente de novo.");
     } finally {
       setSalvando(false);
     }
   }
 
-  return { nome, setNome, lembretesAtivos, setLembretesAtivos, salvando, erro, comecar, capas, capasProntas };
+  return {
+    nome,
+    setNome,
+    lembretesAtivos,
+    setLembretesAtivos,
+    salvando,
+    erro,
+    comecar,
+    capas,
+    capasProntas,
+  };
 }

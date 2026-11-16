@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 
 import { apagarDadosDoBanco } from "../../../data/db/database";
 import {
-    obterUsuario,
-    salvarLembretes,
-    salvarPerfil,
-} from "../../../data/db/userRepository";
+  obterUsuario,
+  salvarLembretes,
+  salvarPerfil,
+} from "../../../data/db/usuarioRepository";
 import { apagarChaveApi } from "../../../data/secure/credenciais";
 import {
-    cancelarLembretes,
-    pedirPermissao,
-    reagendarLembrete,
-} from "../../../data/services/notificationService";
+  cancelarLembretes,
+  pedirPermissao,
+  reagendarLembrete,
+} from "../../../data/services/notificacaoService";
 import { HORARIO_LEMBRETE_PADRAO } from "../../../data/services/regrasLembrete";
 import { limparTudo } from "../../../data/storage/preferencias";
 import { Usuario } from "../../../models/Usuario";

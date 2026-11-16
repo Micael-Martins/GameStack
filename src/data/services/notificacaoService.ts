@@ -3,7 +3,7 @@ import { Platform } from "react-native";
 
 import { jogandoAgora } from "../../store/bibliotecaStoreBase";
 import { listarBiblioteca } from "../db/bibliotecaRepository";
-import { obterUsuario } from "../db/userRepository";
+import { obterUsuario } from "../db/usuarioRepository";
 import {
   calcularDataLembrete,
   HORARIO_LEMBRETE_PADRAO,

@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react';
+import { useRef, useState } from "react";
 
-import { reagendarLembrete } from '../../../data/services/notificationService';
-import { useBibliotecaStore } from '../../../store/bibliotecaStore';
-import { executarRemocaoJogo } from '../Model/remocaoJogo';
+import { reagendarLembrete } from "../../../data/services/notificacaoService";
+import { useBibliotecaStore } from "../../../store/bibliotecaStore";
+import { executarRemocaoJogo } from "../Model/remocaoJogo";
 
 // Lógica do botão de remover (lixeira da tela Detalhes).
 export function useBotaoRemoverViewModel(
@@ -33,8 +33,8 @@ export function useBotaoRemoverViewModel(
 
       sucesso = true;
     } catch (e) {
-      console.warn('Erro ao remover jogo da biblioteca.', e);
-      setErro('Não foi possível remover o jogo. Tente novamente.');
+      console.warn("Erro ao remover jogo da biblioteca.", e);
+      setErro("Não foi possível remover o jogo. Tente novamente.");
     } finally {
       emExecucao.current = false;
       setRemovendo(false);

@@ -1,8 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState } from "react";
 
-import { reagendarLembrete } from '../../../data/services/notificationService';
-import { useBibliotecaStore } from '../../../store/bibliotecaStore';
-import { linhaConclusao, numeroDoZerado, proximoDaFila, textoNota } from '../Model/conclusao';
+import { reagendarLembrete } from "../../../data/services/notificacaoService";
+import { useBibliotecaStore } from "../../../store/bibliotecaStore";
+import {
+  linhaConclusao,
+  numeroDoZerado,
+  proximoDaFila,
+  textoNota,
+} from "../Model/conclusao";
 
 // Toda a lógica da tela Concluir jogo (tela 10). A View só mostra o que este hook devolve.
 export function useConcluirViewModel(id: string) {
@@ -14,7 +19,7 @@ export function useConcluirViewModel(id: string) {
 
   const [nota, setNota] = useState<number | null>(item?.nota ?? null);
   // Começa com a anotação que o jogo já tinha, para não perder nada.
-  const [anotacao, setAnotacao] = useState(item?.anotacao ?? '');
+  const [anotacao, setAnotacao] = useState(item?.anotacao ?? "");
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -26,7 +31,10 @@ export function useConcluirViewModel(id: string) {
 
   // Número calculado ao abrir (depois de salvar, este jogo já conta como concluído).
   const [numero] = useState(() => numeroDoZerado(jogos, id));
-  const resumo = useMemo(() => (item ? linhaConclusao(item.minutosJogados, numero) : ''), [item, numero]);
+  const resumo = useMemo(
+    () => (item ? linhaConclusao(item.minutosJogados, numero) : ""),
+    [item, numero],
+  );
 
   function escolherNota(valor: number) {
     setNota(valor);
@@ -38,12 +46,14 @@ export function useConcluirViewModel(id: string) {
     if (!proximo || comecando || comecouProximo) return;
     setComecando(true);
     try {
-      await mudarStatus(proximo.id, 'JOGANDO');
+      await mudarStatus(proximo.id, "JOGANDO");
       setComecouProximo(true);
-      reagendarLembrete().catch((e) => console.warn('Erro ao reagendar o lembrete.', e));
+      reagendarLembrete().catch((e) =>
+        console.warn("Erro ao reagendar o lembrete.", e),
+      );
     } catch (e) {
-      console.warn('Erro ao começar o próximo jogo.', e);
-      setErro('Não foi possível começar o próximo jogo. Tente de novo.');
+      console.warn("Erro ao começar o próximo jogo.", e);
+      setErro("Não foi possível começar o próximo jogo. Tente de novo.");
     } finally {
       setComecando(false);
     }
@@ -54,24 +64,27 @@ export function useConcluirViewModel(id: string) {
   async function concluir(): Promise<boolean> {
     if (!item || salvando) return false;
     if (nota === null) {
-      setErro('Escolha uma nota para concluir.');
+      setErro("Escolha uma nota para concluir.");
       return false;
     }
 
     setSalvando(true);
     setErro(null);
     try {
-      if (anotacao.trim() !== item.anotacao.trim()) await atualizar(item.id, { anotacao });
-      await mudarStatus(item.id, 'CONCLUIDO', nota);
+      if (anotacao.trim() !== item.anotacao.trim())
+        await atualizar(item.id, { anotacao });
+      await mudarStatus(item.id, "CONCLUIDO", nota);
     } catch (e) {
-      console.warn('Erro ao concluir o jogo.', e);
-      setErro('Não foi possível concluir o jogo. Tente de novo.');
+      console.warn("Erro ao concluir o jogo.", e);
+      setErro("Não foi possível concluir o jogo. Tente de novo.");
       return false;
     } finally {
       setSalvando(false);
     }
 
-    reagendarLembrete().catch((e) => console.warn('Erro ao reagendar o lembrete.', e));
+    reagendarLembrete().catch((e) =>
+      console.warn("Erro ao reagendar o lembrete.", e),
+    );
     return true;
   }
 

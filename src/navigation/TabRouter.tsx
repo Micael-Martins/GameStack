@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import BibliotecaScreen from '../features/biblioteca/Views/BibliotecaScreen';
-import InicioScreen from '../features/home/Views/InicioScreen';
+import InicioScreen from '../features/inicio/Views/InicioScreen';
 import PesquisarScreen from '../features/pesquisar/Views/PesquisarScreen';
 import { cores } from '../theme';
 import { TabParamList } from './tipos';
