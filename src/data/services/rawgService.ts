@@ -1,8 +1,12 @@
 import type { Jogo } from '../../models/Jogo';
 import type { RawgJogo } from '../../models/RawgJogo';
+import { converterRawgParaJogo, extrairSobre, type DetalhesJogoRawg, type SobreJogo } from './rawgMapper.ts';
+import { consultarJsonRawg } from './rawgHttp.ts';
+
+export { converterRawgParaJogo, extrairSobre };
+export type { DetalhesJogoRawg, SobreJogo } from './rawgMapper.ts';
 
 const RAWG_URL = 'https://api.rawg.io/api';
-const TEMPO_LIMITE_MS = 10000;
 
 interface RespostaRawg {
   count: number;
@@ -32,41 +36,6 @@ export interface ResultadoBuscaRawg {
   total: number;
   pagina: number;
   temProximaPagina: boolean;
-}
-
-export function converterRawgParaJogo(rawg: RawgJogo): Jogo {
-  const ano = typeof rawg.released === 'string'
-    ? Number.parseInt(rawg.released.slice(0, 4), 10)
-    : NaN;
-
-  const generos = Array.isArray(rawg.genres)
-    ? rawg.genres.map((item) => item.name).filter(Boolean)
-    : [];
-
-  const plataformas = Array.isArray(rawg.platforms)
-    ? rawg.platforms
-        .map((item) => item.platform?.name)
-        .filter((nome): nome is string => Boolean(nome))
-    : [];
-
-  return {
-    id: `rawg-${rawg.id}`,
-    apiId: String(rawg.id),
-    origemAPI: 'RAWG',
-    nome: rawg.name,
-    imagemURL: rawg.background_image ?? null,
-    genero: generos.join(', '),
-    desenvolvedora: Array.isArray(rawg.developers)
-      ? rawg.developers.map((item) => item.name).filter(Boolean).join(', ')
-      : '',
-    anoLancamento: Number.isFinite(ano) ? ano : null,
-    tempoMedio:
-      typeof rawg.playtime === 'number' &&
-      Number.isFinite(rawg.playtime)
-        ? Math.max(0, rawg.playtime)
-        : 0,
-    plataformas,
-  };
 }
 
 export async function buscarJogosRawg(
@@ -109,64 +78,12 @@ export async function buscarJogosRawg(
     `&page=${pagina}` +
     `&page_size=${limite}`;
 
-  const controller = new AbortController();
-  let tempoEsgotado = false;
-
-  const cancelar = () => controller.abort();
-
-  if (opcoes.signal?.aborted) {
-    controller.abort();
-  } else {
-    opcoes.signal?.addEventListener('abort', cancelar);
+  const dados = await consultarJsonRawg<Partial<RespostaRawg>>(url, 'consulta', opcoes);
+  if (!Array.isArray(dados.results)) {
+    throw new Error('RAWG: formato de resposta inesperado.');
   }
 
-  const temporizador = setTimeout(() => {
-    tempoEsgotado = true;
-    controller.abort();
-  }, TEMPO_LIMITE_MS);
-
-  try {
-    const requisicao = opcoes.fetcher ?? fetch;
-
-    const resposta = await requisicao(url, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-      signal: controller.signal,
-    });
-
-    if (resposta.status === 401 || resposta.status === 403) {
-      throw new Error(
-        'RAWG: chave inválida ou acesso não autorizado.',
-      );
-    }
-
-    if (resposta.status === 429) {
-      throw new Error(
-        'RAWG: limite de requisições atingido. Tente mais tarde.',
-      );
-    }
-
-    if (!resposta.ok) {
-      throw new Error(
-        `RAWG: falha na consulta (HTTP ${resposta.status}).`,
-      );
-    }
-
-    let dados: Partial<RespostaRawg>;
-
-    try {
-      dados = await resposta.json();
-    } catch {
-      throw new Error('RAWG: resposta JSON inválida.');
-    }
-
-    if (!dados || !Array.isArray(dados.results)) {
-      throw new Error('RAWG: formato de resposta inesperado.');
-    }
-
-    const jogos = dados.results
+  const jogos = dados.results
       .filter(
         (item): item is RawgJogo =>
           item != null &&
@@ -175,113 +92,19 @@ export async function buscarJogosRawg(
       )
       .map(converterRawgParaJogo);
 
-    return {
-      jogos,
-      total:
-        typeof dados.count === 'number'
-          ? dados.count
-          : jogos.length,
-      pagina,
-      temProximaPagina: Boolean(dados.next),
-    };
-  } catch (erro) {
-    if (tempoEsgotado) {
-      throw new Error('RAWG: tempo limite da consulta excedido.');
-    }
-
-    if (controller.signal.aborted) {
-      throw new Error('RAWG: consulta cancelada.');
-    }
-
-    if (
-      erro instanceof Error &&
-      erro.message.startsWith('RAWG:')
-    ) {
-      throw erro;
-    }
-
-    throw new Error(
-      'RAWG: falha de conexão. Verifique a internet.',
-    );
-  } finally {
-    clearTimeout(temporizador);
-    opcoes.signal?.removeEventListener('abort', cancelar);
-  }
-}
-
-type OpcoesConsultaRawg = Pick<
-  OpcoesBuscaRawg,
-  'chave' | 'obterChave' | 'fetcher' | 'signal'
-> & {
-  tempoLimiteMs?: number;
-};
-
-// Evita que consultas complementares fiquem esperando indefinidamente.
-async function consultarJsonComLimite<T>(
-  url: string,
-  contexto: string,
-  opcoes: OpcoesConsultaRawg = {},
-): Promise<T> {
-  const controller = new AbortController();
-  let tempoEsgotado = false;
-  const cancelar = () => controller.abort();
-
-  if (opcoes.signal?.aborted) {
-    controller.abort();
-  } else {
-    opcoes.signal?.addEventListener('abort', cancelar);
-  }
-
-  const temporizador = setTimeout(() => {
-    tempoEsgotado = true;
-    controller.abort();
-  }, opcoes.tempoLimiteMs ?? TEMPO_LIMITE_MS);
-
-  try {
-    if (controller.signal.aborted) {
-      throw new Error('RAWG: consulta cancelada.');
-    }
-
-    const requisicao = opcoes.fetcher ?? fetch;
-
-    const resposta = await requisicao(url, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-      signal: controller.signal,
-    });
-
-    if (!resposta.ok) {
-      throw new Error(
-        `RAWG: falha ao buscar ${contexto} (HTTP ${resposta.status}).`,
-      );
-    }
-
-    return await resposta.json() as T;
-  } catch (erro) {
-    if (tempoEsgotado) {
-      throw new Error('RAWG: tempo limite da consulta excedido.');
-    }
-
-    if (controller.signal.aborted) {
-      throw new Error('RAWG: consulta cancelada.');
-    }
-
-    if (erro instanceof Error && erro.message.startsWith('RAWG:')) {
-      throw erro;
-    }
-
-    throw new Error('RAWG: falha de conexão. Verifique a internet.');
-  } finally {
-    clearTimeout(temporizador);
-    opcoes.signal?.removeEventListener('abort', cancelar);
-  }
+  return {
+    jogos,
+    total: typeof dados.count === 'number' ? dados.count : jogos.length,
+    pagina,
+    temProximaPagina: Boolean(dados.next),
+  };
 }
 
 // Jogos mais adicionados na RAWG (Home vazia e ilustração do onboarding).
 // Usa o mesmo conversor da pesquisa, então volta no model Jogo.
 export async function buscarJogosPopulares(
   limite = 10,
-  opcoes: OpcoesConsultaRawg = {},
+  opcoes: Pick<OpcoesBuscaRawg, 'chave' | 'obterChave' | 'fetcher' | 'signal'> = {},
 ): Promise<Jogo[]> {
   const chave = (opcoes.chave ?? (await (opcoes.obterChave ?? obterChavePadrao)())).trim();
   if (!chave) {
@@ -294,9 +117,7 @@ export async function buscarJogosPopulares(
     `&ordering=-added` +
     `&page_size=${limite}`;
 
-  const dados = await consultarJsonComLimite<Partial<RespostaRawg>>(
-    url, 'populares', opcoes,
-  );
+  const dados = await consultarJsonRawg<Partial<RespostaRawg>>(url, 'populares', opcoes);
 
   if (!dados || !Array.isArray(dados.results)) {
     throw new Error('RAWG: formato de resposta inesperado.');
@@ -317,31 +138,11 @@ export async function buscarCapasPopulares(limite = 3): Promise<string[]> {
 
 // Informações da seção "Sobre o jogo" (tela Adicionar). Só servem para mostrar:
 // não vão para o banco.
-export interface SobreJogo {
-  descricao: string;
-  metacritic: number | null;
-  dataLancamento: string | null; // "2017-03-03", como a RAWG manda
-}
-
-export interface DetalhesJogoRawg extends Jogo {
-  sobre: SobreJogo;
-}
-
-// A descrição da RAWG às vezes vem com o texto repetido em espanhol no final.
-export function extrairSobre(rawg: Partial<RawgJogo>): SobreJogo {
-  const descricao = (rawg.description_raw ?? '').split(/\n+Español\b/)[0].trim();
-  const metacritic =
-    typeof rawg.metacritic === 'number' && Number.isFinite(rawg.metacritic) && rawg.metacritic > 0
-      ? rawg.metacritic
-      : null;
-  return { descricao, metacritic, dataLancamento: rawg.released ?? null };
-}
-
 // Detalhes de um jogo (/games/{id}). Usado na tela Adicionar para mostrar a
 // desenvolvedora e o "Sobre o jogo", que não vêm na pesquisa.
 export async function buscarDetalhes(
   apiId: string,
-  opcoes: OpcoesConsultaRawg = {},
+  opcoes: Pick<OpcoesBuscaRawg, 'chave' | 'obterChave' | 'fetcher' | 'signal'> = {},
 ): Promise<DetalhesJogoRawg> {
   const chave = (opcoes.chave ?? (await (opcoes.obterChave ?? obterChavePadrao)())).trim();
   if (!chave) {
@@ -349,9 +150,7 @@ export async function buscarDetalhes(
   }
 
   const url = `${RAWG_URL}/games/${encodeURIComponent(apiId)}?key=${encodeURIComponent(chave)}`;
-  const dados = await consultarJsonComLimite<Partial<RawgJogo>>(
-    url, 'detalhes', opcoes,
-  );
+  const dados = await consultarJsonRawg<Partial<RawgJogo>>(url, 'detalhes', opcoes);
 
   if (!dados || typeof dados.id !== 'number' || typeof dados.name !== 'string') {
     throw new Error('RAWG: formato de resposta inesperado.');
