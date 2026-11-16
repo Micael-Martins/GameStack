@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { CHAVES, ler, salvar } from '../../../data/storage/preferencias';
-import { useBibliotecaStore } from '../../../store/bibliotecaStore';
+import { estadoDaBiblioteca, useBibliotecaStore } from '../../../store/bibliotecaStore';
 import {
   contagemPorFiltro,
-  estadoDaBiblioteca,
   type FiltroBiblioteca,
   filtrarJogos,
   filtroValido,

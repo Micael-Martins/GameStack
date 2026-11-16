@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 
-import { reagendarLembrete } from "../../../data/services/notificacaoService";
 import { useBibliotecaStore } from "../../../store/bibliotecaStore";
 import {
   linhaConclusao,
@@ -48,9 +47,6 @@ export function useConcluirViewModel(id: string) {
     try {
       await mudarStatus(proximo.id, "JOGANDO");
       setComecouProximo(true);
-      reagendarLembrete().catch((e) =>
-        console.warn("Erro ao reagendar o lembrete.", e),
-      );
     } catch (e) {
       console.warn("Erro ao começar o próximo jogo.", e);
       setErro("Não foi possível começar o próximo jogo. Tente de novo.");
@@ -82,9 +78,6 @@ export function useConcluirViewModel(id: string) {
       setSalvando(false);
     }
 
-    reagendarLembrete().catch((e) =>
-      console.warn("Erro ao reagendar o lembrete.", e),
-    );
     return true;
   }
 

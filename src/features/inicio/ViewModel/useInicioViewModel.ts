@@ -7,11 +7,11 @@ import { buscarJogosPopulares } from "../../../data/services/rawgService";
 import type { Estatisticas } from "../../../models/Estatisticas";
 import type { Jogo } from "../../../models/Jogo";
 import {
+    estadoDaBiblioteca,
     porStatus,
     recentes,
     useBibliotecaStore,
 } from "../../../store/bibliotecaStore";
-import { estadoDaBiblioteca } from "../../biblioteca/Model/filtrosBiblioteca";
 
 const NOME_PADRAO = "Jogador";
 const QUANTIDADE_RECENTES = 5;

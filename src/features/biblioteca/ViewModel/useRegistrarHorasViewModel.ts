@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { reagendarLembrete } from "../../../data/services/notificacaoService";
 import { useBibliotecaStore } from "../../../store/bibliotecaStore";
 import {
   desfazer,
@@ -96,10 +95,6 @@ export function useRegistrarHorasViewModel(id: string) {
       setSalvando(false);
     }
 
-    // Registrou: o lembrete dos 5 dias volta a contar a partir de agora.
-    reagendarLembrete().catch((e) =>
-      console.warn("Erro ao reagendar o lembrete.", e),
-    );
     return true;
   }
 

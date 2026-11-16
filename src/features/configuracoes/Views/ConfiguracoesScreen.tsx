@@ -24,7 +24,6 @@ import Interruptor from '../../../components/Interruptor';
 import TituloSecao from '../../../components/TituloSecao';
 import { RootStackParamList } from '../../../navigation/tipos';
 import { cores, estilosGlobais } from '../../../theme';
-import { NOME_APP } from '../../../data/services/regrasLembrete';
 import { useConfiguracoesViewModel } from '../ViewModel/useConfiguracoesViewModel';
 import { styles } from './styles/ConfiguracoesScreen.styles';
 
@@ -172,7 +171,7 @@ export default function ConfiguracoesScreen({ navigation }: Props) {
         )}
 
         <View style={styles.flex} />
-        <Text style={styles.versao}>{NOME_APP} · versão 1.0</Text>
+        <Text style={styles.versao}>{vm.nomeApp} · versão 1.0</Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );

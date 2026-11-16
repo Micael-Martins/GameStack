@@ -4,11 +4,11 @@ import test from 'node:test';
 
 import { criarBibliotecaRepository } from '../src/data/db/bibliotecaRepositoryBase.ts';
 import { CRIAR_TABELAS } from '../src/data/db/esquema.ts';
-import { criarBibliotecaStore, jogandoAgora, porStatus, recentes } from '../src/store/bibliotecaStoreBase.ts';
+import { criarBibliotecaStore, estadoDaBiblioteca, jogandoAgora, porStatus, recentes } from '../src/store/bibliotecaStoreBase.ts';
 import { aplicarMudancaStatus } from '../src/store/regrasStatus.ts';
 
 // Store ligada ao repositório de verdade, com um SQLite em memória do Node.
-function criarStore() {
+function criarStore(aoMudarJogos) {
   const db = new DatabaseSync(':memory:');
   db.exec('PRAGMA foreign_keys = ON;');
   db.exec(CRIAR_TABELAS);
@@ -27,7 +27,7 @@ function criarStore() {
     gerarId: () => `id-${++contador}`,
     agora,
   });
-  const store = criarBibliotecaStore({ repositorio, regras: aplicarMudancaStatus, agora });
+  const store = criarBibliotecaStore({ repositorio, regras: aplicarMudancaStatus, agora, aoMudarJogos });
   store.novaStoreNoMesmoBanco = () => criarBibliotecaStore({ repositorio, regras: aplicarMudancaStatus, agora });
   return store;
 }
@@ -140,4 +140,77 @@ test('limpar esvazia a lista (usado pelo Apagar todos os dados)', async () => {
   store.getState().limpar();
 
   assert.deepEqual(store.getState().jogos, []);
+});
+
+// Espera os avisos que a store dispara sem await.
+const esperarAvisos = () => new Promise((resolver) => setImmediate(resolver));
+
+test('toda mudança nos jogos avisa o app (para reagendar o lembrete)', async () => {
+  let avisos = 0;
+  const store = criarStore(async () => {
+    avisos++;
+  });
+
+  const novo = await store.getState().adicionar(jogo('1'), 'NA_FILA');
+  await store.getState().atualizar(novo.id, { minutosJogados: 30 });
+  await store.getState().mudarStatus(novo.id, 'JOGANDO');
+  await store.getState().remover(novo.id);
+  await esperarAvisos();
+
+  assert.equal(avisos, 4);
+});
+
+test('carregar e limpar não avisam (não mudam jogos no banco)', async () => {
+  let avisos = 0;
+  const store = criarStore(async () => {
+    avisos++;
+  });
+
+  await store.getState().carregar();
+  store.getState().limpar();
+  await esperarAvisos();
+
+  assert.equal(avisos, 0);
+});
+
+test('se a mudança falhar, não avisa', async () => {
+  let avisos = 0;
+  const store = criarStore(async () => {
+    avisos++;
+  });
+
+  await assert.rejects(store.getState().mudarStatus('nao-existe', 'JOGANDO'), /não encontrado/);
+  await assert.rejects(store.getState().atualizar('nao-existe', { minutosJogados: 10 }), /não encontrado/);
+  await esperarAvisos();
+
+  assert.equal(avisos, 0);
+});
+
+test('falha no aviso não desfaz a mudança', async () => {
+  const avisoOriginal = console.warn;
+  console.warn = () => {};
+  try {
+    const store = criarStore(async () => {
+      throw new Error('Notificações indisponíveis');
+    });
+
+    await store.getState().adicionar(jogo('1'), 'JOGANDO');
+    await esperarAvisos();
+
+    assert.equal(store.getState().jogos.length, 1);
+  } finally {
+    console.warn = avisoOriginal;
+  }
+});
+
+test('estado da tela: erro ao abrir o banco mostra erro, não "Adicione seu primeiro jogo"', () => {
+  assert.equal(estadoDaBiblioteca(false, 'Não foi possível abrir a biblioteca.', 0), 'ERRO');
+  assert.equal(estadoDaBiblioteca(false, null, 0), 'VAZIA');
+  assert.equal(estadoDaBiblioteca(true, null, 0), 'CARREGANDO');
+});
+
+test('estado da tela: com jogos, mostra a lista mesmo carregando ou com erro', () => {
+  assert.equal(estadoDaBiblioteca(false, null, 3), 'LISTA');
+  assert.equal(estadoDaBiblioteca(true, null, 3), 'LISTA');
+  assert.equal(estadoDaBiblioteca(false, 'falhou', 3), 'LISTA');
 });

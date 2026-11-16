@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { reagendarLembrete } from "../../../data/services/notificacaoService";
 import {
   buscarDetalhes,
   type SobreJogo,
@@ -80,10 +79,6 @@ export function useAdicionarViewModel(jogoInicial: Jogo) {
       setSalvando(false);
     }
 
-    // Um jogo novo em Jogando muda o lembrete dos 5 dias.
-    reagendarLembrete().catch((e) =>
-      console.warn("Erro ao reagendar o lembrete.", e),
-    );
     return true;
   }
 

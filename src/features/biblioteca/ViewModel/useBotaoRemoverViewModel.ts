@@ -1,8 +1,6 @@
 import { useRef, useState } from "react";
 
-import { reagendarLembrete } from "../../../data/services/notificacaoService";
 import { useBibliotecaStore } from "../../../store/bibliotecaStore";
-import { executarRemocaoJogo } from "../Model/remocaoJogo";
 
 // Lógica do botão de remover (lixeira da tela Detalhes).
 export function useBotaoRemoverViewModel(
@@ -25,11 +23,8 @@ export function useBotaoRemoverViewModel(
     let sucesso = false;
 
     try {
-      // Remove da store/banco e depois reagenda o lembrete dos 5 dias
-      await executarRemocaoJogo(jogoId, {
-        remover,
-        reagendarLembrete,
-      });
+      // Remove da store e do banco (a store já reagenda o lembrete dos 5 dias)
+      await remover(jogoId);
 
       sucesso = true;
     } catch (e) {

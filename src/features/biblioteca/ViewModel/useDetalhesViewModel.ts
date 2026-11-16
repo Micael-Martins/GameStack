@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { reagendarLembrete } from "../../../data/services/notificacaoService";
 import { useBibliotecaStore } from "../../../store/bibliotecaStore";
 import {
     anotacaoMudou,
@@ -44,10 +43,6 @@ export function useDetalhesViewModel(id: string) {
       setSalvando(false);
     }
 
-    // Mexeu no jogo: o lembrete dos 5 dias volta a contar a partir de agora.
-    reagendarLembrete().catch((e) =>
-      console.warn("Erro ao reagendar o lembrete.", e),
-    );
     return true;
   }
 

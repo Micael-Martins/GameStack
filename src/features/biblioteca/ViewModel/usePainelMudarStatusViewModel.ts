@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
-import { reagendarLembrete } from "../../../data/services/notificacaoService";
 import type { JogoBiblioteca } from "../../../models/JogoBiblioteca";
 import type { StatusJogo } from "../../../models/StatusJogo";
 import { useBibliotecaStore } from "../../../store/bibliotecaStore";
@@ -74,10 +73,6 @@ export function usePainelMudarStatusViewModel(
       setSalvandoStatus(null);
     }
 
-    // Mexeu no jogo: o lembrete dos 5 dias volta a contar a partir de agora.
-    reagendarLembrete().catch((e) =>
-      console.warn("Erro ao reagendar o lembrete.", e),
-    );
 
     onFechar();
   }

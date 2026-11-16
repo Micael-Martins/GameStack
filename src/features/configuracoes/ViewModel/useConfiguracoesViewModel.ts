@@ -12,7 +12,7 @@ import {
   pedirPermissao,
   reagendarLembrete,
 } from "../../../data/services/notificacaoService";
-import { HORARIO_LEMBRETE_PADRAO } from "../../../data/services/regrasLembrete";
+import { HORARIO_LEMBRETE_PADRAO, NOME_APP } from "../../../data/services/regrasLembrete";
 import { limparTudo } from "../../../data/storage/preferencias";
 import { Usuario } from "../../../models/Usuario";
 import { useBibliotecaStore } from "../../../store/bibliotecaStore";
@@ -164,5 +164,6 @@ export function useConfiguracoesViewModel() {
     totalJogos,
     apagando,
     apagarTudo,
+    nomeApp: NOME_APP,
   };
 }

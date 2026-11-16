@@ -1,15 +1,21 @@
 import { useStore } from 'zustand';
 
 import * as repositorio from '../data/db/bibliotecaRepository';
+import { reagendarLembrete } from '../data/services/notificacaoService';
 import { criarBibliotecaStore, EstadoBiblioteca } from './bibliotecaStoreBase';
 import { aplicarMudancaStatus } from './regrasStatus';
 
-export { jogandoAgora, porStatus, recentes } from './bibliotecaStoreBase';
-export type { AtualizacaoJogo, EstadoBiblioteca } from './bibliotecaStoreBase';
+export { estadoDaBiblioteca, jogandoAgora, porStatus, recentes } from './bibliotecaStoreBase';
+export type { AtualizacaoJogo, EstadoBiblioteca, EstadoTelaBiblioteca } from './bibliotecaStoreBase';
 
 // Store compartilhada da biblioteca (Zustand). Home, Biblioteca e Detalhes leem
 // daqui, então uma mudança feita numa tela aparece nas outras na hora.
-export const bibliotecaStore = criarBibliotecaStore({ repositorio, regras: aplicarMudancaStatus });
+// Toda mudança nos jogos reagenda o lembrete dos 5 dias (as telas não precisam lembrar disso).
+export const bibliotecaStore = criarBibliotecaStore({
+  repositorio,
+  regras: aplicarMudancaStatus,
+  aoMudarJogos: reagendarLembrete,
+});
 
 // Hook para as telas: const jogos = useBibliotecaStore((s) => s.jogos);
 export function useBibliotecaStore<T>(seletor: (estado: EstadoBiblioteca) => T): T {

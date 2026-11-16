@@ -47,10 +47,18 @@ export interface DependenciasStore {
   // As regras de status entram por aqui (assim a store usa sempre a mesma função).
   regras: typeof aplicarMudancaStatus;
   agora?: () => Date;
+  // Chamada depois de toda mudança nos jogos (o app liga ao reagendarLembrete).
+  aoMudarJogos?: () => Promise<void>;
 }
 
-export function criarBibliotecaStore({ repositorio, regras, agora = () => new Date() }: DependenciasStore) {
+export function criarBibliotecaStore({ repositorio, regras, agora = () => new Date(), aoMudarJogos }: DependenciasStore) {
   return createStore<EstadoBiblioteca>()((set, get) => {
+    // Avisa que os jogos mudaram, sem travar a tela. Se falhar, a mudança já foi salva.
+    function avisarMudanca(): void {
+      if (!aoMudarJogos) return;
+      aoMudarJogos().catch((erro) => console.warn('Erro depois de mudar os jogos.', erro));
+    }
+
     // Relê um jogo do banco e troca na lista.
     async function recarregarJogo(id: string): Promise<void> {
       const atualizado = await repositorio.buscarPorId(id);
@@ -84,6 +92,7 @@ export function criarBibliotecaStore({ repositorio, regras, agora = () => new Da
       adicionar: async (jogo, status, minutos = 0) => {
         const novo = await repositorio.adicionarNaBiblioteca(jogo, status, minutos);
         set({ jogos: ordenarPorInteracao([novo, ...get().jogos.filter((j) => j.id !== novo.id)]) });
+        avisarMudanca();
         return novo;
       },
 
@@ -92,17 +101,20 @@ export function criarBibliotecaStore({ repositorio, regras, agora = () => new Da
         if (campos.minutosJogados !== undefined) await repositorio.atualizarMinutos(id, campos.minutosJogados);
         if (campos.anotacao !== undefined) await repositorio.atualizarAnotacao(id, campos.anotacao.trim());
         await recarregarJogo(id);
+        avisarMudanca();
       },
 
       mudarStatus: async (id, novoStatus, nota) => {
         const atual = buscarNaLista(id);
         await repositorio.mudarStatus(id, regras(atual, novoStatus, nota, agora()));
         await recarregarJogo(id);
+        avisarMudanca();
       },
 
       remover: async (id) => {
         await repositorio.removerJogo(id);
         set({ jogos: get().jogos.filter((j) => j.id !== id) });
+        avisarMudanca();
       },
 
       // Esvazia a lista (usado pelo "Apagar todos os dados", depois de limpar o banco).
@@ -125,4 +137,17 @@ export function recentes(jogos: JogoBiblioteca[], n: number, excluirId?: string)
 
 export function porStatus(jogos: JogoBiblioteca[], status: StatusJogo): JogoBiblioteca[] {
   return jogos.filter((j) => j.status === status);
+}
+
+// O que a tela mostra no lugar da lista (usado na Home e na Biblioteca). A ordem
+// importa: se a leitura do banco falhou, a lista também vem vazia, mas a mensagem
+// certa é a de erro (e não "Adicione seu primeiro jogo", que faria parecer que os
+// jogos sumiram).
+export type EstadoTelaBiblioteca = 'CARREGANDO' | 'ERRO' | 'VAZIA' | 'LISTA';
+
+export function estadoDaBiblioteca(carregando: boolean, erro: string | null, total: number): EstadoTelaBiblioteca {
+  if (total > 0) return 'LISTA'; // já tem jogos na tela: mostra mesmo se uma recarga falhar
+  if (carregando) return 'CARREGANDO';
+  if (erro) return 'ERRO';
+  return 'VAZIA';
 }
